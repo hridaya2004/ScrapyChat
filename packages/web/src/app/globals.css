@@ -150,10 +150,6 @@
   button:active {
     @apply opacity-60 md:opacity-100;
   }
-
-  button:active {
-    @apply scale-[0.97];
-  }
 }
 
 @utility container-wrapper {

@@ -1,19 +1,61 @@
+/** biome-ignore-all lint/correctness/noUnusedFunctionParameters: "ignore" */
 import { betterAuth } from "better-auth";
 import { Pool } from "pg";
+import sendEmail from "./send-email";
 
 export const auth = betterAuth({
   database: new Pool({
-    connectionString: "postgres://postgres:example@localhost:5432/express_db"
+    connectionString: "postgres://postgres:example@localhost:5432/express_db",
   }),
   appName: "ScrapyChat",
   advanced: {
-     useSecureCookies: true,
+    useSecureCookies: true,
   },
   emailAndPassword: {
     enabled: true,
-    revokeSessionsOnPasswordReset:true,
+    revokeSessionsOnPasswordReset: true,
+    requireEmailVerification: true,
   },
-  trustedOrigins: [
-    "http://localhost:3000"
-  ]
+  emailVerification: {
+    sendOnSignIn: true,
+    sendOnSignUp: true,
+    autoSignInAfterVerification: true,
+    sendVerificationEmail: async ({ user, url, token }, request) => {
+      await sendEmail({
+        to: user.email,
+        subject: "Verify your email address",
+        text: `Click the link to verify your email: ${url} \n
+				Token: ${token}`,
+      });
+    },
+  },
+  user: {
+    deleteUser: {
+      enabled: true,
+      // plans for sending email verification later
+      // for now just use token and password
+      // sendDeleteAccountVerification: async ({ user, url, token }, request) => {
+      //   await sendEmail({
+      //     to: user.email,
+      //     subject: "Delete account",
+      //     text: `Click the link to delete your account: ${url}`,
+      //   });
+      // },
+    },
+    changeEmail: {
+      enabled: true,
+      sendChangeEmailVerification: async (
+        { user, newEmail, url, token },
+        request
+      ) => {
+        await sendEmail({
+          to: user.email,
+          subject: "Approve email change",
+          text: `Click the link to approve the change: ${url}`,
+        });
+      },
+    },
+  },
+
+  trustedOrigins: ["http://localhost:3000"],
 });

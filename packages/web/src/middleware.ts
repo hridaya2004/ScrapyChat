@@ -23,7 +23,7 @@ export async function middleware(req: NextRequest) {
     });
 
     if (!session?.data?.user) {
-      const loginUrl = new URL("/login", req.url);
+      const loginUrl = new URL("/auth", req.url);
       loginUrl.searchParams.set("next", pathname);
       return NextResponse.redirect(loginUrl);
     }
@@ -31,7 +31,7 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   } catch (err) {
     console.error("Middleware auth check failed:", err);
-    const loginUrl = new URL("/login", req.url);
+    const loginUrl = new URL("/auth", req.url);
     loginUrl.searchParams.set("next", pathname);
     return NextResponse.redirect(loginUrl);
   }

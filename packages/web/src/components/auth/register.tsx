@@ -3,8 +3,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import z from "zod";
+import { authClient } from "@/lib/auth-client";
 import { Button } from "../ui/button";
-import { Checkbox } from "../ui/checkbox";
 import {
   Form,
   FormControl,
@@ -14,7 +14,6 @@ import {
   FormMessage,
 } from "../ui/form";
 import { Input } from "../ui/input";
-import { authClient } from "@/lib/auth-client";
 
 const signUpFormSchema = z.object({
   name: z.string(),

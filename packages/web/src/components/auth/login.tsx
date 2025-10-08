@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import z from "zod";
 import { authClient } from "@/lib/auth-client";
@@ -23,6 +24,8 @@ const loginFormSchema = z.object({
 });
 
 export default function Login() {
+  const router = useRouter();
+
   const form = useForm<z.infer<typeof loginFormSchema>>({
     resolver: zodResolver(loginFormSchema),
     defaultValues: {
@@ -33,16 +36,16 @@ export default function Login() {
   });
 
   const onSubmit = async (values: z.infer<typeof loginFormSchema>) => {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    const { data, error } = await authClient.signIn.email({
-      ...values,
-    });
-    if (data) {
-      console.log(data);
-    }
-    if (error) {
-      console.error(error);
+    try {
+      const { error } = await authClient.signIn.email({
+        ...values,
+      });
+
+      if (error?.code === "EMAIL_NOT_VERIFIED") {
+        router.push("/auth/verification");
+      }
+    } catch (err) {
+      console.error(err);
     }
   };
 
