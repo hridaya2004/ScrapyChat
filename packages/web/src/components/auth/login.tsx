@@ -16,6 +16,8 @@ import {
   FormMessage,
 } from "../ui/form";
 import { Input } from "../ui/input";
+import { FieldSeparator, FieldSet } from "../ui/field";
+import Github from "./providers/github";
 
 const loginFormSchema = z.object({
   email: z.email(),
@@ -110,6 +112,12 @@ export default function Login() {
         <Button type="submit" className="rounded-full w-full">
           Login
         </Button>
+
+        <FieldSeparator className="my-4 font-bold">OR</FieldSeparator>
+
+        <FieldSet className="items-center">
+          <Github />
+        </FieldSet>
       </form>
     </Form>
   );

@@ -21,6 +21,7 @@ import {
   FormLabel,
   FormMessage,
 } from "../../ui/form";
+import { P } from "@/components/typography";
 
 const changeEmailSchema = z.object({
   newEmail: z.email(),
@@ -52,11 +53,7 @@ export default function ChangeEmail() {
             <Field className="gap-2">
               <FieldLabel>Linked email address</FieldLabel>
               <div className="inline-flex gap-2 items-center">
-                <Input
-                  value={data?.user.email}
-                  readOnly
-                  className="w-fit rounded-3xl"
-                />
+                <P className="text-sm">{data?.user.email as string}</P>
                 {data?.user.emailVerified && (
                   <div className="inline-flex gap-1 items-center">
                     <CheckIcon className="text-green-600" />
@@ -70,9 +67,13 @@ export default function ChangeEmail() {
               name="newEmail"
               render={({ field }) => (
                 <FormItem className="w-fit">
-                  <FormLabel>New email address</FormLabel>
                   <FormControl>
-                    <Input type="email" className="rounded-3xl" {...field} />
+                    <Input
+                      type="email"
+                      placeholder="New email address"
+                      className="rounded-3xl"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

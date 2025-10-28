@@ -9,7 +9,7 @@ services:
       POSTGRES_PASSWORD: example
       POSTGRES_DB: express_db
     volumes:
-      - ./data/db:/var/lib/postgresql/data
+      - ./data/db:/var/lib/postgresql/data:z
     ports:
       - "5432:5432"
 

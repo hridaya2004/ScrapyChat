@@ -14,6 +14,8 @@ import {
   FormMessage,
 } from "../ui/form";
 import { Input } from "../ui/input";
+import { FieldSeparator, FieldSet } from "../ui/field";
+import Github from "./providers/github";
 
 const signUpFormSchema = z.object({
   name: z.string(),
@@ -108,6 +110,12 @@ export default function Register() {
         <Button type="submit" className="rounded-full w-full">
           Register
         </Button>
+
+        <FieldSeparator className="my-4 font-bold">OR</FieldSeparator>
+
+        <FieldSet className="items-center">
+          <Github />
+        </FieldSet>
       </form>
     </Form>
   );
