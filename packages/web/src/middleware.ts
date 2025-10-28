@@ -16,6 +16,7 @@ export async function middleware(req: NextRequest) {
   }
 
   try {
+    // check if there are existing session
     const session = await authClient.getSession({
       fetchOptions: {
         headers: Object.fromEntries(req.headers.entries()),

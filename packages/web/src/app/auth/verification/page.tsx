@@ -1,12 +1,12 @@
 "use client";
 
 import { redirect, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { toast } from "sonner";
 import VerifyEmailDialog from "@/components/verify-email-dialog";
 import { authClient } from "@/lib/auth-client";
 
-export default function VerificationPage() {
+function VerificationPageFunction() {
   const { data } = authClient.useSession();
 
   const [open, setOpen] = useState(true);
@@ -38,5 +38,13 @@ export default function VerificationPage() {
 
   return (
     <VerifyEmailDialog onOpenChange={handleOpenChange} openDialog={open} />
+  );
+}
+
+export default function VerificationPage() {
+  return (
+    <Suspense>
+      <VerificationPageFunction />
+    </Suspense>
   );
 }

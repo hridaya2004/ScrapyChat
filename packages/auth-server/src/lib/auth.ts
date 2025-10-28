@@ -2,20 +2,27 @@
 import { betterAuth } from "better-auth";
 import { Pool } from "pg";
 import sendEmail from "./send-email";
+import { jwt, lastLoginMethod } from "better-auth/plugins";
+import { importPKCS8, SignJWT, type JWTPayload } from "jose";
+
+const privateKey = await importPKCS8(process.env.clientPrivateKey!, "EdDSA");
 
 export const auth = betterAuth({
   database: new Pool({
     connectionString: "postgres://postgres:example@localhost:5432/express_db",
   }),
+
   appName: "ScrapyChat",
   advanced: {
     useSecureCookies: true,
   },
+
   emailAndPassword: {
     enabled: true,
     revokeSessionsOnPasswordReset: true,
     requireEmailVerification: true,
   },
+
   emailVerification: {
     sendOnSignIn: true,
     sendOnSignUp: true,
@@ -29,6 +36,7 @@ export const auth = betterAuth({
       });
     },
   },
+
   user: {
     deleteUser: {
       enabled: true,
@@ -63,6 +71,29 @@ export const auth = betterAuth({
       clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
     },
   },
+
+  plugins: [
+    lastLoginMethod(),
+    jwt({
+      jwks: {
+        remoteUrl: "http://localhost:3000/.well-known/jwks.json",
+        keyPairConfig: {
+          alg: "EdDSA",
+        },
+      },
+      jwt: {
+        sign: async (jwtPayload: JWTPayload) => {
+          return await new SignJWT(jwtPayload)
+            .setProtectedHeader({
+              alg: "EdDSA",
+              kid: process.env.currentKid,
+              typ: "JWT",
+            })
+            .sign(privateKey);
+        },
+      },
+    }),
+  ],
 
   trustedOrigins: ["http://localhost:3000"],
 });
