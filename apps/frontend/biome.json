@@ -1,0 +1,8 @@
+{
+  "root": false,
+  "$schema": "../../node_modules/@biomejs/biome/configuration_schema.json",
+  "files": {
+    "includes": ["**", "!**/components/ui"]
+  },
+  "extends": ["ultracite/core", "ultracite/next"]
+}
