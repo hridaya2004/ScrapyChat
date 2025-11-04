@@ -40,5 +40,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# keys
+# private key just incase
 *.pem
+
+# jwks -- autogen
+public/.well-known

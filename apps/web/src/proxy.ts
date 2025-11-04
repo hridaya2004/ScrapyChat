@@ -4,7 +4,7 @@ import { authClient } from "@/lib/auth-client";
 
 const PUBLIC_PATHS = ["/auth"];
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   if (
