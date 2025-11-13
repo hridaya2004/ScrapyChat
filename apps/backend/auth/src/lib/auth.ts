@@ -43,15 +43,13 @@ export const auth = betterAuth({
   user: {
     deleteUser: {
       enabled: true,
-      // plans for sending email verification later
-      // for now just use token and password
-      // sendDeleteAccountVerification: async ({ user, url, token }, request) => {
-      //   await sendEmail({
-      //     to: user.email,
-      //     subject: "Delete account",
-      //     text: `Click the link to delete your account: ${url}`,
-      //   });
-      // },
+      sendDeleteAccountVerification: async ({ user, url, token }, request) => {
+        await sendEmail({
+          to: user.email,
+          subject: "Delete account",
+          text: `Click the link to delete your account: ${url}`,
+        });
+      },
     },
     changeEmail: {
       enabled: true,

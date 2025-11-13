@@ -1,23 +1,17 @@
-import { H3 } from "@/components/typography";
-import { FieldSeparator } from "@/components/ui/field";
-import ChangeEmail from "./change-email";
-import ChangePassword from "./change-password";
-import ChangeUserDetails from "./change-user-details";
-import DeleteUser from "./delete-user";
+import { authClient } from "@/lib/auth-client";
+import EmailProfile from "./email-profile";
+import OAuthProfile from "./oauth-profile";
 
 export default function ProfileSettings() {
-  return (
-    <div className="container px-4 py-2">
-      <H3>Profile</H3>
-      <div className="flex flex-col gap-8 py-2">
-        <ChangeUserDetails />
-        <FieldSeparator />
-        <ChangeEmail />
-        <FieldSeparator />
-        <ChangePassword />
-        <FieldSeparator />
-        <DeleteUser />
-      </div>
-    </div>
-  );
+  const lastMethod = authClient.getLastUsedLoginMethod();
+
+  if (lastMethod === "github") {
+    return <OAuthProfile />;
+  }
+
+  if (lastMethod === "email") {
+    return <EmailProfile />;
+  }
+
+  return null;
 }

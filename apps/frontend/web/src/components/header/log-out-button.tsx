@@ -7,8 +7,10 @@ import { DropdownMenuItem } from "../ui/dropdown-menu";
 export default function LogOutButton() {
   const handleLogOut = async () => {
     const { data } = await authClient.signOut();
+
     if (data?.success) {
       toast.success("Signed out successfully.");
+      authClient.clearLastUsedLoginMethod();
       redirect("/auth");
     } else {
       toast.error("Failed to sign out.");
