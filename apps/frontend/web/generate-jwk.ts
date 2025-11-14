@@ -22,7 +22,5 @@ const outputPath = path.resolve("public/.well-known/jwks.json");
 fs.mkdirSync(path.dirname(outputPath), { recursive: true });
 fs.writeFileSync(outputPath, JSON.stringify(jwks, null, 2));
 
-// biome-ignore lint/suspicious/noConsole: ignore
 console.log("JWKS generated at:", outputPath);
-// biome-ignore lint/suspicious/noConsole: ignore
 console.log(JSON.stringify(jwks, null, 2));

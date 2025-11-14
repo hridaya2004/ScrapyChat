@@ -40,11 +40,9 @@ export default function Register() {
       ...values,
     });
     if (data) {
-      // biome-ignore lint/suspicious/noConsole: ignore
       console.log(data);
     }
     if (error) {
-      // biome-ignore lint/suspicious/noConsole: ignore
       console.error(error);
     }
   };

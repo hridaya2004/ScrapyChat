@@ -35,7 +35,6 @@ export default function ChangeEmail() {
   });
 
   const onSubmit = (values: z.infer<typeof changeEmailSchema>) => {
-    // biome-ignore lint/suspicious/noConsole: ignore for now
     console.log(values);
   };
 
