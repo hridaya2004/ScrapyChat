@@ -1,4 +1,3 @@
-import { UserCircleIcon } from "lucide-react";
 import type { User } from "@/lib/auth-client";
 import { DropdownMenuItem } from "../ui/dropdown-menu";
 
@@ -8,7 +7,6 @@ export default function UserInfo({ data }: { data: User }) {
       className="flex flex-row gap-2"
       onClick={(e) => e.preventDefault()}
     >
-      <UserCircleIcon />
       <div className="flex flex-col items-start gap-1">
         <span className="font-medium text-sm">{data?.name}</span>
         <span className="text-muted-foreground text-xs">{data?.email}</span>
