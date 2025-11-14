@@ -12,7 +12,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
-import { Drawer, DrawerContent, DrawerTrigger } from "../ui/drawer";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "../ui/drawer";
 import { DropdownMenuItem } from "../ui/dropdown-menu";
 import SettingsContent from "./settings-content";
 
@@ -48,6 +55,12 @@ export default function SettingsTrigger({
           {trigger}
         </DrawerTrigger>
         <DrawerContent>
+          <DrawerHeader className="flex flex-row items-center justify-between border-b">
+            <DrawerTitle className="text-xl">Settings</DrawerTitle>
+            <DrawerClose>
+              <XIcon className="size-4" />
+            </DrawerClose>
+          </DrawerHeader>
           <SettingsContent drawer />
         </DrawerContent>
       </Drawer>
@@ -67,7 +80,10 @@ export default function SettingsTrigger({
             <div className="flex flex-row items-center justify-between border-b px-4 py-2">
               <H3>Settings</H3>
               <DialogClose asChild>
-                <Button className="rounded-full" size="icon-sm" variant="ghost">
+                <Button
+                  className="rounded-full hover:bg-accent"
+                  variant="ghost"
+                >
                   <XIcon />
                 </Button>
               </DialogClose>

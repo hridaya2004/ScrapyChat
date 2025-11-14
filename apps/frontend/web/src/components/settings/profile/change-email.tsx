@@ -79,9 +79,7 @@ export default function ChangeEmail() {
               )}
             />
             <Field className="w-fit">
-              <Button className="rounded-3xl" size="sm">
-                Change email
-              </Button>
+              <Button className="rounded-3xl">Change email</Button>
             </Field>
           </FieldSet>
         </FieldGroup>

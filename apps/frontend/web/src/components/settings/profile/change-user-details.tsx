@@ -138,9 +138,7 @@ export default function ChangeUserDetails() {
             </FieldGroup>
           </FieldContent>
           <FieldSet className="inline-flex flex-row items-center">
-            <Button className="rounded-3xl" size="sm">
-              Save changes
-            </Button>
+            <Button className="rounded-3xl">Save changes</Button>
             <Button
               className="rounded-3xl"
               onClick={() => {

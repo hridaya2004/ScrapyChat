@@ -41,4 +41,28 @@ export default function SettingsContent({
       </Tabs>
     );
   }
+
+  return (
+    <Tabs
+      className="flex h-full w-full flex-col overflow-hidden"
+      defaultValue={activeTab}
+      onValueChange={setActiveTab}
+    >
+      <TabsList className="mx-auto mt-4 h-full min-w-40 items-start overflow-y-auto bg-sidebar">
+        {tabs.map((tab) => (
+          <TabsTrigger className="h-fit" key={tab.label} value={tab.label}>
+            {tab.label}
+          </TabsTrigger>
+        ))}
+      </TabsList>
+
+      <div className="container flex-1 overflow-y-auto">
+        {tabs.map((tab) => (
+          <TabsContent className="h-fit" key={tab.label} value={tab.label}>
+            {tab.component}
+          </TabsContent>
+        ))}
+      </div>
+    </Tabs>
+  );
 }
