@@ -65,6 +65,9 @@ export default function DeleteUser({ oauth = false }: { oauth: boolean }) {
     const { data } = await authClient.token();
 
     try {
+      toast.loading("Deleting account...", {
+        id: "delete-account",
+      });
       const response = await authClient.deleteUser({
         callbackURL: "/auth",
         ...(!oauth && { password: values.password }),
@@ -78,7 +81,10 @@ export default function DeleteUser({ oauth = false }: { oauth: boolean }) {
 
       if (response.data?.success) {
         toast.success(
-          "Delete verification email has been sent to your account."
+          "Delete verification email has been sent to your account.",
+          {
+            id: "delete-account",
+          }
         );
       }
     } catch {
