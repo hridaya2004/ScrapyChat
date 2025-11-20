@@ -53,6 +53,10 @@ class ScrapyVectorStoreProvider(ScrapyBaseProvider):
     def query_engine(self):
         return self.__query_engine
 
+    @property
+    def llm(self):
+        return self.__llm
+
     async def ingest(self, text: str, metadata: dict[str, str]) -> None:
         """
         Ingests a list of text documents into QdrantVectorStore
@@ -65,7 +69,9 @@ class ScrapyVectorStoreProvider(ScrapyBaseProvider):
 
         await self.__index.ainsert_nodes(nodes)
 
-    async def query(self, text: str, filter: Optional[dict[str, str]] = None):
+    async def query(
+        self, text: str, filter: Optional[dict[str, str]] = None, top_k: int = 3
+    ):
         """
         Performs vector search query with metadata filtering
         """
@@ -78,6 +84,8 @@ class ScrapyVectorStoreProvider(ScrapyBaseProvider):
 
             metadata_filters = MetadataFilters(filters=filters_list)
 
-        engine = self.__index.as_query_engine(use_async=True, filters=metadata_filters)
+        engine = self.__index.as_query_engine(
+            use_async=True, filters=metadata_filters, similarity_top_k=top_k
+        )
 
         return await engine.aquery(text)

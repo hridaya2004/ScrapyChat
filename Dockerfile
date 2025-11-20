@@ -34,11 +34,15 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 # Place executables in the environment at the front of the path
 ENV PATH="/app/.venv/bin:$PATH"
 
+# Download the browsers
+RUN playwright install-deps chromium
+RUN playwright install chromium
+
 # Reset the entrypoint, don't invoke `uv`
 ENTRYPOINT []
 
 # Use the non-root user to run our application
-USER nonroot
+# USER nonroot
 
 # Run the FastAPI application with uvicorn
 CMD ["python", "-m", "src.main"]
