@@ -79,13 +79,13 @@ export function ChatInput({
         onClick={() => textareaRef.current?.focus()}
       >
         <PromptInput
-          className="relative z-10 bg-popover p-0 pt-1 shadow-xs backdrop-blur-xl"
+          className="relative z-10 overflow-hidden bg-popover p-0 pt-1 shadow-xs backdrop-blur-xl"
           maxHeight={200}
           onValueChange={onValueChange}
           value={value}
         >
           <PromptInputTextarea
-            className="min-h-11 pt-3 pl-4 text-base leading-[1.3] sm:text-base md:text-base"
+            className="min-h-11 pt-3 pl-4 text-base leading-[1.3] sm:text-base md:text-base dark:bg-popover"
             onKeyDown={handleKeyDown}
             placeholder="Ask anything"
             ref={textareaRef}
