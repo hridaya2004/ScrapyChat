@@ -2,7 +2,7 @@ import os
 from typing import Optional
 
 from llama_index.core.base.embeddings.base import Embedding
-from llama_index.embeddings.openai import OpenAIEmbedding
+from llama_index.embeddings.ollama import OllamaEmbedding
 
 from ..types.provider import ScrapyBaseProvider
 
@@ -12,22 +12,22 @@ class ScrapyEmbeddingProvider(ScrapyBaseProvider):
     The Scrapy Embedding provider
     """
 
-    __embed_model: Optional[OpenAIEmbedding] = None
+    __embed_model: Optional[OllamaEmbedding] = None
 
     def __init__(self) -> None:
         """
         Initialize the embedding model
         """
         # Default settings
-        __embedding_model = os.environ["EMBEDDING_MODEL"]
-        __api_endpoint = os.environ["EMBEDDING_MODEL_API_ENDPOINT"]
+        __embedding_model = os.environ["OLLAMA_EMBEDDING_MODEL"]
+        __api_endpoint = os.environ["OLLAMA_ENDPOINT"]
 
-        self.__embed_model = OpenAIEmbedding(
-            api_base=__api_endpoint, embed_batch_size=10, model_name=__embedding_model
+        self.__embed_model = OllamaEmbedding(
+            base_url=__api_endpoint, model_name=__embedding_model
         )
 
     @property
-    def client(self) -> OpenAIEmbedding:
+    def client(self) -> OllamaEmbedding:
         """
         Returns the underlying embedding client
         """
