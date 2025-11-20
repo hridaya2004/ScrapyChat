@@ -8,3 +8,18 @@ wheels/
 
 # Virtual environments
 .venv
+
+# Docker volumes
+qdrant_data
+
+# Ruff cache
+.ruff_cache
+
+# Environment files
+.env
+
+# IDE configuration
+.vscode
+
+# MacOS files
+.DS_Store
