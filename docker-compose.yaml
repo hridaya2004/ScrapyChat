@@ -1,7 +1,6 @@
 services:
   backend:
     container_name: scrapychat-backend
-    image: scrapychat-backend
     build: .
     env_file: .env
     ports:
