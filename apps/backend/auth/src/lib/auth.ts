@@ -4,7 +4,7 @@ import { nextCookies } from "better-auth/next-js";
 import { jwt, lastLoginMethod } from "better-auth/plugins";
 import { importPKCS8, type JWTPayload, SignJWT } from "jose";
 import { Pool } from "pg";
-import sendEmail from "./send-email";
+import sendEmail from "./send-email.ts";
 
 const privateKey = await importPKCS8(
   process.env.clientPrivateKey as string,
@@ -13,7 +13,7 @@ const privateKey = await importPKCS8(
 
 export const auth = betterAuth({
   database: new Pool({
-    connectionString: "postgres://postgres:example@localhost:5432/express_db",
+    connectionString: "postgres://postgres:example@db:5432/express_db",
   }),
 
   appName: "ScrapyChat",
@@ -79,7 +79,7 @@ export const auth = betterAuth({
     lastLoginMethod(),
     jwt({
       jwks: {
-        remoteUrl: "http://localhost:3000/.well-known/jwks.json",
+        remoteUrl: "https://scrapy.local/.well-known/jwks.json",
         keyPairConfig: {
           alg: "EdDSA",
         },
@@ -98,5 +98,5 @@ export const auth = betterAuth({
     }),
   ],
 
-  trustedOrigins: ["http://localhost:3000"],
+  trustedOrigins: ["http://localhost:3000", "https://scrapy.local"],
 });

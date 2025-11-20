@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "generate-jwk": "bun run generate-jwk.ts",
     "dev": "bun run generate-jwk.ts && next dev",
     "build": "bun run generate-jwk.ts && next build",
     "start": "next start",

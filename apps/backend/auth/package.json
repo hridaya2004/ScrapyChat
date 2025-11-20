@@ -5,6 +5,8 @@
   "private": true,
   "scripts": {
     "dev": "bun --hot run ./src/server.ts",
+    "setup-db": "npx @better-auth/cli migrate -y",
+    "start": "npm run ./src/server.ts",
     "format": "biome format --write"
   },
   "devDependencies": {

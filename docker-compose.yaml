@@ -1,0 +1,69 @@
+services:
+  web:
+    container_name: scrapy-web
+    build:
+      context: .
+      dockerfile: apps/frontend/web/Dockerfile
+    image: scrapy-web
+    env_file: apps/frontend/web/.env
+    networks:
+      - scrapynet
+    depends_on:
+      - auth
+
+  auth:
+    container_name: scrapy-auth
+    build:
+      context: .
+      dockerfile: apps/backend/auth/Dockerfile
+    image: scrapy-auth
+    env_file: apps/backend/auth/.env
+    networks:
+      - scrapynet
+    depends_on:
+      - db
+
+  db:
+    image: postgres:16
+    container_name: postgres_db
+    restart: unless-stopped
+    shm_size: 128mb
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: example
+      POSTGRES_DB: express_db
+    volumes:
+      - ./data/db:/var/lib/postgresql/data:z
+    networks:
+      - scrapynet
+    ports:
+      - "5432:5432"
+
+  adminer:
+    image: adminer
+    container_name: adminer
+    restart: unless-stopped
+    depends_on:
+      - db
+    ports:
+      - "8080:8080"
+    networks:
+      - scrapynet
+    environment:
+      - ADMINER_DEFAULT_SERVER=db
+
+  caddy:
+    image: caddy:alpine
+    container_name: caddy
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:z
+    networks:
+      - scrapynet
+    restart: unless-stopped
+
+networks:
+  scrapynet:
+    external: true

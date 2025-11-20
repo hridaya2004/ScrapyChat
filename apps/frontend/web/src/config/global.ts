@@ -4,5 +4,5 @@ export const siteConfig = {
 } as const;
 
 export const apiConfig = {
-  baseUrl: "http://server:8081",
+  baseUrl: "/api",
 } as const;
