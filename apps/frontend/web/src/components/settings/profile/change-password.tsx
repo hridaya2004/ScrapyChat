@@ -19,6 +19,7 @@ import {
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -34,6 +35,8 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "../../ui/tooltip";
 
 const MINIMUM_PASSWORD_LENGTH = 8;
 const MAXMIMUM_PASSWORD_LENGTH = 100;
+const STRONG_PASSWORD_REGEX =
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()\-_=+{}[\]|;:'",.<>/?]).{8,}$/;
 
 const changePasswordSchema = z.object({
   currentPassword: z
@@ -42,8 +45,9 @@ const changePasswordSchema = z.object({
     .max(MAXMIMUM_PASSWORD_LENGTH),
   newPassword: z
     .string()
-    .min(MINIMUM_PASSWORD_LENGTH)
-    .max(MAXMIMUM_PASSWORD_LENGTH),
+    .min(MINIMUM_PASSWORD_LENGTH, "Password must be at least 8 characters long")
+    .max(MAXMIMUM_PASSWORD_LENGTH)
+    .regex(STRONG_PASSWORD_REGEX, "Invalid new password"),
   revokeOtherSessions: z.boolean(),
 });
 
@@ -62,9 +66,18 @@ export default function ChangePassword() {
 
   const onSubmit = async (values: z.infer<typeof changePasswordSchema>) => {
     try {
-      const { data } = await authClient.changePassword({
+      const { data, error } = await authClient.changePassword({
         ...values,
       });
+
+      if (error) {
+        if (error.code === "INVALID_PASSWORD") {
+          toast.error("Invalid current password");
+        } else {
+          toast.error("Failed to change password");
+        }
+      }
+
       if (data) {
         toast.success("Password changed successfully");
       }
@@ -134,7 +147,7 @@ export default function ChangePassword() {
               render={({ field }) => (
                 <FormItem className="w-fit">
                   <FormControl>
-                    <InputGroup className="rounded-3xl">
+                    <InputGroup className="w-fit rounded-3xl">
                       <InputGroupInput
                         className="rounded-3xl"
                         placeholder="New password"
@@ -164,6 +177,11 @@ export default function ChangePassword() {
                       </InputGroupAddon>
                     </InputGroup>
                   </FormControl>
+                  <FormDescription className="text-balance">
+                    Should contain at least 8 characters, including at least one
+                    uppercase letter, lowercase letter, number, and special
+                    character.
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -172,7 +190,7 @@ export default function ChangePassword() {
               control={passwordForm.control}
               name="revokeOtherSessions"
               render={({ field }) => (
-                <FormItem className="flex w-fit flex-row-reverse items-center gap-1">
+                <FormItem className="flex w-fit flex-row-reverse items-center gap-2">
                   <FormLabel>Revoke other sessions</FormLabel>
                   <FormControl>
                     <Checkbox
