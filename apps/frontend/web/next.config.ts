@@ -6,6 +6,10 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.join(__dirname, "../../.."),
   },
+  output: "standalone",
+  experimental: {
+    scrollRestoration: true,
+  },
 };
 
 export default nextConfig;

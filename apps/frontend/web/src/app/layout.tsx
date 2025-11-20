@@ -1,10 +1,11 @@
-import type { Metadata } from "next";
 import "./globals.css";
+import type { Metadata } from "next";
 import Header from "@/components/header";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { siteConfig } from "@/config/global";
 import { geistMono, geistSans } from "@/lib/geist";
+import { AuthJWTProvider } from "@/providers/auth-jwt-provider";
 
 export const metadata: Metadata = {
   title: siteConfig.title,
@@ -22,11 +23,13 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ThemeProvider>
-          <main className="container-wrapper flex h-full flex-col">
-            <Header />
-            {children}
-          </main>
-          <Toaster />
+          <AuthJWTProvider>
+            <main className="container-wrapper flex h-full flex-col">
+              <Header />
+              {children}
+            </main>
+            <Toaster />
+          </AuthJWTProvider>
         </ThemeProvider>
       </body>
     </html>

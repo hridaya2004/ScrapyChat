@@ -5,7 +5,7 @@ import UserToggle from "./user-toggle";
 
 export default function Header() {
   return (
-    <header className="flex items-center justify-between py-4">
+    <header className="flex max-h-app-header items-center justify-between py-4">
       <Link href={"/"}>
         <H3>ScrapyChat</H3>
       </Link>

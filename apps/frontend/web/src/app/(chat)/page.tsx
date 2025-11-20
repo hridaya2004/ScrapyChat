@@ -1,7 +1,16 @@
-export default function Chat() {
-  return (
-    <div>
-      <p>Chat</p>
-    </div>
-  );
+"use client";
+
+import { Chat } from "@/components/chat";
+import { useAuthJWTProvider } from "@/providers/auth-jwt-provider";
+
+export default function Page() {
+  const data = useAuthJWTProvider();
+
+  console.log(data);
+
+  if (data.loading) {
+    return null;
+  }
+
+  return <Chat />;
 }

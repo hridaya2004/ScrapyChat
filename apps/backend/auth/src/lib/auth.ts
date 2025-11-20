@@ -1,5 +1,6 @@
 /** biome-ignore-all lint/correctness/noUnusedFunctionParameters: "ignore" */
 import { betterAuth } from "better-auth";
+import { nextCookies } from "better-auth/next-js";
 import { jwt, lastLoginMethod } from "better-auth/plugins";
 import { importPKCS8, type JWTPayload, SignJWT } from "jose";
 import { Pool } from "pg";
@@ -74,6 +75,7 @@ export const auth = betterAuth({
   },
 
   plugins: [
+    nextCookies(),
     lastLoginMethod(),
     jwt({
       jwks: {
@@ -83,6 +85,7 @@ export const auth = betterAuth({
         },
       },
       jwt: {
+        expirationTime: "1d",
         sign: async (jwtPayload: JWTPayload) =>
           await new SignJWT(jwtPayload)
             .setProtectedHeader({

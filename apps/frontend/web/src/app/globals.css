@@ -3,6 +3,11 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@theme {
+  --spacing-app-header: 56px;
+  --spacing-input-area: 134px;
+}
+
 @theme inline {
   --breakpoint-3xl: 1600px;
   --breakpoint-4xl: 2000px;
@@ -58,6 +63,17 @@
       opacity: 0.15;
     }
   }
+
+  --spacing-scroll-area: calc(
+    -1 *
+    (var(--spacing-input-area) + var(--spacing-app-header))
+  );
+  --spacing-scroll-anchor-offset: 140px;
+  --spacing-scroll-anchor: calc(
+    var(--spacing-scroll-area) -
+    var(--spacing-scroll-anchor-offset) +
+    100dvh
+  );
 }
 
 :root {
@@ -178,4 +194,8 @@
   &::-webkit-scrollbar {
     display: none;
   }
+}
+
+[data-sonner-toaster] > li {
+  width: 100%;
 }
