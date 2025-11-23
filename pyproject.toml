@@ -11,6 +11,7 @@ dependencies = [
     "llama-index-vector-stores-qdrant>=0.8.6",
     "playwright>=1.55.0",
     "pyrefly>=0.42.3",
+    "python-jose>=3.5.0",
 ]
 
 [tool.pyrefly]
