@@ -10,4 +10,11 @@ dependencies = [
     "llama-index-llms-google-genai>=0.6.2",
     "llama-index-vector-stores-qdrant>=0.8.6",
     "playwright>=1.55.0",
+    "pyrefly>=0.42.3",
+]
+
+[tool.pyrefly]
+project-includes = [
+    "**/*.py*",
+    "**/*.ipynb",
 ]
