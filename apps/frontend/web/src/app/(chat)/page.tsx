@@ -6,8 +6,6 @@ import { useAuthJWTProvider } from "@/providers/auth-jwt-provider";
 export default function Page() {
   const data = useAuthJWTProvider();
 
-  console.log(data);
-
   if (data.loading) {
     return null;
   }

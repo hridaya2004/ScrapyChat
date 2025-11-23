@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { siteConfig } from "@/config/global";
 import { geistMono, geistSans } from "@/lib/geist";
 import { AuthJWTProvider } from "@/providers/auth-jwt-provider";
+import QueryClientWrapper from "@/providers/query-provider";
 
 export const metadata: Metadata = {
   title: siteConfig.title,
@@ -24,11 +25,13 @@ export default function RootLayout({
       >
         <ThemeProvider>
           <AuthJWTProvider>
-            <main className="container-wrapper flex h-full flex-col">
-              <Header />
-              {children}
-            </main>
-            <Toaster />
+            <QueryClientWrapper>
+              <main className="container-wrapper flex h-full flex-col">
+                <Header />
+                {children}
+              </main>
+              <Toaster />
+            </QueryClientWrapper>
           </AuthJWTProvider>
         </ThemeProvider>
       </body>

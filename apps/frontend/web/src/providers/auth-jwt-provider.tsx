@@ -4,22 +4,18 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { authClient } from "@/lib/auth-client";
 
 type AuthJWTContextProps = {
-  token: string;
+  token: string | null;
   loading: boolean;
   error?: string;
 };
 
-const AuthJWTContext = createContext<AuthJWTContextProps>({
-  token: "",
-  loading: true,
-  error: undefined,
-});
-
-const initialAuthState = {
-  token: "",
+const initialAuthState: AuthJWTContextProps = {
+  token: null,
   loading: true,
   error: undefined,
 };
+
+const AuthJWTContext = createContext<AuthJWTContextProps>(initialAuthState);
 
 export const useAuthJWTProvider = () => useContext(AuthJWTContext);
 
@@ -47,7 +43,7 @@ export function AuthJWTProvider({ children }: { children: React.ReactNode }) {
       }
     };
 
-    if (!data.token.trim()) {
+    if (!data.token) {
       getAuthToken();
     }
 
