@@ -1,11 +1,16 @@
 import uvicorn
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from .internal.vector_store import ScrapyVectorStoreProvider
 from .routers.chat import router as chat_router
 from .routers.scrape import router as scraper_router
 
 sv_store = ScrapyVectorStoreProvider()
+
+origins = [
+    "http://localhost:3000",
+]
 
 
 app = FastAPI(
@@ -14,6 +19,14 @@ app = FastAPI(
     docs_url=None,
     redoc_url=None,
     openapi_url=None,
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
