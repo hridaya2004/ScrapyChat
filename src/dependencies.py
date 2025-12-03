@@ -1,8 +1,12 @@
-from base64 import urlsafe_b64decode
+import logging
+from datetime import datetime, timezone
 
+import jwt
 from fastapi import Request
 from fastapi.exceptions import HTTPException
-from jose import jwt
+from jwt import PyJWKClient
+
+logger = logging.getLogger("Dependencies")
 
 jwks = {
     "keys": [
@@ -17,39 +21,38 @@ jwks = {
     ]
 }
 
+
 # TODO: Grab JWKS from here
-jwks_url = "https://scrapychat.hridaya.tech/.well-known/jwks.json"
+# jwks_url = "https://scrapychat.hridaya.tech/.well-known/jwks.json"
 
-
-def get_public_key(jwks, kid):
-    for key in jwks["keys"]:
-        # Decode public key using kid
-        if key["kid"] == kid:
-            x = key["x"]
-            return urlsafe_b64decode(x + "=" * (4 - len(x) % 4))
-    raise HTTPException(status_code=401, detail="Unknown key ID")
+jwks_url = "http://host.docker.internal:3000/.well-known/jwks.json"
 
 
 def verify_token(token: str):
+    """
+    Verifies the token and returns the decoded payload
+    It checks for proper signature and expiration.
+    """
     try:
-        header = jwt.get_unverified_header(token)
-        kid = header.get("kid")
-        if not kid:
-            raise HTTPException(status_code=401, detail="Missing kid")
-
-        public_key = get_public_key(jwks, kid)
+        jwks_client = PyJWKClient(jwks_url)
+        signing_key = jwks_client.get_signing_key_from_jwt(token)
 
         decoded = jwt.decode(
             token,
-            public_key,
+            signing_key,
+            audience="http://localhost:3001",
             algorithms=["EdDSA"],
+            options={"verify_signature": True},
         )
+
+        if decoded["exp"] < datetime.now(timezone.utc).timestamp():
+            raise HTTPException(status_code=401, detail="Token expired")
 
         return decoded
 
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=401, detail="Signature expired")
-    except jwt.JWTError:
+    except jwt.PyJWTError:
         raise HTTPException(status_code=401, detail="Invalid token")
 
 
@@ -58,11 +61,12 @@ def get_user(request: Request):
     Gets user details from auth token
     """
     auth_token = request.headers.get("Authorization")
+
     if auth_token is None:
         raise HTTPException(status_code=401, detail="Unauthorized")
 
     parts = auth_token.split(" ")
-    if len(parts) != 2 or parts[0].lower() != "bearer":
+    if len(parts) != 2 or parts[0].lower() != "Bearer":
         raise HTTPException(status_code=401, detail="Unauthorized")
 
     token = parts[1]
