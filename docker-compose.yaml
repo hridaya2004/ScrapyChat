@@ -10,6 +10,8 @@ services:
     env_file: .env
     ports:
       - 8080:8080
+    networks:
+      - scrapynet
     restart: unless-stopped
 
   qdrant:
@@ -25,6 +27,8 @@ services:
     configs:
       - source: qdrant_config
         target: /qdrant/config/production.yaml
+    networks:
+      - scrapynet
     volumes:
       - ./qdrant_data:/qdrant/storage:z
     restart: unless-stopped
@@ -36,6 +40,8 @@ services:
       - 6379:6379
     expose:
       - 6379
+    networks:
+      - scrapynet
     restart: unless-stopped
 
   redis-insight:
@@ -47,9 +53,15 @@ services:
       - 5540
     environment:
       RI_REDIS_HOST: "redis"
+    networks:
+      - scrapynet
     restart: unless-stopped
 
 configs:
   qdrant_config:
     content: |
       log_level: INFO
+
+networks:
+  scrapynet:
+    external: true
