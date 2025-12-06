@@ -1,14 +1,13 @@
 services:
   backend:
+    build: .
     image: scrapychat-fastapi
     container_name: scrapychat-backend
     environment:
       QDRANT_ENDPOINT: http://qdrant:6333
     env_file: .env
-    ports:
-      - "8080:8080"
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+    networks:
+      - scrapynet
 
   qdrant:
     image: qdrant/qdrant:latest
@@ -24,6 +23,8 @@ services:
     configs:
       - source: qdrant_config
         target: /qdrant/config/production.yaml
+    networks:
+      - scrapynet
     volumes:
       - ./qdrant_data:/qdrant/storage:z
 
@@ -31,3 +32,7 @@ configs:
   qdrant_config:
     content: |
       log_level: INFO
+
+networks:
+  scrapynet:
+    external: true

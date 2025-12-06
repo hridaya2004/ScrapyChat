@@ -39,4 +39,4 @@ app.include_router(scraper_router, prefix="/scrape")
 app.include_router(chat_router, prefix="/chat")
 
 if __name__ == "__main__":
-    uvicorn.run("src.main:app", host="0.0.0.0", port=8080, reload=True)
+    uvicorn.run("src.main:app", host="0.0.0.0", port=8080)
