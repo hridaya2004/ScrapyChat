@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.join(__dirname, "../../.."),
   },
+  outputFileTracingRoot: path.join(__dirname, "../../../"),
   output: "standalone",
   experimental: {
     scrollRestoration: true,

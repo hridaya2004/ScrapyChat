@@ -20,11 +20,16 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 
-COPY --from=builder /app/apps/frontend/web/.next/standalone/node_modules node_modules
-COPY --from=builder /app/apps/frontend/web/.next/standalone/apps/frontend/web .
-COPY --from=builder /app/apps/frontend/web/.next/static .next/static
-COPY --from=builder /app/apps/frontend/web/public .next/public
+# cp -r .next/standalone/apps/frontend/web/.next .next/standalone/
+COPY --from=builder /app/apps/frontend/web/.next/standalone/apps/frontend/web/.next standalone/.next
+
+# cp -r public .next/standalone/ && cp -r .next/static .next/standalone/.next/
+COPY --from=builder /app/apps/frontend/web/public standalone/public
+COPY --from=builder /app/apps/frontend/web/.next/static standalone/.next
+
+COPY --from=builder /app/apps/frontend/web/.next/standalone/node_modules standalone/node_modules
+COPY --from=builder /app/apps/frontend/web/.next/standalone/apps/frontend/web/server.js standalone/server.js
 
 EXPOSE 3000
 
-CMD ["bun", "run", "server.js"]
+CMD ["bun", "run", "standalone/server.js"]
