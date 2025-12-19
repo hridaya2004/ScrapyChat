@@ -146,7 +146,7 @@ export default function DeleteUser({ oauth = false }: { oauth: boolean }) {
                 />
               </>
             )}
-            {oauth && (
+            {!!oauth && (
               <FieldDescription>
                 This action is irreversible. Verification mail will be sent for
                 confirmation.

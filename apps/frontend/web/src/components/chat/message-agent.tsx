@@ -52,7 +52,7 @@ export function MessageAgent({
         )}
         ref={messageRef}
       >
-        {reasoningParts?.text && (
+        {!!reasoningParts?.text && (
           <Reasoning isStreaming={status === "streaming"}>
             {reasoningParts.text}
           </Reasoning>

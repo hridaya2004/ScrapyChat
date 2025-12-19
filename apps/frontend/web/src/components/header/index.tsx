@@ -17,7 +17,7 @@ export default function Header() {
         <H3>ScrapyChat</H3>
       </Link>
       <div className="flex flex-row items-center gap-2">
-        {token && (
+        {!!token && (
           <>
             <ScrapeNew />
             <ScrapeList />

@@ -38,7 +38,7 @@ export default function ScrapeList() {
           This is a list of websites that have been scraped.
         </DialogDescription>
         <div>
-          {error && (
+          {!!error && (
             <P className="text-destructive">Failed to load scraped websites</P>
           )}
 

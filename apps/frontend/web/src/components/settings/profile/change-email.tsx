@@ -53,7 +53,7 @@ export default function ChangeEmail() {
               <FieldLabel>Linked email address</FieldLabel>
               <div className="inline-flex items-center gap-2">
                 <P className="text-sm">{data?.user.email as string}</P>
-                {data?.user.emailVerified && (
+                {!!data?.user.emailVerified && (
                   <div className="inline-flex items-center gap-1">
                     <CheckIcon className="text-green-600" />
                     <span className="font-medium text-sm">Verified</span>

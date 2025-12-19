@@ -73,7 +73,7 @@ export default function ScrapeNew() {
                       id={formUrlInputId}
                       placeholder="Add URL for scraping"
                     />
-                    {fieldState.invalid && (
+                    {!!fieldState.invalid && (
                       <FieldError errors={[fieldState.error]} />
                     )}
                   </Field>
