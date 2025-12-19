@@ -13,7 +13,7 @@ const privateKey = await importPKCS8(
 
 export const auth = betterAuth({
   database: new Pool({
-    connectionString: "postgres://postgres:example@db:5432/express_db",
+    connectionString: process.env.DATABASE_URL,
   }),
 
   appName: "ScrapyChat",
@@ -79,7 +79,7 @@ export const auth = betterAuth({
     lastLoginMethod(),
     jwt({
       jwks: {
-        remoteUrl: "https://scrapy.local/.well-known/jwks.json",
+        remoteUrl: process.env.REMOTE_URL,
         keyPairConfig: {
           alg: "EdDSA",
         },
