@@ -1,7 +1,7 @@
 /** biome-ignore-all lint/correctness/noUnusedFunctionParameters: "ignore" */
 import { betterAuth } from "better-auth";
 import { nextCookies } from "better-auth/next-js";
-import { jwt, lastLoginMethod } from "better-auth/plugins";
+import { jwt, lastLoginMethod, openAPI } from "better-auth/plugins";
 import { importPKCS8, type JWTPayload, SignJWT } from "jose";
 import { Pool } from "pg";
 import sendEmail from "./send-email.ts";
@@ -96,6 +96,7 @@ export const auth = betterAuth({
             .sign(privateKey),
       },
     }),
+    openAPI(),
   ],
 
   trustedOrigins: ["http://localhost:3000", "https://scrapy.local"],
