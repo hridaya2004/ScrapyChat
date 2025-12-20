@@ -2,7 +2,8 @@ import { jwtClient, lastLoginMethodClient } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
 
 export const authClient = createAuthClient({
-  baseURL: "",
+  baseURL:
+    process.env.NODE_ENV === "development" ? "http://localhost:3001" : "",
   plugins: [jwtClient(), lastLoginMethodClient()],
 });
 

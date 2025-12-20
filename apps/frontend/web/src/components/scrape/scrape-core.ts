@@ -18,25 +18,33 @@ const getScrapeList = async (token: string): Promise<ScrapeList> => {
       },
     });
 
-    const data = await response.json();
+    if (response.ok) {
+      const data = await response.json();
 
-    const parsed = scrapeListSchema.safeParse(data);
+      const parsed = scrapeListSchema.safeParse(data);
 
-    if (parsed.error) {
+      if (parsed.error) {
+        toast({
+          title: "Error",
+          description: "Failed to parse scraped websites.",
+          status: "error",
+        });
+
+        console.error(parsed.error);
+        return {
+          ingestedUrls: [],
+        };
+      }
+
+      if (parsed.success) {
+        return parsed.data;
+      }
+    } else {
       toast({
-        title: "Error",
-        description: "Failed to parse scraped websites.",
+        title: "API failed",
         status: "error",
+        description: "Failed to get scraped list data from API.",
       });
-
-      console.error(parsed.error);
-      return {
-        ingestedUrls: [],
-      };
-    }
-
-    if (parsed.success) {
-      return parsed.data;
     }
   } catch (error) {
     console.error(error);
