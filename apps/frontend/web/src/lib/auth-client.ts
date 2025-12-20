@@ -4,7 +4,17 @@ import { createAuthClient } from "better-auth/react";
 export const authClient = createAuthClient({
   baseURL:
     process.env.NODE_ENV === "development" ? "http://localhost:3001" : "",
-  plugins: [jwtClient(), lastLoginMethodClient()],
+  plugins: [
+    jwtClient({
+      jwks: {
+        jwksPath:
+          process.env.NODE_ENV === "development"
+            ? "http://localhost:3001/api/auth/.well-known/jwks.json"
+            : "/api/auth/.well-known/jwks.json",
+      },
+    }),
+    lastLoginMethodClient(),
+  ],
 });
 
 export type AuthContext = typeof authClient.$Infer;

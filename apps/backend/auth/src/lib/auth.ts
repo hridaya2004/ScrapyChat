@@ -2,14 +2,8 @@
 import { betterAuth } from "better-auth";
 import { nextCookies } from "better-auth/next-js";
 import { jwt, lastLoginMethod, openAPI } from "better-auth/plugins";
-import { importPKCS8, type JWTPayload, SignJWT } from "jose";
 import { Pool } from "pg";
 import sendEmail from "./send-email.ts";
-
-const privateKey = await importPKCS8(
-  process.env.clientPrivateKey as string,
-  "EdDSA"
-);
 
 export const auth = betterAuth({
   database: new Pool({
@@ -80,21 +74,14 @@ export const auth = betterAuth({
     lastLoginMethod(),
     jwt({
       jwks: {
-        remoteUrl: process.env.REMOTE_URL,
         keyPairConfig: {
           alg: "EdDSA",
         },
+        jwksPath: "/.well-known/jwks.json",
+        rotationInterval: 86_400,
       },
       jwt: {
         expirationTime: "1d",
-        sign: async (jwtPayload: JWTPayload) =>
-          await new SignJWT(jwtPayload)
-            .setProtectedHeader({
-              alg: "EdDSA",
-              kid: process.env.currentKid,
-              typ: "JWT",
-            })
-            .sign(privateKey),
       },
     }),
     openAPI(),

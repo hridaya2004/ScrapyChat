@@ -8,8 +8,7 @@ COPY apps/backend/auth ./auth
 WORKDIR /app/auth
 
 RUN npm install
-RUN npm install jose zod better-auth @better-auth/cli
-# RUN npm install -g ts-node
+RUN npm install zod better-auth @better-auth/cli
 
 EXPOSE 3001
 
