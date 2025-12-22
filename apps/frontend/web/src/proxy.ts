@@ -2,7 +2,7 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { authClient } from "@/lib/auth-client";
 
-const PUBLIC_PATHS = ["/auth", "/.well-known"];
+const PUBLIC_PATHS = ["/auth"];
 
 export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
@@ -16,21 +16,21 @@ export async function proxy(req: NextRequest) {
   }
 
   try {
-    // check if there are existing session
     const session = await authClient.getSession({
       fetchOptions: {
-        headers: Object.fromEntries(req.headers.entries()),
+        headers: req.headers,
       },
     });
 
-    if (!session?.data?.user) {
+    if (!session.data?.user) {
       const loginUrl = new URL("/auth", req.url);
       loginUrl.searchParams.set("next", pathname);
       return NextResponse.redirect(loginUrl);
     }
 
     return NextResponse.next();
-  } catch {
+  } catch (error) {
+    console.error("Auth middleware error:", error);
     const loginUrl = new URL("/auth", req.url);
     loginUrl.searchParams.set("next", pathname);
     return NextResponse.redirect(loginUrl);
