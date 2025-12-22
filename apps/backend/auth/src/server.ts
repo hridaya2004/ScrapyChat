@@ -8,7 +8,11 @@ const port = 3001;
 
 app.use(
   cors({
-    origin: ["http://localhost:3000", "https://scrapy.local"],
+    origin: [
+      "http://localhost:3000",
+      "https://scrapy.local",
+      "https://scrapy-dev.hridaya.tech",
+    ],
     credentials: true,
   })
 );
