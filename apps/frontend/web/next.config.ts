@@ -10,6 +10,7 @@ const nextConfig: NextConfig = {
   output: "standalone",
   experimental: {
     scrollRestoration: true,
+    authInterrupts: true,
   },
 };
 

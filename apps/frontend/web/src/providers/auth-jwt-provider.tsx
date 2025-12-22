@@ -7,6 +7,7 @@ type AuthJWTContextProps = {
   token: string | null;
   loading: boolean;
   error?: string;
+  errorStatusCode?: number;
 };
 
 const initialAuthState: AuthJWTContextProps = {
@@ -31,6 +32,7 @@ export function AuthJWTProvider({ children }: { children: React.ReactNode }) {
           token: "",
           loading: false,
           error: authError.message,
+          errorStatusCode: authError.status,
         });
       }
 
