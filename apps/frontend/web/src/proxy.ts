@@ -1,3 +1,4 @@
+import { headers } from "next/headers";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { authClient } from "@/lib/auth-client";
@@ -18,14 +19,12 @@ export async function proxy(req: NextRequest) {
   try {
     const session = await authClient.getSession({
       fetchOptions: {
-        headers: req.headers,
+        headers: await headers(),
       },
     });
 
-    if (!session.data?.user) {
-      const loginUrl = new URL("/auth", req.url);
-      loginUrl.searchParams.set("next", pathname);
-      return NextResponse.redirect(loginUrl);
+    if (!session) {
+      return NextResponse.redirect(new URL("/login", req.url));
     }
 
     return NextResponse.next();
