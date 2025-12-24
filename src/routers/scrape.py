@@ -3,6 +3,7 @@ import logging
 from fastapi import APIRouter, Depends
 from fastapi.exceptions import HTTPException
 from pydantic import BaseModel, Field
+from qdrant_client import models
 
 from ..dependencies import get_user
 from ..internal.browser import fetch_page_text
@@ -20,16 +21,23 @@ class ScrapeUrl(BaseModel):
 
 @router.get("/list")
 async def list_scraped(user_id: str = Depends(get_user)):
-    # TODO: Perform a server side distinct search using Qdrant client
     try:
-        all_websites = await sv_store.query("a", {"user_id": user_id}, 999)
-        return {
-            "ingested_urls": {
-                node.node.metadata.get("url")
-                for node in all_websites.source_nodes
-                if node.node.metadata.get("url")
-            }
-        }
+        res, _ = await sv_store.client.scroll(
+            collection_name=sv_store._collection,
+            scroll_filter=models.Filter(
+                must=[
+                    models.FieldCondition(
+                        key="user_id",
+                        match=models.MatchValue(value=user_id),
+                    )
+                ]
+            ),
+            with_payload=["document_id", "url"],
+        )
+
+        records = [record.model_dump().get("payload", {}) for record in res]
+        return {"ingested_urls": {record.get("url") for record in records}}
+
     except Exception as e:
         logger.error("Exception while listing scraped websites: %s", e)
         raise HTTPException(status_code=500, detail="Something went wrong")

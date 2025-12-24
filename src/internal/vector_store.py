@@ -31,15 +31,15 @@ class ScrapyVectorStoreProvider(ScrapyBaseProvider):
         Settings.embed_model = self._embed_model.client
 
         # Qdrant
-        self.endpoint = os.environ["QDRANT_ENDPOINT"]
-        self.collection = os.environ["QDRANT_COLLECTION"]
+        self._endpoint = os.environ["QDRANT_ENDPOINT"]
+        self._collection = os.environ["QDRANT_COLLECTION"]
 
         self._parser = SimpleNodeParser.from_defaults(chunk_size=768, chunk_overlap=16)
 
-        self._client = AsyncQdrantClient(url=self.endpoint, prefer_grpc=True)
+        self._client = AsyncQdrantClient(url=self._endpoint, prefer_grpc=True)
         self._store = QdrantVectorStore(
             aclient=self._client,
-            collection_name=self.collection,
+            collection_name=self._collection,
         )
         self._index = VectorStoreIndex.from_vector_store(
             vector_store=self._store,
@@ -53,7 +53,7 @@ class ScrapyVectorStoreProvider(ScrapyBaseProvider):
             if self._initialized:
                 return
 
-            await self._ensure_collection_exists(self.collection)
+            await self._ensure_collection_exists(self._collection)
             self._initialized = True
 
     @property
