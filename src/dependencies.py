@@ -1,31 +1,22 @@
 import logging
+import os
+import ssl
 from datetime import datetime, timezone
 
 import jwt
 from fastapi import Request
 from fastapi.exceptions import HTTPException
-from jwt import PyJWKClient
+from jwt import ExpiredSignatureError, PyJWKClient, PyJWTError
 
 logger = logging.getLogger("Dependencies")
 
-jwks = {
-    "keys": [
-        {
-            "crv": "Ed25519",
-            "kty": "OKP",
-            "x": "ylWh8tootR_atiNkT84y-yMsQ-9Vh3tLuQhEKLEj5sE",
-            "kid": "606cda0d-cef6-40a7-b1ac-b2cd8c21646e",
-            "use": "sig",
-            "alg": "EdDSA",
-        }
-    ]
-}
+# Only for development
+ssl_context = ssl.create_default_context()
+ssl_context.check_hostname = False
+ssl_context.verify_mode = ssl.CERT_NONE
 
-
-# TODO: Grab JWKS from here
-# jwks_url = "https://scrapychat.hridaya.tech/.well-known/jwks.json"
-
-jwks_url = "http://host.docker.internal:3000/.well-known/jwks.json"
+FRONTEND_URL = os.environ["FRONTEND_URL"]
+JWKS_URL = FRONTEND_URL + "/api/auth/.well-known/jwks.json"
 
 
 def verify_token(token: str):
@@ -34,13 +25,13 @@ def verify_token(token: str):
     It checks for proper signature and expiration.
     """
     try:
-        jwks_client = PyJWKClient(jwks_url)
+        jwks_client = PyJWKClient(JWKS_URL, ssl_context=ssl_context)
         signing_key = jwks_client.get_signing_key_from_jwt(token)
 
         decoded = jwt.decode(
             token,
-            signing_key,
-            audience="http://localhost:3001",
+            signing_key.key,
+            audience=FRONTEND_URL,
             algorithms=["EdDSA"],
             options={"verify_signature": True},
         )
@@ -50,9 +41,10 @@ def verify_token(token: str):
 
         return decoded
 
-    except jwt.ExpiredSignatureError:
+    except ExpiredSignatureError:
         raise HTTPException(status_code=401, detail="Signature expired")
-    except jwt.PyJWTError:
+    except PyJWTError as e:
+        logger.error("Exception while verifying token: %s", e)
         raise HTTPException(status_code=401, detail="Invalid token")
 
 
@@ -66,7 +58,7 @@ def get_user(request: Request):
         raise HTTPException(status_code=401, detail="Unauthorized")
 
     parts = auth_token.split(" ")
-    if len(parts) != 2 or parts[0].lower() != "Bearer":
+    if len(parts) != 2 or parts[0].lower() != "bearer":
         raise HTTPException(status_code=401, detail="Unauthorized")
 
     token = parts[1]

@@ -1,16 +1,30 @@
+from contextlib import asynccontextmanager
+
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from .internal.embeddings import ScrapyEmbeddingProvider
+from .internal.llm import ScrapyLLMProvider
 from .internal.vector_store import ScrapyVectorStoreProvider
 from .routers.chat import router as chat_router
 from .routers.scrape import router as scraper_router
 
-sv_store = ScrapyVectorStoreProvider()
-
 origins = [
     "http://localhost:3000",
 ]
+
+embedding_provider = ScrapyEmbeddingProvider()
+llm_provider = ScrapyLLMProvider()
+vector_store_provider = ScrapyVectorStoreProvider()
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # On startup
+    await vector_store_provider.init()
+
+    yield
 
 
 app = FastAPI(
@@ -19,7 +33,9 @@ app = FastAPI(
     docs_url=None,
     redoc_url=None,
     openapi_url=None,
+    lifespan=lifespan,
 )
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -39,4 +55,4 @@ app.include_router(scraper_router, prefix="/scrape")
 app.include_router(chat_router, prefix="/chat")
 
 if __name__ == "__main__":
-    uvicorn.run("src.main:app", host="0.0.0.0", port=8080)
+    uvicorn.run("src.main:app", host="0.0.0.0", port=8080, reload=True)

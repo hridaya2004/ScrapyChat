@@ -1,11 +1,10 @@
 import os
-from typing import Optional
 
 from llama_index.core.base.llms.types import (
     CompletionResponse,
     CompletionResponseAsyncGen,
 )
-from llama_index.llms.google_genai import GoogleGenAI
+from llama_index.llms.ollama import Ollama
 
 from ..types.provider import ScrapyBaseProvider
 
@@ -15,44 +14,39 @@ class ScrapyLLMProvider(ScrapyBaseProvider):
     The Scrapy LLM provider based on GoogleGenAI
     """
 
-    __llm: Optional[GoogleGenAI] = None
-
-    def __init__(
-        self,
-        google_genai_model: Optional[str] = None,
-    ) -> None:
+    def __init__(self) -> None:
         """
         Initialize the LLM model
         """
-        # Return if the class is initialized
-        if self.client is not None:
-            return
 
-        # Default settings
-        google_genai_model = google_genai_model or os.environ["GOOGLE_GENAI_MODEL"]
+        self._ollama_model = os.environ["OLLAMA_LLM_MODEL"]
+        self._api_endpoint = os.environ["OLLAMA_ENDPOINT"]
 
-        # Clients
-        self.__llm = GoogleGenAI(model=google_genai_model)
+        self._llm = Ollama(
+            base_url=self._api_endpoint,
+            model=self._ollama_model,
+            request_timeout=120.0,
+            context_window=8000,
+        )
+
+    async def init(self) -> None:
+        pass
 
     @property
     def client(self):
         """
-        Returns the underlying embedding client
+        The underlying embedding client
         """
-        return self.__llm
+        return self._llm
 
     async def query(self, prompt: str) -> CompletionResponse:
         """
-        Returns the query response from the LLM
+        The query response from the LLM
         """
-        if not self.__llm:
-            raise
-        return await self.__llm.acomplete(prompt)
+        return await self._llm.acomplete(prompt)
 
     async def stream_query(self, prompt: str) -> CompletionResponseAsyncGen:
         """
-        Returns the streamed query response from the LLM
+        The streamed query response from the LLM
         """
-        if not self.__llm:
-            raise
-        return await self.__llm.astream_complete(prompt)
+        return await self._llm.astream_complete(prompt)

@@ -4,19 +4,27 @@ version = "0.1.0"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "beautifulsoup4>=4.14.2",
+    "beautifulsoup4>=4.14.3",
     "cryptography>=46.0.3",
-    "fastapi[standard]>=0.119.0",
-    "llama-index-embeddings-ollama>=0.8.4",
-    "llama-index-llms-google-genai>=0.6.2",
-    "llama-index-vector-stores-qdrant>=0.8.6",
-    "playwright>=1.55.0",
+    "fastapi>=0.127.0",
+    "httpx>=0.28.1",
+    "llama-index-embeddings-ollama>=0.8.5",
+    "llama-index-llms-ollama>=0.9.1",
+    "llama-index-vector-stores-qdrant>=0.9.0",
+    "playwright>=1.57.0",
     "pyjwt>=2.10.1",
-    "pyrefly>=0.42.3",
+    "uvicorn>=0.40.0",
 ]
 
 [tool.pyrefly]
 project-includes = [
     "**/*.py*",
     "**/*.ipynb",
+]
+
+[dependency-groups]
+dev = [
+    "nox>=2025.11.12",
+    "pyrefly>=0.46.1",
+    "ruff>=0.14.10",
 ]
