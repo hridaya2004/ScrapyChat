@@ -1,15 +1,15 @@
-import type { UIMessage as MessageType } from "@ai-sdk/react";
+import type { UIMessage } from "@ai-sdk/react";
 import { useState } from "react";
 import { MessageAgent } from "./message-agent";
 import { MessageUser } from "./message-user";
 
 type MessageProps = {
-  variant: MessageType["role"];
+  variant: UIMessage["role"];
   children: string;
   isLast?: boolean;
   onDelete: (id: string) => void;
   hasScrollAnchor?: boolean;
-  parts?: MessageType["parts"];
+  parts?: UIMessage["parts"];
   status?: "streaming" | "ready" | "submitted" | "error";
   className?: string;
 };

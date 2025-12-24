@@ -6,7 +6,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
-import { Markdown } from "./markdown"
+import { UIMessage } from "ai";
+import { Streamdown } from "streamdown";
 
 export type MessageProps = {
   children: React.ReactNode
@@ -48,12 +49,11 @@ export type MessageContentProps = {
   children: React.ReactNode
   markdown?: boolean
   className?: string
-} & React.ComponentProps<typeof Markdown> &
+} & React.ComponentProps<typeof Streamdown> &
   React.HTMLProps<HTMLDivElement>
 
 const MessageContent = ({
   children,
-  markdown = false,
   className,
   ...props
 }: MessageContentProps) => {
@@ -62,14 +62,10 @@ const MessageContent = ({
     className
   )
 
-  return markdown ? (
-    <Markdown className={classNames} {...props}>
-      {children as string}
-    </Markdown>
-  ) : (
-    <div className={classNames} {...props}>
+  return (
+    <Streamdown className={classNames} {...props}>
       {children}
-    </div>
+    </Streamdown>
   )
 }
 

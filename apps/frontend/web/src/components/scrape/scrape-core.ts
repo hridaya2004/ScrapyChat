@@ -4,7 +4,6 @@ import { toast } from "../ui/toast";
 
 const getScrapeList = async (token: string): Promise<ScrapeList> => {
   if (!token.trim()) {
-    console.error("Token missing");
     return {
       ingestedUrls: [],
     };
@@ -59,18 +58,25 @@ const getScrapeList = async (token: string): Promise<ScrapeList> => {
   };
 };
 
-const scrapeNewUrl = async (scrapeUrl: string, token: string) => {
+const scrapeNewUrl = async (
+  scrapeUrl: string,
+  token: string,
+  callback?: (success: boolean, loading: boolean) => void
+) => {
   if (!token.trim()) {
-    console.error("Token missing");
+    callback?.(false, false);
     return;
   }
 
   try {
+    callback?.(false, true);
     const response = await fetch(`${apiConfig.baseUrl}/scrape/new`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
       },
+
       body: JSON.stringify({
         url: scrapeUrl,
       }),
@@ -84,6 +90,7 @@ const scrapeNewUrl = async (scrapeUrl: string, token: string) => {
       });
 
       console.error(await response.text());
+      callback?.(false, false);
       return;
     }
 
@@ -93,7 +100,7 @@ const scrapeNewUrl = async (scrapeUrl: string, token: string) => {
         description: "Scraping started.",
         status: "success",
       });
-
+      callback?.(true, false);
       return;
     }
   } catch (err) {

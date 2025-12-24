@@ -6,19 +6,10 @@ import { useAuthJWTProvider } from "@/providers/auth-jwt-provider";
 
 export const useChatCore = () => {
   const { token } = useAuthJWTProvider();
+  const [queryUrl, setQueryUrl] = useState("");
   const [input, setInput] = useState("");
 
-  const {
-    sendMessage,
-    setMessages,
-    error,
-    resumeStream,
-    messages,
-    status,
-    regenerate,
-    id,
-    stop,
-  } = useChat({
+  const { sendMessage, setMessages, messages, status, id, stop } = useChat({
     transport: new DefaultChatTransport({
       api: `${apiConfig.baseUrl}/chat/new`,
       headers: {
@@ -27,17 +18,29 @@ export const useChatCore = () => {
     }),
   });
 
+  const send = () => {
+    sendMessage(
+      {
+        text: input,
+      },
+      {
+        body: {
+          query: queryUrl,
+        },
+      }
+    );
+  };
+
   return {
-    error,
-    resumeStream,
-    sendMessage,
+    sendMessage: send,
     setMessages,
     messages,
     status,
-    regenerate,
     stop,
     id,
     input,
     setInput,
+    queryUrl,
+    setQueryUrl,
   };
 };

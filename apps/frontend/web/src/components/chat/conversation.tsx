@@ -45,6 +45,11 @@ export function Conversation({
             const hasScrollAnchor =
               isLast && messages.length > initialMessageCount.current;
 
+            const text =
+              message.parts
+                ?.map((part) => (part.type === "text" ? part.text : ""))
+                .join("") ?? "";
+
             return (
               <Message
                 hasScrollAnchor={hasScrollAnchor}
@@ -55,7 +60,7 @@ export function Conversation({
                 status={status}
                 variant={message.role}
               >
-                {message.parts as unknown as string}
+                {text}
               </Message>
             );
           })}
@@ -68,7 +73,7 @@ export function Conversation({
               </div>
             )}
           <div className="absolute bottom-0 flex w-full max-w-3xl flex-1 items-end justify-end gap-4 px-6 pb-2">
-            <ScrollButton className="absolute top-[-50px] right-[30px]" />
+            <ScrollButton className="absolute -top-12.5 right-7.5" />
           </div>
         </ChatContainerContent>
       </ChatContainerRoot>

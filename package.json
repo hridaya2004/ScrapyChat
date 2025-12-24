@@ -12,6 +12,7 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "ai": "4.^",
     "better-auth": "^1.4.7",
     "zod": "^4.2.1"
   },

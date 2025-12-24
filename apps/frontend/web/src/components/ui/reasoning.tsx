@@ -10,6 +10,7 @@ import React, {
   useState,
 } from "react"
 import { Markdown } from "./markdown"
+import { Streamdown } from "streamdown"
 
 type ReasoningContextType = {
   isOpen: boolean
@@ -149,7 +150,7 @@ function ReasoningContent({
   }, [isOpen])
 
   const content = markdown ? (
-    <Markdown>{children as string}</Markdown>
+    <Streamdown>{children as string}</Streamdown>
   ) : (
     children
   )

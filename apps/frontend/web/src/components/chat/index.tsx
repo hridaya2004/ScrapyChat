@@ -1,6 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
+import { useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { useChatSession } from "@/providers/session-provider";
 import { ChatInput } from "../chat-input";
@@ -8,8 +9,16 @@ import { Conversation } from "./conversation";
 import { useChatCore } from "./use-chat-core";
 
 export const Chat = () => {
-  const { sendMessage, setMessages, messages, status, stop, input, setInput } =
-    useChatCore();
+  const {
+    id,
+    input,
+    messages,
+    sendMessage,
+    setInput,
+    setMessages,
+    status,
+    stop,
+  } = useChatCore();
 
   const { chatId } = useChatSession();
 
@@ -18,6 +27,10 @@ export const Chat = () => {
   const onDelete = (messageId: string) => {
     setMessages((prev) => prev.filter((message) => message.id !== messageId));
   };
+
+  useEffect(() => {
+    console.log(messages);
+  }, [messages]);
 
   const conversationProps = {
     messages,
