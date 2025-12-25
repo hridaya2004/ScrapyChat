@@ -8,11 +8,11 @@ import {
 import { ScrollButton } from "@/components/ui/scroll-button";
 import { Message } from "./message";
 
-type ConversationProps = {
+interface ConversationProps {
   messages: MessageType[];
   status?: "streaming" | "ready" | "submitted" | "error";
   onDelete: (id: string) => void;
-};
+}
 
 export function Conversation({
   messages,

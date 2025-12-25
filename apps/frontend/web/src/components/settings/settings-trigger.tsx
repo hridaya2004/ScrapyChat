@@ -23,9 +23,9 @@ import {
 import { DropdownMenuItem } from "../ui/dropdown-menu";
 import SettingsContent from "./settings-content";
 
-type SettingsTriggerProps = {
+interface SettingsTriggerProps {
   onOpenChange: (open: boolean) => void;
-};
+}
 
 export default function SettingsTrigger({
   onOpenChange,

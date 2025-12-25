@@ -10,7 +10,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Reasoning } from "../ui/reasoning";
 
-type MessageAgentProps = {
+interface MessageAgentProps {
   children: string;
   isLast?: boolean;
   hasScrollAnchor?: boolean;
@@ -19,7 +19,7 @@ type MessageAgentProps = {
   parts?: MessageAISDK["parts"];
   status?: "streaming" | "ready" | "submitted" | "error";
   className?: string;
-};
+}
 
 export function MessageAgent({
   children,

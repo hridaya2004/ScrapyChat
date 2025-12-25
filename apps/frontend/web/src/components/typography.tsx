@@ -1,9 +1,9 @@
 import type React from "react";
 
-type Props = {
+interface Props {
   className?: string;
   children: string;
-};
+}
 
 const H1: React.FC<Props> = ({ className, children }) => (
   <h1

@@ -10,13 +10,13 @@ import {
 } from "@/components/ui/message";
 import { cn } from "@/lib/utils";
 
-export type MessageUserProps = {
+export interface MessageUserProps {
   hasScrollAnchor?: boolean;
   children: string;
   copied: boolean;
   copyToClipboard: () => void;
   className?: string;
-};
+}
 
 export function MessageUser({
   hasScrollAnchor,

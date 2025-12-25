@@ -7,11 +7,11 @@ import {
   useState,
 } from "react";
 
-type QueryPromptUrlContextValue = {
+interface QueryPromptUrlContextValue {
   query: string;
   setQuery: (query: string) => void;
   clearQuery: () => void;
-};
+}
 
 const QueryPromptUrlContext = createContext<QueryPromptUrlContextValue | null>(
   null
@@ -29,10 +29,10 @@ export function useQueryPromptUrlProvider() {
   return context;
 }
 
-type QueryPromptUrlProviderProps = {
+interface QueryPromptUrlProviderProps {
   children: ReactNode;
   initialQuery?: string;
-};
+}
 
 export function QueryPromptUrlProvider({
   children,

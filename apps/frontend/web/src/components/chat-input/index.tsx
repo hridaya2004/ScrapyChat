@@ -10,7 +10,7 @@ import {
   PromptInputTextarea,
 } from "@/components/ui/prompt-input";
 
-type ChatInputProps = {
+interface ChatInputProps {
   value: string;
   onValueChange: (value: string) => void;
   onSend: () => void;
@@ -18,7 +18,7 @@ type ChatInputProps = {
   hasMessages?: boolean;
   stop: () => void;
   status?: "submitted" | "streaming" | "ready" | "error";
-};
+}
 
 const WHITESPACE_REGEX = /[^\s]/;
 

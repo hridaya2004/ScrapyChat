@@ -9,7 +9,6 @@ import React, {
   useRef,
   useState,
 } from "react"
-import { Markdown } from "./markdown"
 import { Streamdown } from "streamdown"
 
 type ReasoningContextType = {
@@ -124,7 +123,7 @@ function ReasoningContent({
   children,
   className,
   contentClassName,
-  markdown = false,
+  markdown = true,
   ...props
 }: ReasoningContentProps) {
   const contentRef = useRef<HTMLDivElement>(null)

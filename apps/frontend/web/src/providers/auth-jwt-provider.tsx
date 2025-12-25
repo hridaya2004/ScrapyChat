@@ -3,12 +3,12 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { authClient } from "@/lib/auth-client";
 
-type AuthJWTContextProps = {
+interface AuthJWTContextProps {
   token: string | null;
   loading: boolean;
   error?: string;
   errorStatusCode?: number;
-};
+}
 
 const initialAuthState: AuthJWTContextProps = {
   token: null,

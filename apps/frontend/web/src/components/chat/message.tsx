@@ -3,7 +3,7 @@ import { useState } from "react";
 import { MessageAgent } from "./message-agent";
 import { MessageUser } from "./message-user";
 
-type MessageProps = {
+interface MessageProps {
   variant: UIMessage["role"];
   children: string;
   isLast?: boolean;
@@ -12,7 +12,7 @@ type MessageProps = {
   parts?: UIMessage["parts"];
   status?: "streaming" | "ready" | "submitted" | "error";
   className?: string;
-};
+}
 
 export function Message({
   variant,

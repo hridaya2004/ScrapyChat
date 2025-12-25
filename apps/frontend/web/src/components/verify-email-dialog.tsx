@@ -9,10 +9,10 @@ import {
 } from "./ui/alert-dialog";
 import { Spinner } from "./ui/spinner";
 
-type VerifyEmailDialogProps = {
+interface VerifyEmailDialogProps {
   openDialog: boolean;
   onOpenChange: (open: boolean) => void;
-};
+}
 
 export default function VerifyEmailDialog({
   openDialog,
