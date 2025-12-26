@@ -3,15 +3,14 @@ import type { Metadata } from "next";
 import Header from "@/components/header";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
-import { siteConfig } from "@/config/global";
+import { globalMetadata } from "@/config/metadata";
 import { geistMono, geistSans } from "@/lib/geist";
 import { AuthJWTProvider } from "@/providers/auth-jwt-provider";
 import { QueryPromptUrlProvider } from "@/providers/query-prompt-url-provider";
 import QueryClientWrapper from "@/providers/query-provider";
 
 export const metadata: Metadata = {
-  title: siteConfig.title,
-  description: siteConfig.description,
+  ...globalMetadata,
 };
 
 export default function RootLayout({
