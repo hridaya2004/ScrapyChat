@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "next/link";
 import { ModeSwitcher } from "../mode-switcher";
 import ScrapeList from "../scrape/scrape-list";

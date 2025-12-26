@@ -1,3 +1,5 @@
+"use client";
+
 import { useQuery } from "@tanstack/react-query";
 import { ShoppingBagIcon } from "lucide-react";
 import { useAuthJWTProvider } from "@/providers/auth-jwt-provider";

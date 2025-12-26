@@ -1,3 +1,5 @@
+"use client";
+
 import { unauthorized } from "next/navigation";
 import { Chat } from "@/components/chat";
 import { useAuthJWTProvider } from "@/providers/auth-jwt-provider";

@@ -1,5 +1,3 @@
-"use client";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { UploadCloudIcon } from "lucide-react";
 import { useRef, useState } from "react";
