@@ -87,10 +87,5 @@ export const auth = betterAuth({
     openAPI(),
   ],
 
-  trustedOrigins: [
-    "http://localhost:3000",
-    "https://scrapy.local",
-    "http://scrapy.local:3000",
-    "https://scrapy-dev.hridaya.tech",
-  ],
+  trustedOrigins: process.env.TRUSTED_ORIGIN?.split("|"),
 });

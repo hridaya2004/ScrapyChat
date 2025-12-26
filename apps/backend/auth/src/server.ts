@@ -6,13 +6,11 @@ import { auth } from "./lib/auth.ts";
 const app = express();
 const port = 3001;
 
+const ALLOWED_ORIGIN = process.env.TRUSTED_ORIGIN?.split("|");
+
 app.use(
   cors({
-    origin: [
-      "http://localhost:3000",
-      "https://scrapy.local",
-      "https://scrapy-dev.hridaya.tech",
-    ],
+    origin: ALLOWED_ORIGIN ?? "",
     credentials: true,
   })
 );
