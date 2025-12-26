@@ -1,7 +1,6 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import z from "zod";
 import { authClient } from "@/lib/auth-client";
@@ -17,17 +16,18 @@ import {
   FormMessage,
 } from "../ui/form";
 import { Input } from "../ui/input";
+import { toast } from "../ui/toast";
 import Github from "./providers/github";
 
 const loginFormSchema = z.object({
   email: z.email(),
-  password: z.string(),
+  password: z.string().nonempty({
+    error: "Password is required",
+  }),
   rememberMe: z.boolean(),
 });
 
 export default function Login() {
-  const router = useRouter();
-
   const form = useForm<z.infer<typeof loginFormSchema>>({
     resolver: zodResolver(loginFormSchema),
     defaultValues: {
@@ -44,11 +44,20 @@ export default function Login() {
       });
 
       if (error?.code === "EMAIL_NOT_VERIFIED") {
-        router.push("/auth/verification");
+        toast({
+          title: "Email not verified.",
+          description: "Please check your email and verify your account",
+          status: "error",
+        });
+      } else if (error?.code === "INVALID_EMAIL_OR_PASSWORD") {
+        toast({
+          title: "Invalid email or password",
+          description: "Please check your email and password",
+          status: "error",
+        });
       }
     } catch {
-      // TODO: redirect to login?
-      // noop
+      console.error("An error occurred during login");
     }
   };
 
@@ -105,7 +114,7 @@ export default function Login() {
                   onCheckedChange={(checked) => field.onChange(checked)}
                 />
               </FormControl>
-              <FormLabel>Remember Me</FormLabel>
+              <FormLabel>Remember me</FormLabel>
               <FormMessage />
             </FormItem>
           )}
@@ -114,7 +123,9 @@ export default function Login() {
           Login
         </Button>
 
-        <FieldSeparator className="my-4 font-bold">OR</FieldSeparator>
+        <FieldSeparator className="my-4 font-bold" spanClassName="bg-card">
+          OR
+        </FieldSeparator>
 
         <FieldSet className="items-center">
           <Github />

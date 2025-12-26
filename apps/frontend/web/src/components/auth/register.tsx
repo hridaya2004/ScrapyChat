@@ -15,12 +15,42 @@ import {
   FormMessage,
 } from "../ui/form";
 import { Input } from "../ui/input";
+import { toast } from "../ui/toast";
 import Github from "./providers/github";
 
+const MINIMUM_PASSWORD_LENGTH = 8;
+const MAXMIMUM_PASSWORD_LENGTH = 100;
+const STRONG_PASSWORD_REGEX =
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()\-_=+{}[\]|;:'",.<>/?]).{8,}$/;
+
 const signUpFormSchema = z.object({
-  name: z.string(),
-  email: z.email(),
-  password: z.string(),
+  name: z
+    .string({
+      error: "Name is required",
+    })
+    .min(8, {
+      error: "Name must be at least 8 characters",
+    })
+    .max(100, {
+      error: "Name must be at most 100 characters",
+    }),
+  email: z.email({
+    error: "Email is required",
+  }),
+  password: z
+    .string({
+      error: "Password is required",
+    })
+    .min(MINIMUM_PASSWORD_LENGTH, {
+      error: "Password must be between 8 and 100 characters",
+    })
+    .max(MAXMIMUM_PASSWORD_LENGTH, {
+      error: "Password must be between 8 and 100 characters",
+    })
+    .regex(STRONG_PASSWORD_REGEX, {
+      error:
+        "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
+    }),
 });
 
 export default function Register() {
@@ -34,16 +64,22 @@ export default function Register() {
   });
 
   const onSubmit = async (values: z.infer<typeof signUpFormSchema>) => {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
     const { data, error } = await authClient.signUp.email({
       ...values,
     });
-    if (data) {
-      console.log(data);
+    if (data && !data.user.emailVerified) {
+      toast({
+        title: "Email registered, check your inbox",
+        description: "We've sent you a verification email.",
+        status: "info",
+      });
     }
     if (error) {
-      console.error(error);
+      toast({
+        title: "Registration failed",
+        description: error.message,
+        status: "error",
+      });
     }
   };
 
@@ -111,7 +147,9 @@ export default function Register() {
           Register
         </Button>
 
-        <FieldSeparator className="my-4 font-bold">OR</FieldSeparator>
+        <FieldSeparator className="my-4 font-bold" spanClassName="bg-card">
+          OR
+        </FieldSeparator>
 
         <FieldSet className="items-center">
           <Github />
