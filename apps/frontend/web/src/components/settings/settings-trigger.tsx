@@ -71,7 +71,7 @@ export default function SettingsTrigger({
     <Dialog onOpenChange={handleOpenChange} open={open}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
       <DialogContent
-        className="flex max-h-[85vh] flex-col gap-0 overflow-hidden p-0 max-md:min-h-[60vh] md:h-[600px] md:max-w-[680px] lg:max-w-[800px]"
+        className="flex max-h-[85vh] flex-col gap-0 overflow-hidden p-0 max-md:min-h-[60vh] md:h-150 md:max-w-170 lg:max-w-200"
         onOpenAutoFocus={(e) => e.preventDefault()}
         showCloseButton={isMobile}
       >
