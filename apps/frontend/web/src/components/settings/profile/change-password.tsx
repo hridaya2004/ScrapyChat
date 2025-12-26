@@ -4,10 +4,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
 import z from "zod";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { toast } from "@/components/ui/toast";
 import { authClient } from "@/lib/auth-client";
 import {
   Field,
@@ -72,17 +72,33 @@ export default function ChangePassword() {
 
       if (error) {
         if (error.code === "INVALID_PASSWORD") {
-          toast.error("Invalid current password");
+          toast({
+            title: "Invalid current password",
+            description: "Please enter your current password correctly.",
+            status: "error",
+          });
         } else {
-          toast.error("Failed to change password");
+          toast({
+            title: "Failed to change password",
+            description: "Please try again later.",
+            status: "error",
+          });
         }
       }
 
       if (data) {
-        toast.success("Password changed successfully");
+        toast({
+          title: "Password changed successfully",
+          description: "Your password has been updated.",
+          status: "success",
+        });
       }
     } catch {
-      toast.error("Failed to change password");
+      toast({
+        title: "Failed to change password",
+        description: "Please try again later.",
+        status: "error",
+      });
     }
   };
 

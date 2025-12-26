@@ -1,19 +1,25 @@
 import { LogOutIcon } from "lucide-react";
 import { redirect } from "next/navigation";
-import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
 import { DropdownMenuItem } from "../ui/dropdown-menu";
+import { toast } from "../ui/toast";
 
 export default function LogOutButton() {
   const handleLogOut = async () => {
     const { data } = await authClient.signOut();
 
     if (data?.success) {
-      toast.success("Signed out successfully.");
+      toast({
+        title: "Signed out successfully.",
+        status: "success",
+      });
       authClient.clearLastUsedLoginMethod();
       redirect("/auth");
     } else {
-      toast.error("Failed to sign out.");
+      toast({
+        title: "Failed to sign out.",
+        status: "error",
+      });
     }
   };
   return (

@@ -3,6 +3,7 @@
 import { toast as sonnerToast } from "sonner"
 import { Button } from "./button"
 import { CheckCircle2Icon, InfoIcon, MessageCircleWarningIcon } from "lucide-react"
+import { Spinner } from "./spinner"
 
 type ToastProps = {
   id: string | number
@@ -12,7 +13,7 @@ type ToastProps = {
     label: string
     onClick: () => void
   }
-  status?: "error" | "info" | "success" | "warning"
+  status?: "error" | "info" | "success" | "warning" | "loading"
 }
 
 function Toast({ title, description, button, id, status }: ToastProps) {
@@ -28,6 +29,13 @@ function Toast({ title, description, button, id, status }: ToastProps) {
         {status === "success" ? (
           <CheckCircle2Icon className="text-primary mr-3 size-4" />
         ) : null}
+        {
+          status === "loading" ? (
+            <div className="mr-3">
+              <Spinner className="text-primary" size="size-4" />
+            </div>
+          ) : null
+        }
         <div className="w-full">
           <p className="text-foreground text-sm font-medium">{title}</p>
           {description && (

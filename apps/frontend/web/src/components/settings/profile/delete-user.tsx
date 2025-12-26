@@ -4,7 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
 import z from "zod";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,6 +26,7 @@ import {
   InputGroupButton,
   InputGroupInput,
 } from "@/components/ui/input-group";
+import { toast } from "@/components/ui/toast";
 import {
   Tooltip,
   TooltipContent,
@@ -65,8 +65,9 @@ export default function DeleteUser({ oauth = false }: { oauth: boolean }) {
     const { data } = await authClient.token();
 
     try {
-      toast.loading("Deleting account...", {
-        id: "delete-account",
+      toast({
+        title: "Deleting account",
+        status: "loading",
       });
       const response = await authClient.deleteUser({
         callbackURL: "/auth",
@@ -80,15 +81,18 @@ export default function DeleteUser({ oauth = false }: { oauth: boolean }) {
       });
 
       if (response.data?.success) {
-        toast.success(
-          "Delete verification email has been sent to your account.",
-          {
-            id: "delete-account",
-          }
-        );
+        toast({
+          title: "Email for verification sent.",
+          description:
+            "Delete verification email has been sent to your account.",
+          status: "success",
+        });
       }
     } catch {
-      toast.error("Failed to delete user account.");
+      toast({
+        title: "Failed to delete account",
+        status: "error",
+      });
     }
   };
 

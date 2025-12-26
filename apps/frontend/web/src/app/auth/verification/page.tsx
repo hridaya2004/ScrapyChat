@@ -2,7 +2,7 @@
 
 import { redirect, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/toast";
 import VerifyEmailDialog from "@/components/verify-email-dialog";
 import { authClient } from "@/lib/auth-client";
 
@@ -31,7 +31,10 @@ function VerificationPageFunction() {
 
   useEffect(() => {
     if (data?.user.emailVerified) {
-      toast.success("Session refreshed successfully.");
+      toast({
+        title: "Session refreshed successfully.",
+        status: "success",
+      });
       redirect("/");
     }
   }, [data]);
