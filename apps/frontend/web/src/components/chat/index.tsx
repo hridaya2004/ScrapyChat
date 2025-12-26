@@ -1,28 +1,55 @@
 import { AnimatePresence, motion } from "motion/react";
 import { cn } from "@/lib/utils";
+import { useQueryPromptUrlProvider } from "@/providers/query-prompt-url-provider";
 import { useChatSession } from "@/providers/session-provider";
 import { ChatInput } from "../chat-input";
+import { toast } from "../ui/toast";
 import { Conversation } from "./conversation";
 import { useChatCore } from "./use-chat-core";
 
 export const Chat = () => {
+  const { chatId } = useChatSession();
+  const { url } = useQueryPromptUrlProvider();
   const {
     id: _id,
     input,
     messages,
-    sendMessage,
+    sendMessage: send,
     setInput,
     setMessages,
     status,
     stop,
   } = useChatCore();
 
-  const { chatId } = useChatSession();
-
   const showOnboarding = !chatId && messages.length === 0;
 
   const onDelete = (messageId: string) => {
     setMessages((prev) => prev.filter((message) => message.id !== messageId));
+  };
+
+  const sendMessage = () => {
+    if (!(input.trim() && url.trim())) {
+      toast({
+        title: "No input or URL",
+        description: "Please provide either an input or a URL",
+        status: "warning",
+      });
+
+      return;
+    }
+
+    send(
+      {
+        text: input,
+      },
+      {
+        body: {
+          url,
+        },
+      }
+    );
+
+    setInput("");
   };
 
   const conversationProps = {

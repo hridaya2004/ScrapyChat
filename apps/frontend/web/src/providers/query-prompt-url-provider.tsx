@@ -1,53 +1,33 @@
 "use client";
-import {
-  createContext,
-  type ReactNode,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import { createContext, type ReactNode, useContext, useState } from "react";
 
-interface QueryPromptUrlContextValue {
-  query: string;
-  setQuery: (query: string) => void;
-  clearQuery: () => void;
+interface QueryPromptUrlContextProps {
+  url: string;
+  setUrl: (url: string) => void;
+  clearUrl: () => void;
 }
 
-const QueryPromptUrlContext = createContext<QueryPromptUrlContextValue | null>(
-  null
-);
+const QueryPromptUrlContext = createContext<
+  QueryPromptUrlContextProps | undefined
+>(undefined);
 
-export function useQueryPromptUrlProvider() {
+export const useQueryPromptUrlProvider = () => {
   const context = useContext(QueryPromptUrlContext);
-
   if (!context) {
     throw new Error(
       "useQueryPromptUrlProvider must be used within QueryPromptUrlProvider"
     );
   }
-
   return context;
-}
+};
 
-interface QueryPromptUrlProviderProps {
-  children: ReactNode;
-  initialQuery?: string;
-}
+export function QueryPromptUrlProvider({ children }: { children: ReactNode }) {
+  const [url, setUrl] = useState("");
 
-export function QueryPromptUrlProvider({
-  children,
-  initialQuery = "",
-}: QueryPromptUrlProviderProps) {
-  const [query, setQuery] = useState(initialQuery);
-
-  const clearQuery = () => setQuery("");
-
-  useEffect(() => {
-    console.log("Query updated:", query);
-  }, [query]);
+  const clearUrl = () => setUrl("");
 
   return (
-    <QueryPromptUrlContext.Provider value={{ query, setQuery, clearQuery }}>
+    <QueryPromptUrlContext.Provider value={{ url, setUrl, clearUrl }}>
       {children}
     </QueryPromptUrlContext.Provider>
   );

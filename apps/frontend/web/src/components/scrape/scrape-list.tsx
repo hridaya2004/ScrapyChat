@@ -2,8 +2,9 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { ShoppingBagIcon } from "lucide-react";
+import { useState } from "react";
 import { useAuthJWTProvider } from "@/providers/auth-jwt-provider";
-import { useChatCore } from "../chat/use-chat-core";
+import { useQueryPromptUrlProvider } from "@/providers/query-prompt-url-provider";
 import { Button } from "../ui/button";
 import {
   Dialog,
@@ -19,7 +20,8 @@ import { getScrapeList } from "./scrape-core";
 
 export default function ScrapeList() {
   const { token } = useAuthJWTProvider();
-  const { queryUrl, setQueryUrl } = useChatCore();
+  const { setUrl, url, clearUrl } = useQueryPromptUrlProvider();
+  const [open, setOpen] = useState(false);
 
   const { data, refetch } = useQuery({
     queryKey: ["scrapeList"],
@@ -27,19 +29,21 @@ export default function ScrapeList() {
   });
 
   const handleValueChange = (value: string) => {
-    setQueryUrl?.(value);
-
-    if (value !== queryUrl) {
-      toast({
-        title: "Updated context URL",
-        description: `${value}`,
-        status: "info",
-        button: {
-          label: "Clear",
-          onClick: () => setQueryUrl(""),
-        },
-      });
+    if (value === url) {
+      return;
     }
+
+    setUrl?.(value);
+    toast({
+      title: "Updated context URL",
+      description: `${value}`,
+      status: "info",
+      button: {
+        label: "Clear",
+        onClick: clearUrl,
+      },
+    });
+    setOpen(false);
   };
 
   const trigger = (
@@ -55,7 +59,7 @@ export default function ScrapeList() {
   }
 
   return (
-    <Dialog>
+    <Dialog onOpenChange={setOpen} open={open}>
       {trigger}
       <DialogContent>
         <DialogTitle>List of scraped websites</DialogTitle>
@@ -71,7 +75,7 @@ export default function ScrapeList() {
           >
             Refresh
           </Button>
-          <RadioGroup onValueChange={handleValueChange} value={queryUrl}>
+          <RadioGroup onValueChange={handleValueChange} value={url}>
             {data?.ingestedUrls.map((item) => (
               <FieldLabel
                 className="hover:cursor-pointer"

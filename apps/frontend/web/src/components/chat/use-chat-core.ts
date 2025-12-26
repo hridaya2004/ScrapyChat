@@ -6,7 +6,6 @@ import { useAuthJWTProvider } from "@/providers/auth-jwt-provider";
 
 export const useChatCore = () => {
   const { token } = useAuthJWTProvider();
-  const [queryUrl, setQueryUrl] = useState("");
   const [input, setInput] = useState("");
 
   const { sendMessage, setMessages, messages, status, id, stop } = useChat({
@@ -16,23 +15,13 @@ export const useChatCore = () => {
         Authorization: `Bearer ${token}`,
       },
     }),
+    onData: (data) => {
+      console.log(data);
+    },
   });
 
-  const send = () => {
-    sendMessage(
-      {
-        text: input,
-      },
-      {
-        body: {
-          query: queryUrl,
-        },
-      }
-    );
-  };
-
   return {
-    sendMessage: send,
+    sendMessage,
     setMessages,
     messages,
     status,
@@ -40,7 +29,5 @@ export const useChatCore = () => {
     id,
     input,
     setInput,
-    queryUrl,
-    setQueryUrl,
   };
 };
