@@ -6,10 +6,10 @@ from llama_index.core.base.llms.types import (
 )
 from llama_index.llms.ollama import Ollama
 
-from ..types.provider import ScrapyBaseProvider
+from ..types.provider import BaseProvider
 
 
-class ScrapyLLMProvider(ScrapyBaseProvider):
+class LLMProvider(BaseProvider):
     """
     The Scrapy LLM provider based on GoogleGenAI
     """
@@ -28,9 +28,6 @@ class ScrapyLLMProvider(ScrapyBaseProvider):
             request_timeout=120.0,
             context_window=8000,
         )
-
-    async def init(self) -> None:
-        pass
 
     @property
     def client(self):

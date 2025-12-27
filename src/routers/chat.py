@@ -4,11 +4,11 @@ from fastapi import APIRouter, Depends
 from pydantic import Field
 
 from ..dependencies import get_user
-from ..internal.vector_store import ScrapyVectorStoreProvider
+from ..internal.vector_store import VectorStoreProvider
 from ..routers.scrape import ScrapeUrl
 
 router = APIRouter()
-sv_store = ScrapyVectorStoreProvider()
+sv_store = VectorStoreProvider()
 
 
 logger = logging.getLogger("chat")

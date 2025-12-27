@@ -12,7 +12,7 @@ class SingletonMeta(ABCMeta):
         return cls._instances[cls]
 
 
-class ScrapyBaseProvider(metaclass=SingletonMeta):
+class BaseProvider(metaclass=SingletonMeta):
     """
     The Scrapy abstract base provider
     """
@@ -20,10 +20,6 @@ class ScrapyBaseProvider(metaclass=SingletonMeta):
     @abstractmethod
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
-
-    @abstractmethod
-    async def init(self) -> None:
-        pass
 
     @property
     @abstractmethod

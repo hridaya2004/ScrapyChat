@@ -1,16 +1,20 @@
 import logging
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, BackgroundTasks, Depends
 from fastapi.exceptions import HTTPException
+from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel, Field
 from qdrant_client import models
 
+from src.internal.redis import RedisProvider
+
 from ..dependencies import get_user
 from ..internal.browser import fetch_page_text
-from ..internal.vector_store import ScrapyVectorStoreProvider
+from ..internal.vector_store import VectorStoreProvider
 
 router = APIRouter()
-sv_store = ScrapyVectorStoreProvider()
+sv_store = VectorStoreProvider()
+redis = RedisProvider()
 
 logger = logging.getLogger("scraper")
 
@@ -36,7 +40,7 @@ async def list_scraped(user_id: str = Depends(get_user)):
         )
 
         records = [record.model_dump().get("payload", {}) for record in res]
-        return {"ingested_urls": {record.get("url") for record in records}}
+        return {"urls": {record.get("url") for record in records}}
 
     except Exception as e:
         logger.error("Exception while listing scraped websites: %s", e)
@@ -44,8 +48,29 @@ async def list_scraped(user_id: str = Depends(get_user)):
 
 
 @router.post("/new")
-async def scrape_new(scrape_url: ScrapeUrl, user_id: str = Depends(get_user)):
+async def scrape_new(
+    scrape_url: ScrapeUrl,
+    background_tasks: BackgroundTasks,
+    user_id: str = Depends(get_user),
+) -> JSONResponse:
     extracted_text = await fetch_page_text(scrape_url.url)
-    logger.info("Extracted text: %s", extracted_text)
-    await sv_store.ingest(extracted_text, {"user_id": user_id, "url": scrape_url.url})
-    return {"status": "OK"}
+    logger.debug("Extracted text: %s", extracted_text)
+    background_tasks.add_task(
+        sv_store.ingest, user_id=user_id, url=scrape_url.url, text=extracted_text
+    )
+    return JSONResponse(
+        status_code=202,
+        content={"message": "Scrape request scheduled", "url": scrape_url.url},
+    )
+
+
+@router.get("/progress")
+async def get_progress(user_id: str = Depends(get_user)) -> StreamingResponse:
+    return StreamingResponse(
+        redis.get_progress(user_id),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+        },
+    )

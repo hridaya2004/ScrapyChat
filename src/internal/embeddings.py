@@ -3,10 +3,10 @@ import os
 from llama_index.core.base.embeddings.base import Embedding
 from llama_index.embeddings.ollama import OllamaEmbedding
 
-from ..types.provider import ScrapyBaseProvider
+from ..types.provider import BaseProvider
 
 
-class ScrapyEmbeddingProvider(ScrapyBaseProvider):
+class EmbeddingProvider(BaseProvider):
     """
     The Scrapy Embedding provider
     """
@@ -23,9 +23,6 @@ class ScrapyEmbeddingProvider(ScrapyBaseProvider):
             base_url=self._api_endpoint,
             model_name=self._embedding_model,
         )
-
-    async def init(self) -> None:
-        pass
 
     @property
     def client(self) -> OllamaEmbedding:

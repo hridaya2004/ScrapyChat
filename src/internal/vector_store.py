@@ -9,12 +9,13 @@ from llama_index.vector_stores.qdrant import QdrantVectorStore
 from qdrant_client import AsyncQdrantClient
 from qdrant_client.models import Distance, VectorParams
 
-from ..types.provider import ScrapyBaseProvider
-from .embeddings import ScrapyEmbeddingProvider
-from .llm import ScrapyLLMProvider
+from ..types.provider import BaseProvider
+from .embeddings import EmbeddingProvider
+from .llm import LLMProvider
+from .redis import RedisProvider
 
 
-class ScrapyVectorStoreProvider(ScrapyBaseProvider):
+class VectorStoreProvider(BaseProvider):
     """
     The Scrapy vector store provider based on Qdrant
     """
@@ -23,16 +24,17 @@ class ScrapyVectorStoreProvider(ScrapyBaseProvider):
         self._initialized = False
         self._init_lock = asyncio.Lock()
 
-        # LLM & embeddings
-        self._llm = ScrapyLLMProvider()
-        self._embed_model = ScrapyEmbeddingProvider()
+        # Initialize dependent providers
+        self._llm = LLMProvider()
+        self._embed_model = EmbeddingProvider()
+        self._redis = RedisProvider()
 
         Settings.llm = self._llm.client
         Settings.embed_model = self._embed_model.client
 
         # Qdrant
-        self._endpoint = os.environ["QDRANT_ENDPOINT"]
-        self._collection = os.environ["QDRANT_COLLECTION"]
+        self._endpoint = os.getenv("QDRANT_ENDPOINT", "localhost")
+        self._collection = os.getenv("QDRANT_COLLECTION", "scrapy")
 
         self._parser = SimpleNodeParser.from_defaults(chunk_size=768, chunk_overlap=16)
 
@@ -60,22 +62,6 @@ class ScrapyVectorStoreProvider(ScrapyBaseProvider):
     def client(self):
         return self._client
 
-    @property
-    def store(self):
-        return self._store
-
-    @property
-    def query_engine(self):
-        return self._query_engine
-
-    @property
-    def llm(self):
-        return self._llm
-
-    @property
-    def embed(self):
-        return self._embed_model
-
     async def _ensure_collection_exists(self, collection_name: str) -> None:
         try:
             await self._client.get_collection(collection_name)
@@ -88,16 +74,31 @@ class ScrapyVectorStoreProvider(ScrapyBaseProvider):
                 ),
             )
 
-    async def ingest(self, text: str, metadata: dict[str, str]) -> None:
-        await self.init()
+    async def ingest(
+        self, user_id: str, url: str, text: str, metadata: dict[str, str] = {}
+    ) -> None:
+        # Add user_id and url to metadata
+        metadata["user_id"] = user_id
+        metadata["url"] = url
 
         docs = [Document(text=text, metadata=metadata)]
         nodes = self._parser.get_nodes_from_documents(docs)
+        total_nodes = len(nodes)
 
-        for node in nodes:
-            node.embedding = await self.embed.get_embeddings(node.get_content())
+        # Set initial progress
+        await self._redis.set_progress(user_id, url, f"{0 / total_nodes:.2f}")
 
+        for n, node in enumerate(nodes, start=1):
+            node.embedding = await self._embed_model.get_embeddings(node.get_content())
+
+            # Update progress
+            await self._redis.set_progress(user_id, url, f"{n / total_nodes:.2f}")
+
+        # Insert all nodes
         await self._index.ainsert_nodes(nodes)
+
+        # Delete progress data from redis
+        await self._redis.delete_progress(user_id, url)
 
     async def query(
         self,
@@ -105,8 +106,6 @@ class ScrapyVectorStoreProvider(ScrapyBaseProvider):
         filter: Optional[dict[str, str]] = None,
         top_k: int = 3,
     ):
-        await self.init()
-
         metadata_filters = None
         if filter:
             metadata_filters = MetadataFilters(
