@@ -3,12 +3,11 @@ import logging
 from fastapi import APIRouter, BackgroundTasks, Depends
 from fastapi.exceptions import HTTPException
 from fastapi.responses import JSONResponse, StreamingResponse
-from pydantic import BaseModel, Field
-
-from src.internal.redis import RedisProvider
+from pydantic import BaseModel, Field, field_validator
 
 from ..dependencies import get_user
 from ..internal.browser import fetch_page_text
+from ..internal.redis import RedisProvider
 from ..internal.vector_store import VectorStoreProvider
 
 router = APIRouter()
@@ -20,6 +19,11 @@ logger = logging.getLogger("scraper")
 
 class ScrapeUrl(BaseModel):
     url: str = Field(..., description="The URL of the page to be scraped")
+
+    @field_validator("url", mode="before")
+    @classmethod
+    def strip_trailing_slash(cls, v: str) -> str:
+        return v.removesuffix("/")
 
 
 @router.get("/list")

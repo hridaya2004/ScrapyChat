@@ -124,7 +124,7 @@ class VectorStoreProvider(BaseProvider):
 
         records = [record.model_dump().get("payload", {}) for record in res]
         # Return the unique set of ingested URLs
-        return {record.get("url").removesuffix("/") for record in records}
+        return {record.get("url") for record in records}
 
     async def query(
         self,
