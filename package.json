@@ -7,6 +7,7 @@
     "apps/frontend/*"
   ],
   "scripts": {
+    "dev": "bun --filter '*' dev",
     "check": "bun x ultracite check",
     "fix": "bun x ultracite fix",
     "prepare": "husky"
