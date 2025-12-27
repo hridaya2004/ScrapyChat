@@ -24,7 +24,7 @@ class RedisProvider(BaseProvider):
     def client(self) -> redis.Redis:
         return self._client
 
-    async def get_progress(self, user_id: str) -> AsyncGenerator:
+    async def stream_progress(self, user_id: str) -> AsyncGenerator:
         async with self._client.pubsub() as pubsub:
             # Subscribe to user stream
             await pubsub.subscribe(f"user:{user_id}")
@@ -52,6 +52,6 @@ class RedisProvider(BaseProvider):
             f"user:{user_id}", json.dumps({"url": url, "progress": value})
         )
 
-    async def delete_progress(self, user_id: str, url: str) -> None:
-        # Delete progress key
-        await self._client.hdel(f"user:{user_id}", url)  # type: ignore
+    async def expire_progress(self, user_id: str, url: str) -> None:
+        # Set 10 seconds expiry on the key
+        await self._client.hexpire(f"user:{user_id}", 10, url)  # type: ignore

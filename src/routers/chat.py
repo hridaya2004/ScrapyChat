@@ -23,7 +23,7 @@ async def new_chat(chat_request: ChatRequest, user_id: str = Depends(get_user)):
     retrieved_text = await sv_store.query(
         chat_request.query, {"user_id": user_id, "url": chat_request.url}
     )
-    response = await sv_store.llm.query(
+    response = await sv_store._llm.query(
         f"Use the following context to answer this question: {chat_request.query}. Context: {retrieved_text}"
     )
 

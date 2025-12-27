@@ -6,7 +6,7 @@ from llama_index.core import Document, Settings, VectorStoreIndex
 from llama_index.core.node_parser import SimpleNodeParser
 from llama_index.core.vector_stores import MetadataFilter, MetadataFilters
 from llama_index.vector_stores.qdrant import QdrantVectorStore
-from qdrant_client import AsyncQdrantClient
+from qdrant_client import AsyncQdrantClient, models
 from qdrant_client.models import Distance, VectorParams
 
 from ..types.provider import BaseProvider
@@ -77,6 +77,10 @@ class VectorStoreProvider(BaseProvider):
     async def ingest(
         self, user_id: str, url: str, text: str, metadata: dict[str, str] = {}
     ) -> None:
+        """
+        Ingests a document in the vector store and updates progress in redis.
+        """
+
         # Add user_id and url to metadata
         metadata["user_id"] = user_id
         metadata["url"] = url
@@ -89,6 +93,7 @@ class VectorStoreProvider(BaseProvider):
         await self._redis.set_progress(user_id, url, f"{0 / total_nodes:.2f}")
 
         for n, node in enumerate(nodes, start=1):
+            # Save node embeddings
             node.embedding = await self._embed_model.get_embeddings(node.get_content())
 
             # Update progress
@@ -97,8 +102,29 @@ class VectorStoreProvider(BaseProvider):
         # Insert all nodes
         await self._index.ainsert_nodes(nodes)
 
-        # Delete progress data from redis
-        await self._redis.delete_progress(user_id, url)
+        # Eventually delete the finished task progress
+        await self._redis.expire_progress(user_id, url)
+
+    async def get_ingested(self, user_id: str) -> set[str]:
+        """
+        Set of ingested URLs by the particular user
+        """
+        res, _ = await self._client.scroll(
+            collection_name=self._collection,
+            scroll_filter=models.Filter(
+                must=[
+                    models.FieldCondition(
+                        key="user_id",
+                        match=models.MatchValue(value=user_id),
+                    )
+                ]
+            ),
+            with_payload=["document_id", "url"],
+        )
+
+        records = [record.model_dump().get("payload", {}) for record in res]
+        # Return the unique set of ingested URLs
+        return {record.get("url").removesuffix("/") for record in records}
 
     async def query(
         self,

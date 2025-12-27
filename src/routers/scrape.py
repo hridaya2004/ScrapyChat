@@ -4,7 +4,6 @@ from fastapi import APIRouter, BackgroundTasks, Depends
 from fastapi.exceptions import HTTPException
 from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel, Field
-from qdrant_client import models
 
 from src.internal.redis import RedisProvider
 
@@ -25,26 +24,8 @@ class ScrapeUrl(BaseModel):
 
 @router.get("/list")
 async def list_scraped(user_id: str = Depends(get_user)):
-    try:
-        res, _ = await sv_store.client.scroll(
-            collection_name=sv_store._collection,
-            scroll_filter=models.Filter(
-                must=[
-                    models.FieldCondition(
-                        key="user_id",
-                        match=models.MatchValue(value=user_id),
-                    )
-                ]
-            ),
-            with_payload=["document_id", "url"],
-        )
-
-        records = [record.model_dump().get("payload", {}) for record in res]
-        return {"urls": {record.get("url") for record in records}}
-
-    except Exception as e:
-        logger.error("Exception while listing scraped websites: %s", e)
-        raise HTTPException(status_code=500, detail="Something went wrong")
+    ingested_urls = await sv_store.get_ingested(user_id)
+    return {"urls": ingested_urls}
 
 
 @router.post("/new")
@@ -53,8 +34,18 @@ async def scrape_new(
     background_tasks: BackgroundTasks,
     user_id: str = Depends(get_user),
 ) -> JSONResponse:
+    # Check if the URL has already been ingested by the same user
+    ingested_urls = await sv_store.get_ingested(user_id)
+    if scrape_url.url in ingested_urls:
+        raise HTTPException(
+            status_code=409, detail="Duplicate, the URL has already been ingested"
+        )
+
+    # Extract text from the URL
     extracted_text = await fetch_page_text(scrape_url.url)
     logger.debug("Extracted text: %s", extracted_text)
+
+    # Add ingestion background task
     background_tasks.add_task(
         sv_store.ingest, user_id=user_id, url=scrape_url.url, text=extracted_text
     )
@@ -67,7 +58,7 @@ async def scrape_new(
 @router.get("/progress")
 async def get_progress(user_id: str = Depends(get_user)) -> StreamingResponse:
     return StreamingResponse(
-        redis.get_progress(user_id),
+        redis.stream_progress(user_id),
         media_type="text/event-stream",
         headers={
             "Cache-Control": "no-cache",
