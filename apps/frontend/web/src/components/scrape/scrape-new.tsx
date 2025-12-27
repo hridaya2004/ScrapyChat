@@ -55,11 +55,8 @@ export default function ScrapeNew() {
     scrapeNewUrl(data.url, token, (success, updatedLoading) => {
       setLoading(updatedLoading);
       if (success) {
-        console.log("Scrape started");
         setDialogOpen(false);
         fetchScrapeProgress();
-      } else {
-        console.log("Scrape failed");
       }
     });
   };
