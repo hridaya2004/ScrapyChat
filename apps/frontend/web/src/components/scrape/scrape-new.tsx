@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useQuery } from "@tanstack/react-query";
 import { PlusIcon } from "lucide-react";
 import { useId, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -12,6 +13,7 @@ import { useAuthJWTProvider } from "@/providers/auth-jwt-provider";
 import { Button } from "../ui/button";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -19,13 +21,18 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
-import { Field, FieldError, FieldGroup, FieldLabel } from "../ui/field";
+import { Field, FieldError, FieldGroup } from "../ui/field";
 import { Input } from "../ui/input";
 import { Spinner } from "../ui/spinner";
-import { scrapeNewUrl } from "./scrape-core";
+import { getScrapeProgress, scrapeNewUrl } from "./scrape-core";
 
 export default function ScrapeNew() {
   const { token } = useAuthJWTProvider();
+
+  const { refetch: fetchScrapeProgress } = useQuery({
+    queryKey: ["scrapeStatus"],
+    queryFn: () => getScrapeProgress(token ?? ""),
+  });
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -50,6 +57,7 @@ export default function ScrapeNew() {
       if (success) {
         console.log("Scrape started");
         setDialogOpen(false);
+        fetchScrapeProgress();
       } else {
         console.log("Scrape failed");
       }
@@ -63,11 +71,11 @@ export default function ScrapeNew() {
           <PlusIcon />
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="rounded-3xl" showCloseButton={false}>
         <DialogHeader>
-          <DialogTitle>Add new URL to scrape</DialogTitle>
+          <DialogTitle>Enter the website URL</DialogTitle>
           <DialogDescription>
-            Paste the link you want to scrape below:
+            Enter the URL of the website you want the information from:
           </DialogDescription>
         </DialogHeader>
         <div>
@@ -81,13 +89,13 @@ export default function ScrapeNew() {
                 name="url"
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor={formUrlInputId}>URL</FieldLabel>
                     <Input
                       {...field}
                       aria-invalid={fieldState.invalid}
                       autoComplete="off"
+                      className="rounded-3xl"
                       id={formUrlInputId}
-                      placeholder="Add URL for scraping"
+                      placeholder="https://example.com"
                     />
                     {!!fieldState.invalid && (
                       <FieldError errors={[fieldState.error]} />
@@ -99,7 +107,17 @@ export default function ScrapeNew() {
           </form>
         </div>
         <DialogFooter>
-          <Button disabled={loading} form={htmlFormId} type="submit">
+          <DialogClose asChild>
+            <Button className="rounded-3xl" variant="outline">
+              Cancel
+            </Button>
+          </DialogClose>
+          <Button
+            className="rounded-3xl"
+            disabled={loading}
+            form={htmlFormId}
+            type="submit"
+          >
             {!!loading && (
               <Spinner className="bg-primary-foreground" size="size-4" />
             )}

@@ -61,16 +61,15 @@ export default function ScrapeList() {
   return (
     <Dialog onOpenChange={setOpen} open={open}>
       {trigger}
-      <DialogContent>
+      <DialogContent className="rounded-3xl">
         <DialogTitle>List of scraped websites</DialogTitle>
         <DialogDescription>
           This is a list of websites that have been scraped.
         </DialogDescription>
         <div className="flex w-full max-w-md flex-col gap-4">
           <Button
-            className="ms-auto"
+            className="ms-auto rounded-3xl"
             onClick={() => refetch()}
-            size="sm"
             variant="outline"
           >
             Refresh

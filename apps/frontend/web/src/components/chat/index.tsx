@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils";
 import { useQueryPromptUrlProvider } from "@/providers/query-prompt-url-provider";
 import { useChatSession } from "@/providers/session-provider";
 import { ChatInput } from "../chat-input";
+import { ScrapeProgress } from "../scrape/scrape-progress";
 import { toast } from "../ui/toast";
 import { Conversation } from "./conversation";
 import { useChatCore } from "./use-chat-core";
@@ -98,6 +99,7 @@ export const Chat = () => {
           <Conversation key="conversation" {...conversationProps} />
         )}
       </AnimatePresence>
+      <ScrapeProgress />
       <motion.div
         className={cn(
           "relative inset-x-0 bottom-0 z-50 mx-auto w-full max-w-3xl"

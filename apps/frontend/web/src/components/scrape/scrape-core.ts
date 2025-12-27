@@ -1,5 +1,9 @@
 import { apiConfig } from "@/config/global";
 import { type ScrapeList, scrapeListSchema } from "@/model/scrape/list";
+import {
+  type ScrapeProgress,
+  scrapeProgressSchema,
+} from "@/model/scrape/progress";
 import { toast } from "../ui/toast";
 
 const getScrapeList = async (token: string): Promise<ScrapeList> => {
@@ -45,9 +49,7 @@ const getScrapeList = async (token: string): Promise<ScrapeList> => {
         description: "Failed to get scraped list data from API.",
       });
     }
-  } catch (error) {
-    console.error(error);
-
+  } catch {
     return {
       ingestedUrls: [],
     };
@@ -111,4 +113,45 @@ const scrapeNewUrl = async (
   return null;
 };
 
-export { getScrapeList, scrapeNewUrl };
+const getScrapeProgress = async (token: string): Promise<ScrapeProgress> => {
+  if (!token.trim()) {
+    return [];
+  }
+
+  try {
+    const response = await fetch(`${apiConfig.baseUrl}/scrape/progress`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+
+      const parsedData = scrapeProgressSchema.safeParse(data);
+
+      if (parsedData.error) {
+        toast({
+          title: "Failed to parse progress data",
+          description: parsedData.error.message,
+          status: "error",
+        });
+      }
+
+      if (parsedData.success) {
+        return parsedData.data;
+      }
+    }
+  } catch {
+    toast({
+      title: "Failed to fetch progress",
+      description: "An error occurred while fetching the progress.",
+      status: "error",
+    });
+  }
+
+  return [];
+};
+
+export { getScrapeList, scrapeNewUrl, getScrapeProgress };
