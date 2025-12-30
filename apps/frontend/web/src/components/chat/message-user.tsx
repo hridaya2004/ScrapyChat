@@ -36,8 +36,7 @@ export function MessageUser({
       )}
     >
       <MessageContent
-        className="prose dark:prose-invert relative max-w-[70%] rounded-3xl bg-accent px-5 py-2.5"
-        markdown={true}
+        className="relative max-w-[70%] rounded-3xl bg-accent px-5 py-2.5"
         ref={contentRef}
       >
         {children}
