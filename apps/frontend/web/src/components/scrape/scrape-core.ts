@@ -85,13 +85,21 @@ const scrapeNewUrl = async (
     });
 
     if (!response.ok) {
-      toast({
-        title: "Error",
-        description: "Failed to start scraping.",
-        status: "error",
-      });
+      if (response.status === 409) {
+        // 409 is dupe conflict
+        toast({
+          title: "Failed to scrape given URL",
+          description: JSON.parse(await response.text()).detail,
+          status: "error",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to start scraping.",
+          status: "error",
+        });
+      }
 
-      console.error(await response.text());
       callback?.(false, false);
       return;
     }
@@ -106,7 +114,7 @@ const scrapeNewUrl = async (
       return;
     }
   } catch (err) {
-    console.log(err);
+    console.error(err);
     return;
   }
 
