@@ -27,7 +27,8 @@ export const ScrapeProgress = () => {
 
     getScrapeProgress(token, (data: ScrapeProgressType) => {
       setScrapeData((prev) => {
-        const isComplete = Number.parseFloat(String(data.progress)) >= 1.0;
+        // this float ranges from 0 to 1.0
+        const isComplete = data.progress === 1.0;
         const filtered = prev.filter((item) => item.url !== data.url);
         return isComplete ? filtered : [...filtered, data];
       });
@@ -35,10 +36,18 @@ export const ScrapeProgress = () => {
   }, [token]);
 
   useEffect(() => {
-    const hasLengthIncreased = scrapeData.length > previousLengthRef.current;
-    const hasDataChanged = persistentDataRef.current !== scrapeData;
+    if (!scrapeData.length) {
+      return;
+    }
 
-    if (scrapeData.length > 0 && hasLengthIncreased && hasDataChanged) {
+    const validData = scrapeData.filter(
+      (item) => item && Object.keys(item).length > 0
+    );
+
+    const hasValidDataIncreased = validData.length > previousLengthRef.current;
+    const hasDataChanged = !Object.is(persistentDataRef.current, scrapeData);
+
+    if (hasValidDataIncreased && hasDataChanged) {
       toast({
         title: "User defined website being scraped.",
         button: {
@@ -49,10 +58,10 @@ export const ScrapeProgress = () => {
     }
 
     persistentDataRef.current = scrapeData;
-    previousLengthRef.current = scrapeData.length;
+    previousLengthRef.current = validData.length;
   }, [scrapeData]);
 
-  if (!scrapeData.length) {
+  if (scrapeData.filter((item) => item && Object.keys(item).length > 0)) {
     return null;
   }
 
