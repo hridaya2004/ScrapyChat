@@ -12,21 +12,19 @@ export const Chat = () => {
   const { chatId } = useChatSession();
   const { url } = useQueryPromptUrlProvider();
   const {
-    id: _id,
     input,
     messages,
-    sendMessage: send,
     setInput,
-    setMessages,
+    setMessages: _setMessages,
     status,
-    stop,
+    sendMessage: send,
   } = useChatCore();
 
   const showOnboarding = !chatId && messages.length === 0;
 
-  const onDelete = (messageId: string) => {
-    setMessages((prev) => prev.filter((message) => message.id !== messageId));
-  };
+  // const onDelete = (messageId: string) => {
+  //   setMessages((prev) => prev.filter((message) => message.id !== messageId));
+  // };
 
   const sendMessage = () => {
     if (!(input.trim() && url.trim())) {
@@ -39,16 +37,10 @@ export const Chat = () => {
       return;
     }
 
-    send(
-      {
-        text: input,
-      },
-      {
-        body: {
-          url,
-        },
-      }
-    );
+    send({
+      input,
+      queryUrl: url,
+    });
 
     setInput("");
   };
@@ -56,7 +48,7 @@ export const Chat = () => {
   const conversationProps = {
     messages,
     status,
-    onDelete,
+    // onDelete,
   };
 
   const chatInputProps = {
@@ -65,7 +57,7 @@ export const Chat = () => {
     status,
     hasMessages: messages.length > 0,
     value: input,
-    isSubmitting: status === "submitted" || status === "streaming",
+    isSubmitting: status === "submitted",
     onValueChange: setInput,
   };
 

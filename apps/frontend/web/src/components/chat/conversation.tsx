@@ -1,4 +1,3 @@
-import type { UIMessage as MessageType } from "@ai-sdk/react";
 import { Loader } from "lucide-react";
 import { useRef } from "react";
 import {
@@ -6,18 +5,19 @@ import {
   ChatContainerRoot,
 } from "@/components/ui/chat-container";
 import { ScrollButton } from "@/components/ui/scroll-button";
+import type { Message as MessageType } from "@/lib/types";
 import { Message } from "./message";
 
 interface ConversationProps {
   messages: MessageType[];
-  status?: "streaming" | "ready" | "submitted" | "error";
-  onDelete: (id: string) => void;
+  status?: "ready" | "submitted";
+  // onDelete: (id: string) => void;
 }
 
 export function Conversation({
   messages,
   status = "ready",
-  onDelete,
+  // onDelete,
 }: ConversationProps) {
   const initialMessageCount = useRef(messages.length);
 
@@ -45,22 +45,16 @@ export function Conversation({
             const hasScrollAnchor =
               isLast && messages.length > initialMessageCount.current;
 
-            const text =
-              message.parts
-                ?.map((part) => (part.type === "text" ? part.text : ""))
-                .join("") ?? "";
-
             return (
               <Message
                 hasScrollAnchor={hasScrollAnchor}
                 isLast={isLast}
-                key={message.id}
-                onDelete={onDelete}
-                parts={message.parts}
+                key={message.text}
+                // onDelete={onDelete}
                 status={status}
                 variant={message.role}
               >
-                {text}
+                {message.text}
               </Message>
             );
           })}

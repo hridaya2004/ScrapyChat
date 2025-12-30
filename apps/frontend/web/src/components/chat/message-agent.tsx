@@ -1,4 +1,3 @@
-import type { UIMessage as MessageAISDK } from "@ai-sdk/react";
 import { CheckIcon, CopyIcon } from "lucide-react";
 import { useRef } from "react";
 import {
@@ -8,7 +7,6 @@ import {
   MessageContent,
 } from "@/components/ui/message";
 import { cn } from "@/lib/utils";
-import { Reasoning } from "../ui/reasoning";
 
 interface MessageAgentProps {
   children: string;
@@ -16,8 +14,7 @@ interface MessageAgentProps {
   hasScrollAnchor?: boolean;
   copied?: boolean;
   copyToClipboard?: () => void;
-  parts?: MessageAISDK["parts"];
-  status?: "streaming" | "ready" | "submitted" | "error";
+  status?: "ready" | "submitted";
   className?: string;
 }
 
@@ -27,13 +24,12 @@ export function MessageAgent({
   hasScrollAnchor,
   copied,
   copyToClipboard,
-  parts,
   status,
   className,
 }: MessageAgentProps) {
-  const reasoningParts = parts?.find((part) => part.type === "reasoning");
+  // const reasoningParts = parts?.find((part) => part.type === "reasoning");
   const contentNullOrEmpty = children === null || children === "";
-  const isLastStreaming = status === "streaming" && isLast;
+  const isLastStreaming = status !== "ready" && isLast;
 
   const messageRef = useRef<HTMLDivElement>(null);
 
@@ -52,11 +48,11 @@ export function MessageAgent({
         )}
         ref={messageRef}
       >
-        {!!reasoningParts?.text && (
+        {/*{!!reasoningParts?.text && (
           <Reasoning isStreaming={status === "streaming"}>
             {reasoningParts.text}
           </Reasoning>
-        )}
+        )}*/}
 
         {contentNullOrEmpty ? null : (
           <MessageContent

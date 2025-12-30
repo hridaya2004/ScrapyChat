@@ -1,16 +1,15 @@
-import type { UIMessage } from "@ai-sdk/react";
 import { useState } from "react";
+import type { Message as MessageType } from "@/lib/types";
 import { MessageAgent } from "./message-agent";
 import { MessageUser } from "./message-user";
 
 interface MessageProps {
-  variant: UIMessage["role"];
+  variant: MessageType["role"];
   children: string;
   isLast?: boolean;
-  onDelete: (id: string) => void;
+  // onDelete: (id: string) => void;
   hasScrollAnchor?: boolean;
-  parts?: UIMessage["parts"];
-  status?: "streaming" | "ready" | "submitted" | "error";
+  status?: "ready" | "submitted";
   className?: string;
 }
 
@@ -19,7 +18,6 @@ export function Message({
   children,
   isLast,
   hasScrollAnchor,
-  parts,
   status,
   className,
 }: MessageProps) {
@@ -52,7 +50,6 @@ export function Message({
         copyToClipboard={copyToClipboard}
         hasScrollAnchor={hasScrollAnchor}
         isLast={isLast}
-        parts={parts}
         status={status}
       >
         {children}
