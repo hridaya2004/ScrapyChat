@@ -1,9 +1,7 @@
 import { apiConfig } from "@/config/global";
+import { streamSSEResponse } from "@/lib/sse-parser";
 import { type ScrapeList, scrapeListSchema } from "@/model/scrape/list";
-import {
-  type ScrapeProgress,
-  scrapeProgressSchema,
-} from "@/model/scrape/progress";
+import type { ScrapeProgress } from "@/model/scrape/progress";
 import { toast } from "../ui/toast";
 
 const getScrapeList = async (token: string): Promise<ScrapeList> => {
@@ -121,9 +119,12 @@ const scrapeNewUrl = async (
   return null;
 };
 
-const getScrapeProgress = async (token: string): Promise<ScrapeProgress> => {
+const getScrapeProgress = async (
+  token: string,
+  onProgress: (data: ScrapeProgress) => void
+): Promise<void> => {
   if (!token.trim()) {
-    return [];
+    return;
   }
 
   try {
@@ -134,32 +135,21 @@ const getScrapeProgress = async (token: string): Promise<ScrapeProgress> => {
       },
     });
 
-    if (response.ok) {
-      const data = await response.json();
-
-      const parsedData = scrapeProgressSchema.safeParse(data);
-
-      if (parsedData.error) {
-        toast({
-          title: "Failed to parse progress data",
-          description: parsedData.error.message,
-          status: "error",
-        });
-      }
-
-      if (parsedData.success) {
-        return parsedData.data;
-      }
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
-  } catch {
-    toast({
-      title: "Failed to fetch progress",
-      description: "An error occurred while fetching the progress.",
-      status: "error",
-    });
-  }
 
-  return [];
+    const reader = response.body?.getReader();
+    if (!reader) {
+      throw new Error("No reader available");
+    }
+
+    await streamSSEResponse(reader, onProgress);
+  } catch (error) {
+    if (error instanceof Error && error.name !== "AbortError") {
+      console.error("SSE Error:", error);
+    }
+  }
 };
 
 export { getScrapeList, scrapeNewUrl, getScrapeProgress };

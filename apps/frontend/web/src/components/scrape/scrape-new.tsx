@@ -1,7 +1,6 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQuery } from "@tanstack/react-query";
 import { PlusIcon } from "lucide-react";
 import { useId, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -24,15 +23,10 @@ import {
 import { Field, FieldError, FieldGroup } from "../ui/field";
 import { Input } from "../ui/input";
 import { Spinner } from "../ui/spinner";
-import { getScrapeProgress, scrapeNewUrl } from "./scrape-core";
+import { scrapeNewUrl } from "./scrape-core";
 
 export default function ScrapeNew() {
   const { token } = useAuthJWTProvider();
-
-  const { refetch: fetchScrapeProgress } = useQuery({
-    queryKey: ["scrapeStatus"],
-    queryFn: () => getScrapeProgress(token ?? ""),
-  });
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -56,7 +50,6 @@ export default function ScrapeNew() {
       setLoading(updatedLoading);
       if (success) {
         setDialogOpen(false);
-        fetchScrapeProgress();
       }
     });
   };

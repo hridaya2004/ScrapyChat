@@ -1,4 +1,3 @@
-import { useQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import type { ScrapeProgress as ScrapeProgressType } from "@/model/scrape/progress";
 import { useAuthJWTProvider } from "@/providers/auth-jwt-provider";
@@ -12,39 +11,48 @@ import { toast } from "../ui/toast";
 import { getScrapeProgress } from "./scrape-core";
 
 export const ScrapeProgress = () => {
-  const hasToastedRef = useRef(false);
-  const persistentDataRef = useRef<ScrapeProgressType>([]);
-
   const [showDialog, setShowDialog] = useState(false);
-
+  const [scrapeData, setScrapeData] = useState<ScrapeProgressType[]>([]);
+  const persistentDataRef = useRef<ScrapeProgressType[]>([]);
+  const previousLengthRef = useRef(0);
   const { token } = useAuthJWTProvider();
-  const { data } = useQuery({
-    queryKey: ["scrapeStatus"],
-    queryFn: () => getScrapeProgress(token ?? ""),
-  });
+  const hasStartedRef = useRef(false);
 
-  const handleDialog = (value: boolean) => {
-    setShowDialog(value);
-  };
-
-  // biome-ignore lint/correctness/useExhaustiveDependencies: ignore
   useEffect(() => {
-    if (
-      !hasToastedRef.current &&
-      data?.length &&
-      persistentDataRef.current !== data
-    ) {
-      hasToastedRef.current = true;
-      persistentDataRef.current = data;
+    if (!token || hasStartedRef.current) {
+      return;
+    }
 
+    hasStartedRef.current = true;
+
+    getScrapeProgress(token, (data: ScrapeProgressType) => {
+      setScrapeData((prev) => {
+        const isComplete = Number.parseFloat(String(data.progress)) >= 1.0;
+        const filtered = prev.filter((item) => item.url !== data.url);
+        return isComplete ? filtered : [...filtered, data];
+      });
+    });
+  }, [token]);
+
+  useEffect(() => {
+    const hasLengthIncreased = scrapeData.length > previousLengthRef.current;
+    const hasDataChanged = persistentDataRef.current !== scrapeData;
+
+    if (scrapeData.length > 0 && hasLengthIncreased && hasDataChanged) {
       toast({
         title: "User defined website being scraped.",
-        button: handleDialog(!showDialog) ?? undefined,
+        button: {
+          label: "View",
+          onClick: () => setShowDialog(true),
+        },
       });
     }
-  }, [data]);
 
-  if (!data) {
+    persistentDataRef.current = scrapeData;
+    previousLengthRef.current = scrapeData.length;
+  }, [scrapeData]);
+
+  if (!scrapeData.length) {
     return null;
   }
 
@@ -55,14 +63,13 @@ export const ScrapeProgress = () => {
         <DialogDescription>
           Currently being scraped websites' progress
         </DialogDescription>
-
         <div className="mt-4 flex flex-col rounded-3xl border">
-          {data.map((item) => (
+          {scrapeData.map((item) => (
             <div
-              className="flex items-center justify-between border-b p-2 px-4 last:border-b-0"
+              className="flex items-center justify-between gap-4 border-b p-2 px-4 last:border-b-0"
               key={item.url}
             >
-              <span className="font-mono text-muted-foreground">
+              <span className="font-mono text-muted-foreground text-sm">
                 {item.url}
               </span>
               <span className="font-semibold">
