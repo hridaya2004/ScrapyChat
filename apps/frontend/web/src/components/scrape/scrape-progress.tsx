@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { isEmpty } from "@/lib/utils";
 import type { ScrapeProgress as ScrapeProgressType } from "@/model/scrape/progress";
 import { useAuthJWTProvider } from "@/providers/auth-jwt-provider";
 import {
@@ -36,32 +37,30 @@ export const ScrapeProgress = () => {
   }, [token]);
 
   useEffect(() => {
-    if (!scrapeData.length) {
-      return;
+    // no use of checking scrapeData's length as
+    // SSE would always send an empty object, hence making the
+    // length of it be more than 0
+    if (!isEmpty(scrapeData)) {
+      const hasValidDataIncreased =
+        scrapeData.length > previousLengthRef.current;
+      const hasDataChanged = !Object.is(persistentDataRef.current, scrapeData);
+
+      if (hasValidDataIncreased && hasDataChanged) {
+        toast({
+          title: "User defined website being scraped.",
+          button: {
+            label: "View",
+            onClick: () => setShowDialog(true),
+          },
+        });
+      }
+
+      persistentDataRef.current = scrapeData;
+      previousLengthRef.current = scrapeData.length;
     }
-
-    const validData = scrapeData.filter(
-      (item) => item && Object.keys(item).length > 0
-    );
-
-    const hasValidDataIncreased = validData.length > previousLengthRef.current;
-    const hasDataChanged = !Object.is(persistentDataRef.current, scrapeData);
-
-    if (hasValidDataIncreased && hasDataChanged) {
-      toast({
-        title: "User defined website being scraped.",
-        button: {
-          label: "View",
-          onClick: () => setShowDialog(true),
-        },
-      });
-    }
-
-    persistentDataRef.current = scrapeData;
-    previousLengthRef.current = validData.length;
   }, [scrapeData]);
 
-  if (scrapeData.filter((item) => item && Object.keys(item).length > 0)) {
+  if (isEmpty(scrapeData)) {
     return null;
   }
 
