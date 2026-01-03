@@ -6,7 +6,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
-import { UIMessage } from "ai";
 import { Streamdown } from "streamdown";
 
 export type MessageProps = {
