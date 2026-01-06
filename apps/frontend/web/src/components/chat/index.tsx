@@ -64,7 +64,7 @@ export const Chat = () => {
   return (
     <div
       className={cn(
-        "@container/main relative flex h-full flex-col items-center justify-end md:justify-center"
+        "@container/main relative flex h-full max-h-[calc(100vh-(var(--spacing-app-header)))] flex-col items-center justify-end md:justify-center"
       )}
     >
       <AnimatePresence initial={false} mode="popLayout">
