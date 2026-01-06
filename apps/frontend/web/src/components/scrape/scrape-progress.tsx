@@ -71,15 +71,13 @@ export const ScrapeProgress = () => {
         <DialogDescription>
           Currently being scraped websites' progress
         </DialogDescription>
-        <div className="mt-4 flex flex-col rounded-3xl border">
+        <div className="mt-2 flex flex-col rounded-3xl border">
           {scrapeData.map((item) => (
             <div
-              className="flex items-center justify-between gap-4 border-b p-2 px-4 last:border-b-0"
+              className="flex items-center justify-between gap-4 border-b p-2 px-4 font-mono text-sm last:border-b-0"
               key={item.url}
             >
-              <span className="font-mono text-muted-foreground text-sm">
-                {item.url}
-              </span>
+              <span className="text-muted-foreground">{item.url}</span>
               <span className="font-semibold">
                 {Math.round(item.progress * 100)}%
               </span>
