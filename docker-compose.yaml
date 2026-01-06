@@ -4,6 +4,7 @@ services:
     image: scrapychat-fastapi
     container_name: scrapychat-backend
     environment:
+      HOT_RELOAD: true
       QDRANT_ENDPOINT: http://qdrant:6333
       REDIS_HOST: redis
       REDIS_PORT: 6379
@@ -13,6 +14,13 @@ services:
     networks:
       - scrapynet
     restart: unless-stopped
+    develop:
+      watch:
+        - action: sync
+          path: src
+          target: /app/src
+        - action: rebuild
+          path: ./pyproject.toml
 
   qdrant:
     image: qdrant/qdrant:latest
