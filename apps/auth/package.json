@@ -6,9 +6,7 @@
   "scripts": {
     "dev": "bun --hot run ./src/server.ts",
     "setup-db": "bunx @better-auth/cli migrate -y",
-    "start": "bun --hot run ./src/server.ts",
-    "lint": "biome check",
-    "format": "biome format --write"
+    "start": "bun --hot run ./src/server.ts"
   },
   "devDependencies": {
     "@types/bun": "^1.3.5",
