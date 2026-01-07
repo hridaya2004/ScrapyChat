@@ -1,12 +1,13 @@
 {
-  "name": "auth-server",
+  "name": "auth",
   "module": "index.ts",
   "type": "module",
   "private": true,
   "scripts": {
     "dev": "bun --hot run ./src/server.ts",
-    "setup-db": "npx @better-auth/cli migrate -y",
-    "start": "npm run ./src/server.ts",
+    "setup-db": "bunx @better-auth/cli migrate -y",
+    "start": "bun --hot run ./src/server.ts",
+    "lint": "biome check",
     "format": "biome format --write"
   },
   "devDependencies": {

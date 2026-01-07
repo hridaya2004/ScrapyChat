@@ -3,7 +3,7 @@ services:
     container_name: scrapy-web
     build:
       context: .
-      dockerfile: apps/frontend/web/Dockerfile
+      dockerfile: apps/web/Dockerfile
     image: scrapy-web
     ports:
       - "3001:3000"
@@ -16,11 +16,11 @@ services:
     container_name: scrapy-auth
     build:
       context: .
-      dockerfile: apps/backend/auth/Dockerfile
+      dockerfile: apps/auth/Dockerfile
     image: scrapy-auth
     ports:
       - "3002:3001"
-    env_file: apps/backend/auth/.env
+    env_file: apps/auth/.env
     networks:
       - scrapynet
     depends_on:
