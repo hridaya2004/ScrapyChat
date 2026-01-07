@@ -1,4 +1,5 @@
 import "./globals.css";
+import { GoogleAnalytics, GoogleTagManager } from "@next/third-parties/google";
 import type { Metadata } from "next";
 import Header from "@/components/header";
 import { Toaster } from "@/components/ui/sonner";
@@ -20,6 +21,8 @@ export default function RootLayout({
 }>) {
   return (
     <html data-scroll-behavior="smooth" lang="en" suppressHydrationWarning>
+      <GoogleTagManager gtmId="GTM-N8J7XBGV" />
+      <GoogleAnalytics gaId="G-57KPX2KXVZ" />
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
