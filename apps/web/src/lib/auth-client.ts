@@ -1,9 +1,9 @@
 import { jwtClient, lastLoginMethodClient } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
+import { apiConfig } from "@/config/global";
 
 export const authClient = createAuthClient({
-  baseURL:
-    process.env.NODE_ENV === "development" ? "http://localhost:3001" : "",
+  baseURL: apiConfig.authUrl.replace("/api", ""),
 
   fetchOptions: {
     credentials: "include",
@@ -12,10 +12,7 @@ export const authClient = createAuthClient({
   plugins: [
     jwtClient({
       jwks: {
-        jwksPath:
-          process.env.NODE_ENV === "development"
-            ? "http://localhost:3001/api/auth/.well-known/jwks.json"
-            : "/api/auth/.well-known/jwks.json",
+        jwksPath: `${apiConfig.authUrl}/auth/.well-known/jwks.json`,
       },
     }),
     lastLoginMethodClient(),

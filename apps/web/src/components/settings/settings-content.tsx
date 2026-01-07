@@ -1,11 +1,16 @@
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
+import { BYOKSection } from "./apiKeys/byok-section";
 import ProfileSettings from "./profile";
 
 const tabs = [
   {
     label: "Profile",
     component: <ProfileSettings />,
+  },
+  {
+    label: "API Keys",
+    component: <BYOKSection />,
   },
 ];
 
@@ -24,7 +29,7 @@ export default function SettingsContent({
         onValueChange={setActiveTab}
       >
         <TabsList className="h-full min-w-40 items-start overflow-y-auto bg-sidebar">
-          <div className="flex w-full flex-col gap-2">
+          <div className="flex w-full flex-col gap-1">
             {tabs.map((tab) => (
               <TabsTrigger className="h-fit" key={tab.label} value={tab.label}>
                 {tab.label}
@@ -62,7 +67,11 @@ export default function SettingsContent({
 
       <div className="container flex-1 overflow-y-auto">
         {tabs.map((tab) => (
-          <TabsContent className="h-fit" key={tab.label} value={tab.label}>
+          <TabsContent
+            className="h-fit pb-16"
+            key={tab.label}
+            value={tab.label}
+          >
             {tab.component}
           </TabsContent>
         ))}
