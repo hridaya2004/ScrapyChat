@@ -4,5 +4,5 @@
   "files": {
     "includes": ["!**/components/ui"]
   },
-  "extends": ["ultracite/core", "ultracite/next"]
+  "extends": ["ultracite/biome/core", "ultracite/biome/next"]
 }
