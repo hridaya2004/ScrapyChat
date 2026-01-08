@@ -285,12 +285,11 @@ export const BYOKSection = () => {
                 <div className="flex gap-2">
                   {models[selectedProvider] && (
                     <Button
-                      className="mt-2"
+                      className="mt-2 rounded-3xl"
                       disabled={
                         deleteMutation.isPending || saveMutation.isPending
                       }
                       onClick={() => handleDeleteClick(selectedProvider)}
-                      size="sm"
                       type="button"
                       variant="outline"
                     >
