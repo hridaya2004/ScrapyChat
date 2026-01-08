@@ -43,15 +43,11 @@ class RedisProvider(BaseProvider):
 
     async def set_progress(self, user_id: str, url: str, value: str) -> None:
         # Set progress in hashset
-        await self._client.hset(
-            f"user:{user_id}", mapping={"url": url, "progress": value}
-        )  # type: ignore
+        await self._client.hset(f"user:{user_id}", mapping={url: value})  # type: ignore
 
         # Publish progress updates to consumer
-        await self._client.publish(
-            f"user:{user_id}", json.dumps({"url": url, "progress": value})
-        )
+        await self._client.publish(f"user:{user_id}", json.dumps({url: value}))
 
-    async def expire_progress(self, user_id: str, url: str) -> None:
-        # Set 10 seconds expiry on the key
-        await self._client.hexpire(f"user:{user_id}", 10, url)  # type: ignore
+    async def expire_progress(self, user_id: str, url: str, expiry: int = 5) -> None:
+        # Set 5 seconds expiry on the key
+        await self._client.hexpire(f"user:{user_id}", expiry, url)
