@@ -9,17 +9,17 @@ import {
   scrapeNewSchema,
 } from "@/model/scrape/new";
 import { useAuthJWTProvider } from "@/providers/auth-jwt-provider";
-import { Button } from "../ui/button";
 import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "../ui/dialog";
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "../ui/alert-dialog";
+import { Button } from "../ui/button";
 import { Field, FieldError, FieldGroup } from "../ui/field";
 import { Input } from "../ui/input";
 import { Spinner } from "../ui/spinner";
@@ -55,19 +55,19 @@ export default function ScrapeNew() {
   };
 
   return (
-    <Dialog onOpenChange={setDialogOpen} open={dialogOpen}>
-      <DialogTrigger asChild>
+    <AlertDialog onOpenChange={setDialogOpen} open={dialogOpen}>
+      <AlertDialogTrigger asChild>
         <Button variant="outline">
           <PlusIcon />
         </Button>
-      </DialogTrigger>
-      <DialogContent className="rounded-3xl" showCloseButton={false}>
-        <DialogHeader>
-          <DialogTitle>Enter the website URL</DialogTitle>
-          <DialogDescription>
+      </AlertDialogTrigger>
+      <AlertDialogContent className="rounded-3xl">
+        <AlertDialogHeader>
+          <AlertDialogTitle>Enter the website URL</AlertDialogTitle>
+          <AlertDialogDescription>
             Enter the URL of the website you want the information from:
-          </DialogDescription>
-        </DialogHeader>
+          </AlertDialogDescription>
+        </AlertDialogHeader>
         <div>
           <form
             id={htmlFormId}
@@ -96,12 +96,12 @@ export default function ScrapeNew() {
             </FieldGroup>
           </form>
         </div>
-        <DialogFooter>
-          <DialogClose asChild>
+        <AlertDialogFooter>
+          <AlertDialogCancel asChild>
             <Button className="rounded-3xl" variant="outline">
               Cancel
             </Button>
-          </DialogClose>
+          </AlertDialogCancel>
           <Button
             className="rounded-3xl"
             disabled={loading}
@@ -113,8 +113,8 @@ export default function ScrapeNew() {
             )}
             {loading ? "Scraping" : "Scrape"}
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }
