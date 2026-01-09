@@ -5,16 +5,12 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .internal.embeddings import EmbeddingProvider
-from .internal.llm import LLMProvider
 from .internal.vector_store import VectorStoreProvider
 from .routers.chat import router as chat_router
 from .routers.scrape import router as scraper_router
 
 origins = os.getenv("ALLOWED_ORIGINS", "").split("|")
 
-embedding_provider = EmbeddingProvider()
-llm_provider = LLMProvider()
 vector_store_provider = VectorStoreProvider()
 
 

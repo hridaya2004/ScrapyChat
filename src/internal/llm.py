@@ -1,12 +1,49 @@
+import logging
 import os
+from enum import Enum
 
 from llama_index.core.base.llms.types import (
     CompletionResponse,
     CompletionResponseAsyncGen,
 )
+from llama_index.llms.google_genai import GoogleGenAI
 from llama_index.llms.ollama import Ollama
+from pydantic import BaseModel, Field
 
 from ..types.provider import BaseProvider
+
+logger = logging.getLogger("internal.llm")
+
+
+class ExternalLLM(Enum):
+    """
+    Enum representing available external LLM providers
+    """
+
+    GOOGLE_GENAI = "google_genai"
+
+
+class LLMConfig(BaseModel):
+    """
+    Model representing an external LLM configuration
+    """
+
+    provider: ExternalLLM = Field(
+        ..., description="The name of the external LLM provider"
+    )
+    model: str = Field(..., description="The name of the particular model")
+    api_key: str = Field(
+        ..., description="The API key for the particular provider and model"
+    )
+
+    def client(self):
+        """
+        Returns LLM client for the provider
+        """
+
+        match self.provider:
+            case ExternalLLM.GOOGLE_GENAI:
+                return GoogleGenAI(self.model, self.api_key)
 
 
 class LLMProvider(BaseProvider):

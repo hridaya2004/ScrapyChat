@@ -3,6 +3,7 @@ import os
 from typing import Optional
 
 from llama_index.core import Document, Settings, VectorStoreIndex
+from llama_index.core.llms.utils import LLMType
 from llama_index.core.node_parser import SimpleNodeParser
 from llama_index.core.vector_stores import MetadataFilter, MetadataFilters
 from llama_index.vector_stores.qdrant import QdrantVectorStore
@@ -129,6 +130,7 @@ class VectorStoreProvider(BaseProvider):
     async def query(
         self,
         text: str,
+        llm: LLMType,
         filter: Optional[dict[str, str]] = None,
         top_k: int = 3,
     ):
@@ -139,6 +141,7 @@ class VectorStoreProvider(BaseProvider):
             )
 
         engine = self._index.as_query_engine(
+            llm=llm,
             use_async=True,
             filters=metadata_filters,
             similarity_top_k=top_k,
