@@ -77,7 +77,9 @@ export const ScrapeProgress = () => {
               className="flex items-center justify-between gap-4 border-b p-2 px-4 font-mono text-sm last:border-b-0"
               key={item.url}
             >
-              <span className="text-muted-foreground">{item.url}</span>
+              <span className="break-all text-muted-foreground">
+                {item.url}
+              </span>
               <span className="font-semibold">
                 {Math.round(item.progress * 100)}%
               </span>
