@@ -44,3 +44,49 @@ export async function encryptData(apiKey: string, encryptionSecret: string) {
 
   return encryptedGoodies;
 }
+
+export async function decryptData(
+  encryptedGoodies: string,
+  encryptionSecret: string
+) {
+  const encoder = new TextEncoder();
+  const decoder = new TextDecoder();
+
+  const rawData = Buffer.from(encryptedGoodies, "base64");
+
+  const salt = rawData.subarray(0, 16);
+  const iv = rawData.subarray(16, 28);
+  const encryptedData = rawData.subarray(28);
+
+  const keyMaterial = await crypto.subtle.importKey(
+    "raw",
+    encoder.encode(encryptionSecret),
+    { name: "PBKDF2" },
+    false,
+    ["deriveKey"]
+  );
+
+  const key = await crypto.subtle.deriveKey(
+    {
+      name: "PBKDF2",
+      salt,
+      iterations: 100_000,
+      hash: "SHA-256",
+    },
+    keyMaterial,
+    { name: "AES-GCM", length: 256 },
+    false,
+    ["decrypt"]
+  );
+
+  const decrypted = await crypto.subtle.decrypt(
+    {
+      name: "AES-GCM",
+      iv,
+    },
+    key,
+    encryptedData
+  );
+
+  return decoder.decode(decrypted);
+}

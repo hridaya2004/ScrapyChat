@@ -2,7 +2,7 @@ import { fromNodeHeaders, toNodeHandler } from "better-auth/node";
 import cors from "cors";
 import express from "express";
 import { auth } from "./lib/auth.ts";
-import { encryptData } from "./lib/utils.ts";
+import { decryptData, encryptData } from "./lib/utils.ts";
 
 const app = express();
 const port = 3001;
@@ -29,7 +29,7 @@ app.get("/api/me", async (req, res) => {
 // or only apply it to routes that don't interact with Better Auth
 app.use(express.json());
 
-app.post("/api/api-keys", async (req, res) => {
+app.post("/api/api-keys/encrypt", async (req, res) => {
   const session = await auth.api.getSession({
     headers: fromNodeHeaders(req.headers),
   });
@@ -45,18 +45,51 @@ app.post("/api/api-keys", async (req, res) => {
     return res.status(400).json({ error: "Provider and API key are required" });
   }
 
-  const encryptedSalt = process.env.BETTER_AUTH_SECRET
-    ? `${process.env.BETTER_AUTH_SECRET}-${userId}`
-    : userId;
+  if (!process.env.BETTER_AUTH_SECRET) {
+    return res.status(500).json({
+      error: "Secret not provided.",
+    });
+  }
 
-  const encryptedGoodies = await encryptData(apiKey, encryptedSalt);
+  const uniqueSalt = `${process.env.BETTER_AUTH_SECRET}-${userId}`;
 
-  const finalData = JSON.stringify({
+  const encryptedGoodies = await encryptData(apiKey, uniqueSalt);
+
+  return res.json({
     provider_id: provider,
     api_key: encryptedGoodies,
   });
+});
 
-  return res.json(finalData);
+app.post("/api/api-keys/decrypt", async (req, res) => {
+  const session = await auth.api.getSession({
+    headers: fromNodeHeaders(req.headers),
+  });
+
+  const userId = session?.user.id;
+  const { apiKey } = req.body;
+
+  if (!userId) {
+    return res.status(401).json({ error: "User is unauthorized." });
+  }
+
+  if (!apiKey) {
+    return res.status(400).json({ error: "API key are required" });
+  }
+
+  if (!process.env.BETTER_AUTH_SECRET) {
+    return res.status(500).json({
+      error: "Secret not provided.",
+    });
+  }
+
+  const uniqueSalt = `${process.env.BETTER_AUTH_SECRET}-${userId}`;
+
+  const decryptedGoodies = await decryptData(apiKey, uniqueSalt);
+
+  return res.json({
+    api_key: decryptedGoodies,
+  });
 });
 
 app.listen(port, () => {

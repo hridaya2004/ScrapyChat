@@ -94,7 +94,7 @@ export const BYOKSection = () => {
       provider: string;
       apiKey: string;
     }) => {
-      const res = await fetch(`${apiConfig.authUrl}/api-keys`, {
+      const res = await fetch(`${apiConfig.authUrl}/api-keys/encrypt`, {
         method: "POST",
         credentials: "include",
         headers: {
