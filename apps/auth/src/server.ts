@@ -35,14 +35,16 @@ app.post("/api/api-keys/encrypt", async (req, res) => {
   });
 
   const userId = session?.user.id;
-  const { provider, apiKey } = req.body;
+  const { provider, apiKey, modelName } = req.body;
 
   if (!userId) {
     return res.status(401).json({ error: "User is unauthorized." });
   }
 
-  if (!(provider && apiKey)) {
-    return res.status(400).json({ error: "Provider and API key are required" });
+  if (!(provider && apiKey && modelName)) {
+    return res
+      .status(400)
+      .json({ error: "Required fields are not satisfied." });
   }
 
   if (!process.env.BETTER_AUTH_SECRET) {
@@ -58,6 +60,7 @@ app.post("/api/api-keys/encrypt", async (req, res) => {
   return res.json({
     provider_id: provider,
     api_key: encryptedGoodies,
+    model: modelName,
   });
 });
 

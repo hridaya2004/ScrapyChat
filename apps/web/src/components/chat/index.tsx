@@ -51,7 +51,7 @@ export const Chat = () => {
       modelName:
         selectedModel === "google-selfhost"
           ? undefined
-          : models[selectedModel].providerId,
+          : models[selectedModel].modelName,
     });
 
     setInput("");

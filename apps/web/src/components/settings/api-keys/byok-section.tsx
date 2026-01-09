@@ -28,6 +28,7 @@ import { useModel } from "@/providers/model-provider";
 
 interface Provider {
   id: string;
+  model: string;
   name: string;
   icon: React.ComponentType<{ className?: string }>;
   placeholder: string;
@@ -38,9 +39,10 @@ interface Provider {
 
 const PROVIDERS: Provider[] = [
   {
-    id: "gemma3b",
-    name: "Google",
+    id: "google_genai",
+    name: "Gemini 2.0 Flash",
     icon: GoogleIcon,
+    model: "gemini-2.0-flash",
     placeholder: "AIza...",
     paid: true,
     getKeyUrl: "https://ai.google.dev/gemini-api/docs/api-key",
@@ -49,6 +51,7 @@ const PROVIDERS: Provider[] = [
   {
     id: "google-selfhost",
     name: "Gemma 3",
+    model: "gemma3b",
     icon: GeminiIcon,
     paid: false,
     placeholder: "AIza............",
@@ -86,13 +89,24 @@ export const BYOKSection = () => {
     return apiKeys[providerId] || fallbackValue;
   };
 
+  const getModelName = (providerId: string) => {
+    const model = PROVIDERS.find((p) => p.id === providerId);
+    if (!model) {
+      return "";
+    }
+
+    return model.model;
+  };
+
   const saveMutation = useMutation({
     mutationFn: async ({
       provider,
       apiKey,
+      modelName,
     }: {
       provider: string;
       apiKey: string;
+      modelName: string;
     }) => {
       const res = await fetch(`${apiConfig.authUrl}/api-keys/encrypt`, {
         method: "POST",
@@ -103,6 +117,7 @@ export const BYOKSection = () => {
         body: JSON.stringify({
           provider,
           apiKey,
+          modelName,
         }),
       });
 
@@ -193,6 +208,7 @@ export const BYOKSection = () => {
 
   const handleSave = (providerId: string) => {
     const value = getProviderValue(providerId);
+    const model = getModelName(providerId);
     if (!value) {
       toast({
         title: "Empty API key",
@@ -200,7 +216,11 @@ export const BYOKSection = () => {
       });
       return;
     }
-    saveMutation.mutate({ provider: providerId, apiKey: value });
+    saveMutation.mutate({
+      provider: providerId,
+      apiKey: value,
+      modelName: model,
+    });
   };
 
   return (

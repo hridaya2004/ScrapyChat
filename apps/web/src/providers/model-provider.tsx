@@ -5,6 +5,7 @@ import { useLocalStorage } from "@/hooks/use-local-storage";
 
 interface ModelConfig {
   providerId: string;
+  modelName: string;
   apiKey: string;
 }
 
@@ -45,7 +46,7 @@ export function ModelContextProvider({
   );
 
   const [selectedModel, setSelectedModel] = useState<string>(
-    () => getSelectedModel() ?? "google-selfhosted"
+    () => getSelectedModel() ?? "google-selfhost"
   );
 
   const refreshSelectedModel = useCallback(() => {
