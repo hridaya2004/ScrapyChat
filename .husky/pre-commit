@@ -4,6 +4,10 @@
 # Exit on any error
 set -e
 
+# web version increment script
+./scripts/increment-web-version.sh
+git add ./apps/web/src/config/version.json
+
 # Check if there are any staged files
 if [ -z "$(git diff --cached --name-only)" ]; then
   echo "No staged files to format"
