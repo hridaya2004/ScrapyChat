@@ -38,7 +38,7 @@ interface Provider {
 
 const PROVIDERS: Provider[] = [
   {
-    id: "google",
+    id: "gemma3b",
     name: "Google",
     icon: GoogleIcon,
     placeholder: "AIza...",

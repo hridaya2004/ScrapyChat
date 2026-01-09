@@ -15,9 +15,15 @@ export const useChatCore = () => {
   const sendMessage = async ({
     input,
     queryUrl,
+    providerId,
+    modelName,
+    apiKey,
   }: {
     input: string;
     queryUrl: string;
+    providerId?: string;
+    modelName?: string;
+    apiKey?: string;
   }) => {
     try {
       setMessages([
@@ -38,6 +44,11 @@ export const useChatCore = () => {
         body: JSON.stringify({
           url: queryUrl,
           query: input,
+          llm: {
+            provider: providerId,
+            model: modelName,
+            api_key: apiKey,
+          },
         }),
       });
 

@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from "motion/react";
 import { cn } from "@/lib/utils";
+import { useModel } from "@/providers/model-provider";
 import { useQueryPromptUrlProvider } from "@/providers/query-prompt-url-provider";
 import { useChatSession } from "@/providers/session-provider";
 import { ChatInput } from "../chat-input";
@@ -19,6 +20,7 @@ export const Chat = () => {
     status,
     sendMessage: send,
   } = useChatCore();
+  const { selectedModel, models } = useModel();
 
   const showOnboarding = !chatId && messages.length === 0;
 
@@ -40,6 +42,16 @@ export const Chat = () => {
     send({
       input,
       queryUrl: url,
+      providerId:
+        selectedModel === "google-selfhost" ? undefined : selectedModel,
+      apiKey:
+        selectedModel === "google-selfhost"
+          ? undefined
+          : models[selectedModel].apiKey,
+      modelName:
+        selectedModel === "google-selfhost"
+          ? undefined
+          : models[selectedModel].providerId,
     });
 
     setInput("");
