@@ -1,0 +1,9 @@
+
+#!/bin/sh
+# Exit on any error
+set -e
+
+# web version increment script
+./scripts/increment-web-version.sh
+git add ./apps/web/src/config/version.json
+git commit -m "[husky] Bump version info"
