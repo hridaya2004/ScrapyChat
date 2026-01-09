@@ -26,6 +26,7 @@ export default function ScrapeList() {
   const { data, refetch } = useQuery({
     queryKey: ["scrapeList"],
     queryFn: () => getScrapeList(token?.trim() ? token : ""),
+    enabled: !!token?.trim(),
   });
 
   const handleValueChange = (value: string) => {
