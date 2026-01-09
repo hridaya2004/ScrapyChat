@@ -1,6 +1,7 @@
 services:
   web:
     container_name: scrapy-web
+    restart: unless-stopped
     build:
       context: .
       dockerfile: apps/web/Dockerfile
@@ -14,6 +15,7 @@ services:
 
   auth:
     container_name: scrapy-auth
+    restart: unless-stopped
     build:
       context: .
       dockerfile: apps/auth/Dockerfile
