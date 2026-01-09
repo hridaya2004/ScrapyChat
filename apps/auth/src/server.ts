@@ -65,16 +65,24 @@ app.post("/api/api-keys/encrypt", async (req, res) => {
 });
 
 app.post("/api/api-keys/decrypt", async (req, res) => {
-  const session = await auth.api.getSession({
-    headers: fromNodeHeaders(req.headers),
+  const token = req.headers.authorization?.split(" ")[1];
+
+  if (!token) {
+    return res.status(401).json({ error: "Token not provided" });
+  }
+
+  const decryptedToken = await auth.api.verifyJWT({
+    body: {
+      token,
+      issuer: process.env.ISSUER_URL,
+    },
   });
 
-  const userId = session?.user.id;
-  const { apiKey } = req.body;
-
-  if (!userId) {
-    return res.status(401).json({ error: "User is unauthorized." });
+  if (!decryptedToken.payload) {
+    return res.status(401).json({ error: "Token is invalid" });
   }
+
+  const { apiKey } = req.body;
 
   if (!apiKey) {
     return res.status(400).json({ error: "API key are required" });
@@ -86,7 +94,8 @@ app.post("/api/api-keys/decrypt", async (req, res) => {
     });
   }
 
-  const uniqueSalt = `${process.env.BETTER_AUTH_SECRET}-${userId}`;
+  // subject - user.id
+  const uniqueSalt = `${process.env.BETTER_AUTH_SECRET}-${decryptedToken.payload.sub}`;
 
   const decryptedGoodies = await decryptData(apiKey, uniqueSalt);
 
