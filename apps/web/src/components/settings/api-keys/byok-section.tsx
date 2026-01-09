@@ -114,7 +114,7 @@ export const BYOKSection = () => {
     },
     onSuccess: (response, { provider }) => {
       const providerConfig = PROVIDERS.find((p) => p.id === provider);
-      const parsed = apiKeySchema.parse(JSON.parse(response));
+      const parsed = apiKeySchema.parse(response);
 
       setModel({
         ...models,
