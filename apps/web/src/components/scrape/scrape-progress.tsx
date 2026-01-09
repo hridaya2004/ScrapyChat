@@ -11,53 +11,59 @@ import {
 import { toast } from "../ui/toast";
 import { getScrapeProgress } from "./scrape-core";
 
+interface ProgressItem {
+  url: string;
+  progress: number;
+}
+
 export const ScrapeProgress = () => {
   const [showDialog, setShowDialog] = useState(false);
-  const [scrapeData, setScrapeData] = useState<ScrapeProgressType[]>([]);
-  const persistentDataRef = useRef<ScrapeProgressType[]>([]);
-  const previousLengthRef = useRef(0);
-  const { token } = useAuthJWTProvider();
+  const [scrapeData, setScrapeData] = useState<ProgressItem[]>([]);
+  const previousUrlsRef = useRef<Set<string>>(new Set());
   const hasStartedRef = useRef(false);
+  const { token } = useAuthJWTProvider();
 
   useEffect(() => {
-    if (!token || hasStartedRef.current) {
+    if (!token?.trim() || hasStartedRef.current) {
       return;
     }
-
     hasStartedRef.current = true;
 
     getScrapeProgress(token, (data: ScrapeProgressType) => {
-      setScrapeData((prev) => {
-        // this float ranges from 0 to 1.0
-        const isComplete = data.progress === 1.0;
-        const filtered = prev.filter((item) => item.url !== data.url);
-        return isComplete ? filtered : [...filtered, data];
-      });
+      const next = Object.entries(data)
+        .filter(([, progress]) => progress !== 1)
+        .map(([url, progress]) => ({ url, progress }));
+
+      setScrapeData(next);
     });
   }, [token]);
 
   useEffect(() => {
-    // no use of checking scrapeData's length as
-    // SSE would always send an empty object, hence making the
-    // length of it be more than 0
-    if (!isEmpty(scrapeData)) {
-      const hasValidDataIncreased =
-        scrapeData.length > previousLengthRef.current;
-      const hasDataChanged = !Object.is(persistentDataRef.current, scrapeData);
-
-      if (hasValidDataIncreased && hasDataChanged) {
-        toast({
-          title: "User defined website being scraped.",
-          button: {
-            label: "View",
-            onClick: () => setShowDialog(true),
-          },
-        });
-      }
-
-      persistentDataRef.current = scrapeData;
-      previousLengthRef.current = scrapeData.length;
+    if (isEmpty(scrapeData)) {
+      return;
     }
+
+    const currentUrls = new Set(scrapeData.map((d) => d.url));
+
+    let hasNewUrl = false;
+    for (const url of currentUrls) {
+      if (!previousUrlsRef.current.has(url)) {
+        hasNewUrl = true;
+        break;
+      }
+    }
+
+    if (hasNewUrl) {
+      toast({
+        title: "User defined website being scraped.",
+        button: {
+          label: "View",
+          onClick: () => setShowDialog(true),
+        },
+      });
+    }
+
+    previousUrlsRef.current = currentUrls;
   }, [scrapeData]);
 
   if (isEmpty(scrapeData)) {
@@ -71,17 +77,16 @@ export const ScrapeProgress = () => {
         <DialogDescription>
           Currently being scraped websites' progress
         </DialogDescription>
+
         <div className="mt-2 flex flex-col rounded-3xl border">
-          {scrapeData.map((item) => (
+          {scrapeData.map(({ url, progress }) => (
             <div
               className="flex items-center justify-between gap-4 border-b p-2 px-4 font-mono text-sm last:border-b-0"
-              key={item.url}
+              key={url}
             >
-              <span className="break-all text-muted-foreground">
-                {item.url}
-              </span>
+              <span className="break-all text-muted-foreground">{url}</span>
               <span className="font-semibold">
-                {Math.round(item.progress * 100)}%
+                {Math.round(progress * 100)}%
               </span>
             </div>
           ))}

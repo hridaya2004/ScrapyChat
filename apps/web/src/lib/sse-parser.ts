@@ -8,6 +8,7 @@ const parseSSELine = (
     return;
   }
 
+  // this trims out the data: {} part
   const jsonStr = line.slice(6).trim();
   try {
     const parsedJson = JSON.parse(jsonStr);
