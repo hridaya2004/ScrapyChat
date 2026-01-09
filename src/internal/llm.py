@@ -2,10 +2,12 @@ import logging
 import os
 from enum import Enum
 
+from httpx import AsyncClient
 from llama_index.core.base.llms.types import (
     CompletionResponse,
     CompletionResponseAsyncGen,
 )
+from llama_index.core.llms.llm import LLM
 from llama_index.llms.google_genai import GoogleGenAI
 from llama_index.llms.ollama import Ollama
 from pydantic import BaseModel, Field
@@ -36,14 +38,32 @@ class LLMConfig(BaseModel):
         ..., description="The API key for the particular provider and model"
     )
 
-    def client(self):
+    async def decrypt_key(self, token: str) -> str:
+        """
+        Decrypts encrypted token from express
+        """
+
+        async with AsyncClient() as client:
+            res = await client.post(
+                url=os.environ["FRONTEND_URL"] + "/api/api-keys/decrypt",
+                json={"apiKey": self.api_key},
+                headers={"Authorization": token},
+            )
+
+            res.raise_for_status()
+            return res.json()["api_key"]
+
+    async def client(self, token: str) -> LLM:
         """
         Returns LLM client for the provider
         """
 
+        # Get decrypted key
+        decrypted_key = await self.decrypt_key(token)
+
         match self.provider:
             case ExternalLLM.GOOGLE_GENAI:
-                return GoogleGenAI(self.model, self.api_key)
+                return GoogleGenAI(self.model, decrypted_key)
 
 
 class LLMProvider(BaseProvider):
