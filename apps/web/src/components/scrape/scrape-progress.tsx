@@ -17,43 +17,54 @@ interface ProgressItem {
 }
 
 export const ScrapeProgress = () => {
-  const [showDialog, setShowDialog] = useState(false);
-  const [scrapeData, setScrapeData] = useState<ProgressItem[]>([]);
-  const previousUrlsRef = useRef<Set<string>>(new Set());
-  const hasStartedRef = useRef(false);
   const { token } = useAuthJWTProvider();
 
+  const [showDialog, setShowDialog] = useState(false);
+  const [scrapeData, setScrapeData] = useState<ProgressItem[]>([]);
+
+  const previousUrlsRef = useRef<Set<string>>(new Set());
+  const lastToastAtRef = useRef(0);
+  const startedRef = useRef(false);
+
+  // send the request on mount
   useEffect(() => {
-    if (!token?.trim() || hasStartedRef.current) {
+    if (!token?.trim() || startedRef.current) {
       return;
     }
-    hasStartedRef.current = true;
+
+    startedRef.current = true;
 
     getScrapeProgress(token, (data: ScrapeProgressType) => {
-      const next = Object.entries(data)
-        .filter(([, progress]) => progress !== 1)
-        .map(([url, progress]) => ({ url, progress }));
+      setScrapeData((prev) => {
+        const map = new Map(prev.map(({ url, progress }) => [url, progress]));
 
-      setScrapeData(next);
+        for (const [url, progress] of Object.entries(data)) {
+          progress === 1 ? map.delete(url) : map.set(url, progress);
+        }
+
+        return Array.from(map, ([url, progress]) => ({ url, progress }));
+      });
     });
   }, [token]);
 
+  // show toast only if new URL is shown and
+  // 5sec have passed since last toast
   useEffect(() => {
     if (isEmpty(scrapeData)) {
+      previousUrlsRef.current.clear();
+      lastToastAtRef.current = 0;
       return;
     }
 
     const currentUrls = new Set(scrapeData.map((d) => d.url));
+    const hasNewUrl = [...currentUrls].some(
+      (url) => !previousUrlsRef.current.has(url)
+    );
 
-    let hasNewUrl = false;
-    for (const url of currentUrls) {
-      if (!previousUrlsRef.current.has(url)) {
-        hasNewUrl = true;
-        break;
-      }
-    }
+    const now = Date.now();
+    if (hasNewUrl && now - lastToastAtRef.current >= 5000) {
+      lastToastAtRef.current = now;
 
-    if (hasNewUrl) {
       toast({
         title: "User defined website being scraped.",
         button: {

@@ -50,6 +50,8 @@ export default function ScrapeNew() {
       setLoading(updatedLoading);
       if (success) {
         setDialogOpen(false);
+        // cleanup the form after use
+        scrapeNewUrlForm.resetField("url");
       }
     });
   };
