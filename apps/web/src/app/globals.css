@@ -59,6 +59,7 @@
     0% {
       opacity: 1;
     }
+
     100% {
       opacity: 0.15;
     }
@@ -166,11 +167,11 @@
 
   body {
     @apply bg-background text-foreground;
+    @apply antialiased;
+    @apply h-dvh;
 
     font-synthesis-weight: none;
     text-rendering: optimizeLegibility;
-
-    @apply h-dvh;
   }
 
   a:active,
