@@ -5,6 +5,14 @@ import { rawResponseMessageSchema } from "@/model/chat/new";
 import { useAuthJWTProvider } from "@/providers/auth-jwt-provider";
 import { toast } from "../ui/toast";
 
+interface SendMessageParams {
+  input: string;
+  queryUrl: string;
+  providerId?: string;
+  modelName?: string;
+  apiKey?: string;
+}
+
 export const useChatCore = () => {
   const { token } = useAuthJWTProvider();
 
@@ -18,13 +26,7 @@ export const useChatCore = () => {
     providerId,
     modelName,
     apiKey,
-  }: {
-    input: string;
-    queryUrl: string;
-    providerId?: string;
-    modelName?: string;
-    apiKey?: string;
-  }) => {
+  }: SendMessageParams) => {
     try {
       setMessages([
         ...messages,
@@ -44,11 +46,14 @@ export const useChatCore = () => {
         body: JSON.stringify({
           url: queryUrl,
           query: input,
-          llm: {
-            provider: providerId,
-            model: modelName,
-            api_key: apiKey,
-          },
+          llm:
+            providerId && modelName && apiKey
+              ? {
+                  provider: providerId,
+                  model: modelName,
+                  api_key: apiKey,
+                }
+              : undefined,
         }),
       });
 
