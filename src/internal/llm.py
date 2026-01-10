@@ -13,8 +13,10 @@ from llama_index.llms.ollama import Ollama
 from pydantic import BaseModel, Field
 
 from ..types.provider import BaseProvider
+from .redis import RedisProvider
 
 logger = logging.getLogger("internal.llm")
+redis = RedisProvider()
 
 
 class ExternalLLM(Enum):
@@ -38,11 +40,17 @@ class LLMConfig(BaseModel):
         ..., description="The API key for the particular provider and model"
     )
 
-    async def decrypt_key(self, token: str) -> str:
+    async def get_decrypted_key(self, token: str) -> str:
         """
-        Decrypts encrypted token from express
+        Returns decrypted token from express/redis
         """
 
+        # Retrieve decrypted key from cache
+        cached_key = await redis.client.get(f"key:{self.api_key}")
+        if cached_key is not None:
+            return cached_key
+
+        # Get the decrypted key from express auth server
         async with AsyncClient() as client:
             res = await client.post(
                 url=os.environ["FRONTEND_URL"] + "/api/api-keys/decrypt",
@@ -51,7 +59,16 @@ class LLMConfig(BaseModel):
             )
 
             res.raise_for_status()
-            return res.json()["api_key"]
+            decrypted_key = res.json()["api_key"]
+
+            # Cache decrypted key for a week
+            await redis.client.set(
+                f"key:{self.api_key}",
+                decrypted_key,
+                ex=(7 * 24 * 60 * 60),  # 7 days
+            )
+
+            return decrypted_key
 
     async def client(self, token: str) -> LLM:
         """
@@ -59,7 +76,7 @@ class LLMConfig(BaseModel):
         """
 
         # Get decrypted key
-        decrypted_key = await self.decrypt_key(token)
+        decrypted_key = await self.get_decrypted_key(token)
 
         match self.provider:
             case ExternalLLM.GOOGLE_GENAI:
