@@ -1,14 +1,17 @@
 "use client";
 
-import { ArrowUpIcon, SquareIcon } from "lucide-react";
+import { ArrowUpIcon, LinkIcon, SquareIcon } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
 import { useCallback, useRef } from "react";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import {
   PromptInput,
   PromptInputAction,
   PromptInputActions,
   PromptInputTextarea,
 } from "@/components/ui/prompt-input";
+import { useDialog } from "@/providers/dialog-context-provider";
+import { useQueryPromptUrlProvider } from "@/providers/query-prompt-url-provider";
 
 interface ChatInputProps {
   value: string;
@@ -32,6 +35,17 @@ export function ChatInput({
 }: ChatInputProps) {
   const isOnlyWhitespace = (text: string) => !WHITESPACE_REGEX.test(text);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const { url, clearUrl } = useQueryPromptUrlProvider();
+  const { setDialogState } = useDialog("scrape-list");
+
+  const handleContextUrlButton = () => {
+    setDialogState(true);
+  };
+
+  const clearContextUrl = () => {
+    clearUrl();
+  };
 
   const handleSend = useCallback(() => {
     if (isSubmitting) {
@@ -91,6 +105,45 @@ export function ChatInput({
             ref={textareaRef}
           />
           <PromptInputActions className="mt-3 w-full justify-between p-2">
+            <PromptInputAction
+              tooltip={url.trim() ? "Clear context URL" : "Select context URL"}
+            >
+              <AnimatePresence mode="popLayout">
+                <motion.button
+                  className={buttonVariants({
+                    size: "icon",
+                    variant: "outline",
+                    class: "min-w-fit! rounded-full!",
+                  })}
+                  layout
+                  onClick={handleContextUrlButton}
+                >
+                  <motion.div
+                    className="flex w-full flex-row items-center gap-1 px-2"
+                    layout
+                  >
+                    <LinkIcon />
+                  </motion.div>
+                </motion.button>
+                {url && (
+                  <motion.button
+                    animate={{ opacity: 1 }}
+                    className={buttonVariants({
+                      variant: "outline",
+                      class: "truncate rounded-full!",
+                    })}
+                    exit={{ opacity: 0 }}
+                    initial={{ opacity: 0 }}
+                    key={"context-button-clear-url"}
+                    layout
+                    onClick={clearContextUrl}
+                    style={{ transformOrigin: "left" }}
+                  >
+                    {url}
+                  </motion.button>
+                )}
+              </AnimatePresence>
+            </PromptInputAction>
             <PromptInputAction
               tooltip={status === "streaming" ? "Stop" : "Send"}
             >
