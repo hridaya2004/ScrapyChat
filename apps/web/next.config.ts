@@ -13,6 +13,9 @@ const nextConfig: NextConfig = {
     authInterrupts: true,
     turbopackFileSystemCacheForBuild: true,
   },
+  devIndicators: {
+    position: "top-left",
+  },
 };
 
 export default nextConfig;

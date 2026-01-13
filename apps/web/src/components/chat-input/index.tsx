@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/prompt-input";
 import { useDialog } from "@/providers/dialog-context-provider";
 import { useQueryPromptUrlProvider } from "@/providers/query-prompt-url-provider";
+import { HorizontalFadeWrapper } from "../fade-wrapper";
 
 interface ChatInputProps {
   value: string;
@@ -126,21 +127,23 @@ export function ChatInput({
                   </motion.div>
                 </motion.button>
                 {url && (
-                  <motion.button
-                    animate={{ opacity: 1 }}
-                    className={buttonVariants({
-                      variant: "outline",
-                      class: "truncate rounded-full!",
-                    })}
-                    exit={{ opacity: 0 }}
-                    initial={{ opacity: 0 }}
-                    key={"context-button-clear-url"}
-                    layout
-                    onClick={clearContextUrl}
-                    style={{ transformOrigin: "left" }}
+                  // maybe that much width is enough
+                  <HorizontalFadeWrapper
+                    className="scrollbar-width-0 max-w-40 rounded-full border bg-background p-2 lg:max-w-72 dark:bg-input/30"
+                    key={"layout-context-container"}
                   >
-                    {url}
-                  </motion.button>
+                    <motion.div
+                      animate={{ opacity: 1 }}
+                      className="font-medium text-sm"
+                      exit={{ opacity: 0 }}
+                      initial={{ opacity: 0 }}
+                      layout
+                      onClick={clearContextUrl}
+                      style={{ transformOrigin: "left" }}
+                    >
+                      {url}
+                    </motion.div>
+                  </HorizontalFadeWrapper>
                 )}
               </AnimatePresence>
             </PromptInputAction>
