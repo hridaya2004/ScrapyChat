@@ -2,8 +2,8 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { ShoppingBagIcon } from "lucide-react";
-import { useState } from "react";
 import { useAuthJWTProvider } from "@/providers/auth-jwt-provider";
+import { useDialog } from "@/providers/dialog-context-provider";
 import { useQueryPromptUrlProvider } from "@/providers/query-prompt-url-provider";
 import { Button } from "../ui/button";
 import {
@@ -21,7 +21,7 @@ import { getScrapeList } from "./scrape-core";
 export default function ScrapeList() {
   const { token } = useAuthJWTProvider();
   const { setUrl, url, clearUrl } = useQueryPromptUrlProvider();
-  const [open, setOpen] = useState(false);
+  const { dialogState, setDialogState } = useDialog("scrape-list");
 
   const { data, refetch } = useQuery({
     queryKey: ["scrapeList"],
@@ -44,7 +44,7 @@ export default function ScrapeList() {
         onClick: clearUrl,
       },
     });
-    setOpen(false);
+    setDialogState(false);
   };
 
   const trigger = (
@@ -60,7 +60,7 @@ export default function ScrapeList() {
   }
 
   return (
-    <Dialog onOpenChange={setOpen} open={open}>
+    <Dialog onOpenChange={setDialogState} open={dialogState}>
       {trigger}
       <DialogContent className="rounded-3xl">
         <DialogTitle>List of scraped websites</DialogTitle>

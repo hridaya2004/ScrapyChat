@@ -9,11 +9,11 @@ import { useState } from "react";
  * wrapping the queryclient for the whole children in the layout
  * so that we don't have to keep creating new query client
  */
-export default function QueryClientWrapper({
+export const QueryClientWrapper = ({
   children,
 }: {
   children: React.ReactNode;
-}) {
+}) => {
   const [queryClient] = useState(
     () =>
       new QueryClient({
@@ -27,4 +27,4 @@ export default function QueryClientWrapper({
   return (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   );
-}
+};

@@ -20,7 +20,11 @@ const AuthJWTContext = createContext<AuthJWTContextProps>(initialAuthState);
 
 export const useAuthJWTProvider = () => useContext(AuthJWTContext);
 
-export function AuthJWTProvider({ children }: { children: React.ReactNode }) {
+export const AuthJWTProvider = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
   const [data, setData] = useState<AuthJWTContextProps>(initialAuthState);
 
   useEffect(() => {
@@ -57,4 +61,4 @@ export function AuthJWTProvider({ children }: { children: React.ReactNode }) {
   return (
     <AuthJWTContext.Provider value={data}>{children}</AuthJWTContext.Provider>
   );
-}
+};

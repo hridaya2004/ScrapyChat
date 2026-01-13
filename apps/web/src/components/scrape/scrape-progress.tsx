@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { isEmpty } from "@/lib/utils";
 import type { ScrapeProgress as ScrapeProgressType } from "@/model/scrape/progress";
 import { useAuthJWTProvider } from "@/providers/auth-jwt-provider";
+import { useDialog } from "@/providers/dialog-context-provider";
 import {
   Dialog,
   DialogContent,
@@ -19,7 +20,8 @@ interface ProgressItem {
 export const ScrapeProgress = () => {
   const { token } = useAuthJWTProvider();
 
-  const [showDialog, setShowDialog] = useState(false);
+  const { dialogState, setDialogState } = useDialog("scrape-progress");
+
   const [scrapeData, setScrapeData] = useState<ProgressItem[]>([]);
 
   const previousUrlsRef = useRef<Set<string>>(new Set());
@@ -69,20 +71,20 @@ export const ScrapeProgress = () => {
         title: "User defined website being scraped.",
         button: {
           label: "View",
-          onClick: () => setShowDialog(true),
+          onClick: () => setDialogState(true),
         },
       });
     }
 
     previousUrlsRef.current = currentUrls;
-  }, [scrapeData]);
+  }, [scrapeData, setDialogState]);
 
   if (isEmpty(scrapeData)) {
     return null;
   }
 
   return (
-    <Dialog onOpenChange={setShowDialog} open={showDialog}>
+    <Dialog onOpenChange={setDialogState} open={dialogState}>
       <DialogContent className="rounded-3xl">
         <DialogTitle>Progress</DialogTitle>
         <DialogDescription>

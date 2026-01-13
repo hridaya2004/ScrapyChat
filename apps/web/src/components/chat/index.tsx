@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from "motion/react";
 import { cn } from "@/lib/utils";
+import { useDialog } from "@/providers/dialog-context-provider";
 import { useModel } from "@/providers/model-provider";
 import { useQueryPromptUrlProvider } from "@/providers/query-prompt-url-provider";
 import { useChatSession } from "@/providers/session-provider";
@@ -28,6 +29,8 @@ export const Chat = () => {
   //   setMessages((prev) => prev.filter((message) => message.id !== messageId));
   // };
 
+  const { dialogState, setDialogState } = useDialog("scrape-list");
+
   const sendMessage = () => {
     if (!(input.trim() && url.trim())) {
       toast({
@@ -35,6 +38,10 @@ export const Chat = () => {
         description: "Please provide either an input or a URL",
         status: "warning",
       });
+
+      if (!dialogState) {
+        setDialogState(true);
+      }
 
       return;
     }
