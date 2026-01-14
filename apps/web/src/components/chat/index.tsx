@@ -1,4 +1,5 @@
 import { AnimatePresence, motion } from "motion/react";
+import { useLocalStorage } from "@/hooks/use-local-storage";
 import { cn } from "@/lib/utils";
 import { useDialog } from "@/providers/dialog-context-provider";
 import { useModel } from "@/providers/model-provider";
@@ -31,19 +32,37 @@ export const Chat = () => {
 
   const { dialogState, setDialogState } = useDialog("scrape-list");
 
+  const { setItem } = useLocalStorage("selected-model");
+
   const sendMessage = () => {
-    if (!(input.trim() && url.trim())) {
+    if (!input.trim()) {
       toast({
-        title: "No input or URL",
-        description: "Please provide either an input or a URL",
+        title: "Invalid prompt",
+        description: "Please provide a valid prompt.",
         status: "warning",
       });
 
+      return;
+    }
+
+    if (!url.trim()) {
       if (!dialogState) {
         setDialogState(true);
       }
 
       return;
+    }
+
+    const model = models?.[selectedModel];
+
+    // biome-ignore lint/complexity/useOptionalChain: Ignore
+    if (!(model && model.apiKey?.trim())) {
+      toast({
+        title: "Empty API key",
+        description:
+          "The model that you selected have invalid API key. We have switched to free model for you.",
+      });
+      setItem("google-selfhost");
     }
 
     send({
