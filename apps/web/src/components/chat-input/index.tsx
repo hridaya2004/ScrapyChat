@@ -1,18 +1,18 @@
 "use client";
 
-import { ArrowUpIcon, LinkIcon, SquareIcon } from "lucide-react";
+import { ArrowUpIcon, SquareIcon } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useCallback, useRef } from "react";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
   PromptInput,
   PromptInputAction,
   PromptInputActions,
   PromptInputTextarea,
 } from "@/components/ui/prompt-input";
-import { useDialog } from "@/providers/dialog-context-provider";
 import { useQueryPromptUrlProvider } from "@/providers/query-prompt-url-provider";
 import { HorizontalFadeWrapper } from "../fade-wrapper";
+import ScrapeList from "../scrape/scrape-list";
 
 interface ChatInputProps {
   value: string;
@@ -38,11 +38,6 @@ export function ChatInput({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const { url, clearUrl } = useQueryPromptUrlProvider();
-  const { setDialogState } = useDialog("scrape-list");
-
-  const handleContextUrlButton = () => {
-    setDialogState(true);
-  };
 
   const clearContextUrl = () => {
     clearUrl();
@@ -110,22 +105,7 @@ export function ChatInput({
               tooltip={url.trim() ? "Clear context URL" : "Select context URL"}
             >
               <AnimatePresence mode="popLayout">
-                <motion.button
-                  className={buttonVariants({
-                    size: "icon",
-                    variant: "outline",
-                    class: "min-w-fit! rounded-full!",
-                  })}
-                  layout
-                  onClick={handleContextUrlButton}
-                >
-                  <motion.div
-                    className="flex w-full flex-row items-center gap-1 px-2"
-                    layout
-                  >
-                    <LinkIcon />
-                  </motion.div>
-                </motion.button>
+                <ScrapeList />
                 {url && (
                   // maybe that much width is enough
                   <HorizontalFadeWrapper

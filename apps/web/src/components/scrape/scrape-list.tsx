@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { ShoppingBagIcon } from "lucide-react";
+import { LinkIcon } from "lucide-react";
 import { useAuthJWTProvider } from "@/providers/auth-jwt-provider";
 import { useDialog } from "@/providers/dialog-context-provider";
 import { useQueryPromptUrlProvider } from "@/providers/query-prompt-url-provider";
@@ -17,6 +17,7 @@ import { Field, FieldContent, FieldLabel, FieldTitle } from "../ui/field";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { toast } from "../ui/toast";
 import { getScrapeList } from "./scrape-core";
+import ScrapeNew from "./scrape-new";
 
 export default function ScrapeList() {
   const { token } = useAuthJWTProvider();
@@ -49,8 +50,8 @@ export default function ScrapeList() {
 
   const trigger = (
     <DialogTrigger asChild>
-      <Button variant="outline">
-        <ShoppingBagIcon />
+      <Button className="rounded-full" size="icon" variant="outline">
+        <LinkIcon />
       </Button>
     </DialogTrigger>
   );
@@ -68,13 +69,16 @@ export default function ScrapeList() {
           This is a list of websites that have been scraped.
         </DialogDescription>
         <div className="flex w-full max-w-md flex-col gap-4">
-          <Button
-            className="ms-auto rounded-3xl"
-            onClick={() => refetch()}
-            variant="outline"
-          >
-            Refresh
-          </Button>
+          <div className="flex flex-row items-center justify-end gap-2">
+            <ScrapeNew />
+            <Button
+              className="rounded-3xl"
+              onClick={() => refetch()}
+              variant="outline"
+            >
+              Refresh
+            </Button>
+          </div>
           <RadioGroup onValueChange={handleValueChange} value={url}>
             {data?.ingestedUrls.map((item) => (
               <FieldLabel

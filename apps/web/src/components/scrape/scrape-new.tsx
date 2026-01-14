@@ -1,7 +1,6 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { PlusIcon } from "lucide-react";
 import { useId, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
@@ -59,8 +58,8 @@ export default function ScrapeNew() {
   return (
     <AlertDialog onOpenChange={setDialogOpen} open={dialogOpen}>
       <AlertDialogTrigger asChild>
-        <Button variant="outline">
-          <PlusIcon />
+        <Button className="rounded-full" variant="outline">
+          Add new website
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent className="rounded-3xl">
