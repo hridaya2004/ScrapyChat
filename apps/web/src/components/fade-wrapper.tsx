@@ -49,7 +49,7 @@ export const HorizontalFadeWrapper: React.FC<HorizontalFadeWrapperProps> = ({
     <div className={`relative overflow-hidden ${className}`}>
       {/* Inner scroll container */}
       <div
-        className="no-scrollbar relative w-full overflow-x-auto whitespace-nowrap px-2 py-1.5"
+        className="no-scrollbar relative w-full overflow-x-auto whitespace-nowrap"
         ref={containerRef}
       >
         {children}
