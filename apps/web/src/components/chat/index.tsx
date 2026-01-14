@@ -20,6 +20,7 @@ export const Chat = () => {
     setMessages: _setMessages,
     status,
     sendMessage: send,
+    stop,
   } = useChatCore();
   const { selectedModel, models } = useModel();
 

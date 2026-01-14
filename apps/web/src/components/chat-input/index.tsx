@@ -21,7 +21,7 @@ interface ChatInputProps {
   isSubmitting?: boolean;
   hasMessages?: boolean;
   stop: () => void;
-  status?: "submitted" | "streaming" | "ready" | "error";
+  status?: "submitted" | "ready";
 }
 
 const WHITESPACE_REGEX = /[^\s]/;
@@ -44,27 +44,18 @@ export function ChatInput({
   };
 
   const handleSend = useCallback(() => {
-    if (isSubmitting) {
-      return;
-    }
-
-    if (status === "streaming") {
+    if (status === "submitted") {
       stop();
       return;
     }
 
     onSend();
-  }, [isSubmitting, onSend, status, stop]);
+  }, [onSend, status, stop]);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: ignore
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
-      if (isSubmitting) {
-        e.preventDefault();
-        return;
-      }
-
-      if (e.key === "Enter" && status === "streaming") {
+      if (e.key === "Enter" && status === "submitted") {
         e.preventDefault();
         return;
       }
@@ -128,17 +119,17 @@ export function ChatInput({
               </AnimatePresence>
             </PromptInputAction>
             <PromptInputAction
-              tooltip={status === "streaming" ? "Stop" : "Send"}
+              tooltip={status === "submitted" ? "Stop" : "Send"}
             >
               <Button
-                aria-label={status === "streaming" ? "Stop" : "Send message"}
+                aria-label={status === "submitted" ? "Stop" : "Send message"}
                 className="ms-auto size-9 rounded-full transition-all duration-300 ease-out"
-                disabled={!value || isSubmitting || isOnlyWhitespace(value)}
+                disabled={!(value || isOnlyWhitespace(value))}
                 onClick={handleSend}
                 size="sm"
                 type="button"
               >
-                {status === "streaming" ? (
+                {status === "submitted" ? (
                   <SquareIcon className="size-4" />
                 ) : (
                   <ArrowUpIcon className="size-4" />

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { apiConfig } from "@/config/global";
 import type { Message } from "@/lib/types";
 import { rawResponseMessageSchema } from "@/model/chat/new";
@@ -15,6 +15,7 @@ interface SendMessageParams {
 
 export const useChatCore = () => {
   const { token } = useAuthJWTProvider();
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   const [input, setInput] = useState("");
   const [status, setStatus] = useState<"submitted" | "ready">("ready");
@@ -37,6 +38,8 @@ export const useChatCore = () => {
       ]);
       setStatus("submitted");
 
+      abortControllerRef.current = new AbortController();
+
       const response = await fetch(`${apiConfig.baseUrl}/chat/new`, {
         method: "POST",
         headers: {
@@ -55,6 +58,7 @@ export const useChatCore = () => {
                 }
               : undefined,
         }),
+        signal: abortControllerRef.current.signal,
       });
 
       if (response.ok) {
@@ -85,6 +89,15 @@ export const useChatCore = () => {
       console.error(err);
     } finally {
       setStatus("ready");
+      abortControllerRef.current = null;
+    }
+  };
+
+  const stop = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+      setStatus("ready");
     }
   };
 
@@ -96,5 +109,6 @@ export const useChatCore = () => {
     status,
     setStatus,
     sendMessage,
+    stop,
   };
 };
