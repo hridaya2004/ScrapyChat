@@ -129,7 +129,7 @@ export function ChatInput({
                 {url && (
                   // maybe that much width is enough
                   <HorizontalFadeWrapper
-                    className="scrollbar-width-0 max-w-40 rounded-full border bg-background p-2 lg:max-w-72 dark:bg-input/30"
+                    className="scrollbar-width-0 max-w-40 rounded-full border bg-background lg:max-w-72 dark:bg-input/30"
                     key={"layout-context-container"}
                   >
                     <motion.div
