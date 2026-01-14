@@ -167,7 +167,7 @@
 
   body {
     @apply bg-background text-foreground;
-    @apply h-dvh antialiased;
+    @apply h-svh antialiased;
 
     font-synthesis-weight: none;
     text-rendering: optimizeLegibility;

@@ -37,9 +37,9 @@ export default function RootLayout({
               <QueryPromptUrlProvider>
                 <ModelContextProvider>
                   <DialogProvider>
-                    <main className="container-wrapper flex h-dvh flex-col">
+                    <main className="container-wrapper flex h-full flex-col">
                       <Header />
-                      {children}
+                      <div className="flex-1 overflow-y-auto">{children}</div>
                     </main>
                     <Toaster />
                   </DialogProvider>
