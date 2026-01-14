@@ -1,6 +1,6 @@
 import { SettingsIcon, XIcon } from "lucide-react";
-import { useState } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useDialog } from "@/providers/dialog-context-provider";
 import { H3 } from "../typography";
 import { Button } from "../ui/button";
 import {
@@ -30,11 +30,11 @@ interface SettingsTriggerProps {
 export default function SettingsTrigger({
   onOpenChange,
 }: SettingsTriggerProps) {
-  const [open, setOpen] = useState(false);
+  const { dialogState, setDialogState } = useDialog("settings-dialog");
   const isMobile = useIsMobile();
 
   const handleOpenChange = (isOpen: boolean) => {
-    setOpen(isOpen);
+    setDialogState(isOpen);
     onOpenChange(isOpen);
   };
 
@@ -50,7 +50,7 @@ export default function SettingsTrigger({
 
   if (isMobile) {
     return (
-      <Drawer onOpenChange={handleOpenChange} open={open}>
+      <Drawer onOpenChange={handleOpenChange} open={dialogState}>
         <DrawerTrigger asChild className="cursor-pointer">
           {trigger}
         </DrawerTrigger>
@@ -68,7 +68,7 @@ export default function SettingsTrigger({
   }
 
   return (
-    <Dialog onOpenChange={handleOpenChange} open={open}>
+    <Dialog onOpenChange={handleOpenChange} open={dialogState}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
       <DialogContent
         className="flex max-h-[85vh] flex-col gap-0 overflow-hidden p-0 max-md:min-h-[60vh] md:h-150 md:max-w-170 lg:max-w-200"

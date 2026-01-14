@@ -1,5 +1,4 @@
 import { AnimatePresence, motion } from "motion/react";
-import { useLocalStorage } from "@/hooks/use-local-storage";
 import { cn } from "@/lib/utils";
 import { useDialog } from "@/providers/dialog-context-provider";
 import { useModel } from "@/providers/model-provider";
@@ -32,7 +31,11 @@ export const Chat = () => {
 
   const { dialogState, setDialogState } = useDialog("scrape-list");
 
-  const { setItem } = useLocalStorage("selected-model");
+  // both user menu and settings have to be opened, as settings dialog
+  // is nested within user menu
+  const { setDialogState: setSettingsDialogState } =
+    useDialog("settings-dialog");
+  const { setDialogState: setUserMenuState } = useDialog("user-menu");
 
   const sendMessage = () => {
     if (!input.trim()) {
@@ -53,16 +56,20 @@ export const Chat = () => {
       return;
     }
 
-    const model = models?.[selectedModel];
-
-    // biome-ignore lint/complexity/useOptionalChain: Ignore
-    if (!(model && model.apiKey?.trim())) {
+    if (
+      !models?.[selectedModel]?.apiKey?.trim() &&
+      selectedModel !== "google-selfhost"
+    ) {
       toast({
         title: "Empty API key",
         description:
-          "The model that you selected have invalid API key. We have switched to free model for you.",
+          "Please go to the API Keys section to add API key for the selected model.",
+        status: "error",
       });
-      setItem("google-selfhost");
+      setUserMenuState(true);
+      setSettingsDialogState(true);
+
+      return;
     }
 
     send({

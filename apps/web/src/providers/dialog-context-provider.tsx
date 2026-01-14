@@ -22,7 +22,9 @@ export const useDialog = (id: string) => {
 
   return {
     dialogState: dialogs[id] ?? false,
-    setDialogState: (isOpen: boolean) => setDialogState(id, isOpen),
+    setDialogState: (isOpen: boolean) => {
+      setDialogState(id, isOpen);
+    },
   };
 };
 

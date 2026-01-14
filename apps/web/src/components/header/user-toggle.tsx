@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import { authClient } from "@/lib/auth-client";
+import { useDialog } from "@/providers/dialog-context-provider";
 import SettingsTrigger from "../settings/settings-trigger";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import {
@@ -16,19 +16,27 @@ import UserInfo from "./user-info";
 export default function UserToggle() {
   const { data } = authClient.useSession();
 
-  const [isMenuOpen, setMenuOpen] = useState(false);
-  const [isSettingsOpen, setSettingsOpen] = useState(false);
+  const { dialogState: userMenuState, setDialogState: setUserMenuState } =
+    useDialog("user-menu");
+  const {
+    dialogState: settingsDialogState,
+    setDialogState: setSettingsDialogState,
+  } = useDialog("settings-dialog");
 
   const handleSettingsOpenChange = (isOpen: boolean) => {
-    setSettingsOpen(isOpen);
+    setSettingsDialogState(isOpen);
     if (!isOpen) {
-      setMenuOpen(false);
+      setUserMenuState(false);
     }
   };
 
   if (data?.session) {
     return (
-      <DropdownMenu modal={false} onOpenChange={setMenuOpen} open={isMenuOpen}>
+      <DropdownMenu
+        modal={false}
+        onOpenChange={setUserMenuState}
+        open={userMenuState}
+      >
         <DropdownMenuTrigger className="cursor-pointer">
           <Avatar>
             <AvatarImage
@@ -42,11 +50,11 @@ export default function UserToggle() {
           forceMount
           onCloseAutoFocus={(e) => e.preventDefault()}
           onInteractOutside={(e) => {
-            if (isSettingsOpen) {
+            if (settingsDialogState) {
               e.preventDefault();
               return;
             }
-            setMenuOpen(false);
+            setUserMenuState(false);
           }}
           sideOffset={4}
         >
