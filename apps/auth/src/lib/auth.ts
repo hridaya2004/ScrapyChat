@@ -1,12 +1,10 @@
 import { betterAuth } from "better-auth";
 import { jwt, lastLoginMethod, openAPI } from "better-auth/plugins";
-import { Pool } from "pg";
+import { dbAdapter } from "../db/adapter";
 import sendEmail from "./send-email";
 
 export const auth = betterAuth({
-  database: new Pool({
-    connectionString: process.env.DATABASE_URL,
-  }),
+  database: dbAdapter,
 
   appName: "ScrapyChat",
   advanced: {

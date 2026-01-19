@@ -5,7 +5,6 @@
   "private": true,
   "scripts": {
     "dev": "bun --hot run ./src/server.ts",
-    "setup-db": "bunx @better-auth/cli migrate -y",
     "build": "bun build --compile --minify-whitespace --minify-syntax --outfile=server ./src/index.ts"
   },
   "peerDependencies": {
@@ -15,8 +14,14 @@
     "@elysiajs/cors": "^1.4.1",
     "@types/nodemailer": "^7.0.5",
     "@types/pg": "^8.16.0",
+    "drizzle-orm": "^0.45.1",
     "elysia": "latest",
+    "mysql2": "^3.16.1",
     "nodemailer": "^7.0.12",
-    "pg": "^8.16.3"
+    "pg": "^8.17.1"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^0.31.8",
+    "tsx": "^4.21.0"
   }
 }

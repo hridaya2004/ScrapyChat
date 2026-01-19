@@ -33,7 +33,7 @@ const betterAuth = new Elysia({ name: "better-auth" })
 const app = new Elysia()
   .use(
     cors({
-      origin: ALLOWED_ORIGIN ?? [],
+      origin: ALLOWED_ORIGIN,
       methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
       credentials: true,
       allowedHeaders: ["Content-Type", "Authorization"],

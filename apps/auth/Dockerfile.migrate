@@ -13,16 +13,22 @@ WORKDIR /app
 COPY --from=prepare /app/out/json/ .
 RUN bun install
 COPY --from=prepare /app/out/full/ .
-RUN bunx turbo build
 
 FROM base AS runner
 WORKDIR /app
 
-RUN addgroup --system --gid 1001 elysiajs
-RUN adduser --system --uid 1001 elysiajs
-COPY --from=builder --chown=elysiajs:elysiajs /app .
-USER elysiajs
+# Copy the built project
+COPY --from=builder /app .
+
+# Set working directory to auth app
+WORKDIR /app/apps/auth
+
+# Make sure the script is executable
+RUN chmod +x setup-db.sh
+
+# Install dependencies needed for migration
+RUN bun install
 
 ENV NODE_ENV=production
 
-CMD ["sh", "-c", "cd apps/auth && ./server"]
+CMD ["./setup-db.sh"]

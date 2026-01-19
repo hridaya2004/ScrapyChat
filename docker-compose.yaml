@@ -28,6 +28,19 @@ services:
     depends_on:
       - db
 
+  migrate:
+    container_name: scrapy-migrate
+    build:
+      context: .
+      dockerfile: apps/auth/Dockerfile.migrate
+    image: scrapy-migrate
+    env_file: apps/auth/.env
+    networks:
+      - scrapynet
+    depends_on:
+      - db
+    restart: "no"
+
   db:
     image: postgres:16
     container_name: postgres_db
