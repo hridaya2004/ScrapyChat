@@ -20,9 +20,9 @@ WORKDIR /app
 
 RUN addgroup --system --gid 1001 elysiajs
 RUN adduser --system --uid 1001 elysiajs
-COPY --from=builder --chown=elysiajs:elysiajs /app .
+COPY --from=builder --chown=elysiajs:elysiajs /app/apps/auth/server .
 USER elysiajs
 
 ENV NODE_ENV=production
 
-CMD ["sh", "-c", "cd apps/auth && ./server"]
+CMD ["./server"]
