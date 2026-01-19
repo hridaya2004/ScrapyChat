@@ -1,34 +1,21 @@
 FROM oven/bun:alpine AS base
-
-FROM base AS prepare
 WORKDIR /app
 
+FROM base AS prepare
 RUN bun add -g turbo
 COPY . .
 RUN turbo prune auth --docker
 
 FROM base AS builder
-WORKDIR /app
-
 COPY --from=prepare /app/out/json/ .
 RUN bun install
 COPY --from=prepare /app/out/full/ .
 
 FROM base AS runner
-WORKDIR /app
-
-# Copy the built project
 COPY --from=builder /app .
 
-# Set working directory to auth app
 WORKDIR /app/apps/auth
-
-# Make sure the script is executable
 RUN chmod +x setup-db.sh
-
-# Install dependencies needed for migration
 RUN bun install
-
-ENV NODE_ENV=production
 
 CMD ["./setup-db.sh"]
