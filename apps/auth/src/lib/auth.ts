@@ -73,6 +73,7 @@ export const auth = betterAuth({
       },
       jwt: {
         expirationTime: "1d",
+        audience: process.env.ISSUER_URL,
       },
     }),
     openAPI(),
