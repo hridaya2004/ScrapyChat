@@ -56,13 +56,13 @@ app.post(
 
     const userId = session?.user.id;
     if (!userId) {
-      ctx.set.status = 401;
-      return { error: "User is unauthorized." };
+      return ctx.status(401, { error: "User is unauthorized." });
     }
 
     if (!process.env.BETTER_AUTH_SECRET) {
-      ctx.set.status = 500;
-      return { error: "Secret not provided." };
+      return ctx.status(500, {
+        error: "Secret not provided.",
+      });
     }
 
     const { provider, apiKey, modelName } = ctx.body;
@@ -92,8 +92,7 @@ app.post(
     const token = ctx.headers.authorization?.split(" ")[1];
 
     if (!token) {
-      ctx.set.status = 401;
-      return { error: "Token not provided." };
+      return ctx.status(401, { error: "Token not provided" });
     }
 
     const decryptedToken = await auth.api.verifyJWT({
@@ -104,20 +103,17 @@ app.post(
     });
 
     if (!decryptedToken.payload) {
-      ctx.set.status = 401;
-      return { error: "Token is invalid." };
+      return ctx.status(401, { error: "Token is invalid." });
     }
 
     const { apiKey } = ctx.body;
 
     if (!apiKey) {
-      ctx.set.status = 400;
-      return { error: "API key are required." };
+      return ctx.status(400, { error: "API key are required." });
     }
 
     if (!process.env.BETTER_AUTH_SECRET) {
-      ctx.set.status = 500;
-      return { error: "Secret not provided." };
+      return ctx.status(500, { error: "Secret not provided." });
     }
 
     // subject - user.id
