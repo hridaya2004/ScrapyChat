@@ -15,7 +15,7 @@
     "@types/nodemailer": "^7.0.5",
     "@types/pg": "^8.16.0",
     "drizzle-orm": "^0.45.1",
-    "elysia": "latest",
+    "elysia": "1.4.22",
     "mysql2": "^3.16.1",
     "nodemailer": "^7.0.12",
     "pg": "^8.17.1"
