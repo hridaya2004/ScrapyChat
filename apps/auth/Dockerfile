@@ -21,17 +21,19 @@ COPY --from=prepare /app/out/full/ .
 
 RUN bunx turbo build
 
+# Add python dependencies required for better-auth
+#RUN apk --update add python3 build-base
+
 FROM base AS runner
 WORKDIR /app
 
-# Add python dependencies required for better-auth
-RUN apk --update add python3 build-base
+RUN addgroup --system --gid 1001 elysiajs
+RUN adduser --system --uid 1001 elysiajs
 
-RUN addgroup --system --gid 1001 expressjs
-RUN adduser --system --uid 1001 expressjs
+COPY --from=builder --chown=elysiajs:elysiajs /app/apps/auth/server .
 
-COPY --from=builder --chown=expressjs:expressjs /app .
+USER elysiajs
 
-USER expressjs
+ENV NODE_ENV=production
 
-CMD ["sh", "-c", "cd apps/auth && bun run setup-db && bun run src/server.ts"]
+CMD ["./server"]

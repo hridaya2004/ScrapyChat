@@ -1,109 +1,141 @@
-import { fromNodeHeaders, toNodeHandler } from "better-auth/node";
-import cors from "cors";
-import express from "express";
-import { auth } from "./lib/auth.ts";
-import { decryptData, encryptData } from "./lib/utils.ts";
+import { cors } from "@elysiajs/cors";
+import { fromNodeHeaders } from "better-auth/node";
+import Elysia from "elysia";
+import z from "zod";
+import { auth } from "./lib/auth";
+import { decryptData, encryptData } from "./lib/utils";
 
-const app = express();
 const port = 3001;
 
 const ALLOWED_ORIGIN = process.env.TRUSTED_ORIGIN?.split("|");
 
-app.use(
-  cors({
-    origin: ALLOWED_ORIGIN ?? "",
-    credentials: true,
-  })
-);
+const betterAuth = new Elysia({ name: "better-auth" })
+  .mount(auth.handler)
+  .macro({
+    auth: {
+      async resolve({ status, request: { headers } }) {
+        const session = await auth.api.getSession({
+          headers,
+        });
 
-app.all("/api/auth/*splat", toNodeHandler(auth));
+        if (!session) {
+          return status(401);
+        }
 
-app.get("/api/me", async (req, res) => {
-  const session = await auth.api.getSession({
-    headers: fromNodeHeaders(req.headers),
-  });
-  return res.json(session);
-});
-
-// Mount express json middleware after Better Auth handler
-// or only apply it to routes that don't interact with Better Auth
-app.use(express.json());
-
-app.post("/api/api-keys/encrypt", async (req, res) => {
-  const session = await auth.api.getSession({
-    headers: fromNodeHeaders(req.headers),
-  });
-
-  const userId = session?.user.id;
-  const { provider, apiKey, modelName } = req.body;
-
-  if (!userId) {
-    return res.status(401).json({ error: "User is unauthorized." });
-  }
-
-  if (!(provider && apiKey && modelName)) {
-    return res
-      .status(400)
-      .json({ error: "Required fields are not satisfied." });
-  }
-
-  if (!process.env.BETTER_AUTH_SECRET) {
-    return res.status(500).json({
-      error: "Secret not provided.",
-    });
-  }
-
-  const uniqueSalt = `${process.env.BETTER_AUTH_SECRET}-${userId}`;
-
-  const encryptedGoodies = await encryptData(apiKey, uniqueSalt);
-
-  return res.json({
-    provider_id: provider,
-    api_key: encryptedGoodies,
-    model: modelName,
-  });
-});
-
-app.post("/api/api-keys/decrypt", async (req, res) => {
-  const token = req.headers.authorization?.split(" ")[1];
-
-  if (!token) {
-    return res.status(401).json({ error: "Token not provided" });
-  }
-
-  const decryptedToken = await auth.api.verifyJWT({
-    body: {
-      token,
-      issuer: process.env.ISSUER_URL,
+        return {
+          user: session.user,
+          session: session.session,
+        };
+      },
     },
   });
 
-  if (!decryptedToken.payload) {
-    return res.status(401).json({ error: "Token is invalid" });
-  }
+const app = new Elysia()
+  .use(
+    cors({
+      origin: ALLOWED_ORIGIN ?? [],
+      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+      credentials: true,
+      allowedHeaders: ["Content-Type", "Authorization"],
+    })
+  )
+  .use(betterAuth)
+  .mount(auth.handler)
+  .listen(port);
 
-  const { apiKey } = req.body;
+app.get("/api/user", ({ user }) => user, {
+  auth: true,
+});
 
-  if (!apiKey) {
-    return res.status(400).json({ error: "API key are required" });
-  }
-
-  if (!process.env.BETTER_AUTH_SECRET) {
-    return res.status(500).json({
-      error: "Secret not provided.",
+app.post(
+  "/api/api-keys/encrypt",
+  async (ctx) => {
+    const session = await auth.api.getSession({
+      headers: fromNodeHeaders(ctx.headers),
     });
+
+    const userId = session?.user.id;
+    if (!userId) {
+      ctx.set.status = 401;
+      return { error: "User is unauthorized." };
+    }
+
+    if (!process.env.BETTER_AUTH_SECRET) {
+      ctx.set.status = 500;
+      return { error: "Secret not provided." };
+    }
+
+    const { provider, apiKey, modelName } = ctx.body;
+
+    const uniqueSalt = `${process.env.BETTER_AUTH_SECRET}-${userId}`;
+    const encryptedGoodies = await encryptData(apiKey, uniqueSalt);
+
+    return {
+      provider_id: provider,
+      api_key: encryptedGoodies,
+      model: modelName,
+    };
+  },
+  {
+    body: z.object({
+      provider: z.string(),
+      apiKey: z.string(),
+      modelName: z.string(),
+    }),
+    auth: true,
   }
+);
 
-  // subject - user.id
-  const uniqueSalt = `${process.env.BETTER_AUTH_SECRET}-${decryptedToken.payload.sub}`;
+app.post(
+  "/api/api-keys/decrypt",
+  async (ctx) => {
+    const token = ctx.headers.authorization?.split(" ")[1];
 
-  const decryptedGoodies = await decryptData(apiKey, uniqueSalt);
+    if (!token) {
+      ctx.set.status = 401;
+      return { error: "Token not provided." };
+    }
 
-  return res.json({
-    api_key: decryptedGoodies,
-  });
-});
+    const decryptedToken = await auth.api.verifyJWT({
+      body: {
+        token,
+        issuer: process.env.ISSUER_URL,
+      },
+    });
 
-app.listen(port, () => {
-  console.log(`ScrapyChat server listening on port ${port}`);
-});
+    if (!decryptedToken.payload) {
+      ctx.set.status = 401;
+      return { error: "Token is invalid." };
+    }
+
+    const { apiKey } = ctx.body;
+
+    if (!apiKey) {
+      ctx.set.status = 400;
+      return { error: "API key are required." };
+    }
+
+    if (!process.env.BETTER_AUTH_SECRET) {
+      ctx.set.status = 500;
+      return { error: "Secret not provided." };
+    }
+
+    // subject - user.id
+    const uniqueSalt = `${process.env.BETTER_AUTH_SECRET}-${decryptedToken.payload.sub}`;
+
+    const decryptedGoodies = await decryptData(apiKey, uniqueSalt);
+
+    return {
+      api_key: decryptedGoodies,
+    };
+  },
+  {
+    body: z.object({
+      apiKey: z.string(),
+    }),
+  }
+);
+
+console.log(
+  `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`
+);

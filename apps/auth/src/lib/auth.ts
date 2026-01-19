@@ -1,9 +1,7 @@
-/** biome-ignore-all lint/correctness/noUnusedFunctionParameters: "ignore" */
 import { betterAuth } from "better-auth";
-import { nextCookies } from "better-auth/next-js";
 import { jwt, lastLoginMethod, openAPI } from "better-auth/plugins";
 import { Pool } from "pg";
-import sendEmail from "./send-email.ts";
+import sendEmail from "./send-email";
 
 export const auth = betterAuth({
   database: new Pool({
@@ -25,7 +23,7 @@ export const auth = betterAuth({
     sendOnSignIn: true,
     sendOnSignUp: true,
     autoSignInAfterVerification: true,
-    sendVerificationEmail: async ({ user, url, token }, request) => {
+    sendVerificationEmail: async ({ user, url }) => {
       await sendEmail({
         to: user.email,
         subject: "Verify your email address",
@@ -37,7 +35,7 @@ export const auth = betterAuth({
   user: {
     deleteUser: {
       enabled: true,
-      sendDeleteAccountVerification: async ({ user, url, token }, request) => {
+      sendDeleteAccountVerification: async ({ user, url }) => {
         await sendEmail({
           to: user.email,
           subject: "Delete account",
@@ -47,10 +45,7 @@ export const auth = betterAuth({
     },
     changeEmail: {
       enabled: true,
-      sendChangeEmailVerification: async (
-        { user, newEmail, url, token },
-        request
-      ) => {
+      sendChangeEmailVerification: async ({ user, url }) => {
         await sendEmail({
           to: user.email,
           subject: "Approve email change",
@@ -69,7 +64,6 @@ export const auth = betterAuth({
   },
 
   plugins: [
-    nextCookies(),
     lastLoginMethod(),
     jwt({
       jwks: {
