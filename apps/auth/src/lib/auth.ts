@@ -1,7 +1,9 @@
 import { betterAuth } from "better-auth";
 import { jwt, lastLoginMethod, openAPI } from "better-auth/plugins";
+import MailSender from "../controller/mail-sender";
 import { dbAdapter } from "../db/adapter";
-import sendEmail from "./send-email";
+
+const mailSender = MailSender.getInstance();
 
 export const auth = betterAuth({
   database: dbAdapter,
@@ -22,7 +24,7 @@ export const auth = betterAuth({
     sendOnSignUp: true,
     autoSignInAfterVerification: true,
     sendVerificationEmail: async ({ user, url }) => {
-      await sendEmail({
+      await mailSender.sendEmail({
         to: user.email,
         subject: "Verify your email address",
         text: `Click the link to verify your email: ${url}`,
@@ -34,7 +36,7 @@ export const auth = betterAuth({
     deleteUser: {
       enabled: true,
       sendDeleteAccountVerification: async ({ user, url }) => {
-        await sendEmail({
+        await mailSender.sendEmail({
           to: user.email,
           subject: "Delete account",
           text: `Click the link to delete your account: ${url}`,
@@ -44,7 +46,7 @@ export const auth = betterAuth({
     changeEmail: {
       enabled: true,
       sendChangeEmailVerification: async ({ user, url }) => {
-        await sendEmail({
+        await mailSender.sendEmail({
           to: user.email,
           subject: "Approve email change",
           text: `Click the link to approve the change: ${url}`,
