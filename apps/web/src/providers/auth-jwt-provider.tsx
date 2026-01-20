@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { authClient } from "@/lib/auth-client";
 
 interface AuthJWTContextProps {
@@ -26,8 +26,13 @@ export const AuthJWTProvider = ({
   children: React.ReactNode;
 }) => {
   const [data, setData] = useState<AuthJWTContextProps>(initialAuthState);
+  const hasInitialized = useRef(false);
 
   useEffect(() => {
+    if (hasInitialized.current) {
+      return;
+    }
+
     const getAuthToken = async () => {
       const { data: authData, error: authError } = await authClient.token();
 
@@ -38,6 +43,8 @@ export const AuthJWTProvider = ({
           error: authError.message,
           errorStatusCode: authError.status,
         });
+        hasInitialized.current = true;
+        return;
       }
 
       if (authData?.token) {
@@ -46,17 +53,12 @@ export const AuthJWTProvider = ({
           loading: false,
           error: undefined,
         });
+        hasInitialized.current = true;
       }
     };
 
-    if (!data.token) {
-      getAuthToken();
-    }
-
-    return () => {
-      //noop
-    };
-  }, [data.token]);
+    getAuthToken();
+  }, []);
 
   return (
     <AuthJWTContext.Provider value={data}>{children}</AuthJWTContext.Provider>

@@ -4,7 +4,7 @@ export const siteConfig = {
 
 const getDevelopmentUrl = () => {
   if (typeof window === "undefined") {
-    return;
+    return "/api";
   }
   let url = window.localStorage.getItem("development-url") || "";
 
@@ -13,11 +13,13 @@ const getDevelopmentUrl = () => {
     url = url.slice(1, -1);
   }
 
-  return `${url.trim()}/api`;
+  return url.trim() ? `${url.trim()}/api` : "/api";
 };
 
 export const apiConfig = {
-  baseUrl: getDevelopmentUrl() ?? "/api",
+  get baseUrl() {
+    return getDevelopmentUrl();
+  },
   authUrl:
     process.env.NODE_ENV === "development"
       ? "http://localhost:3001/api"

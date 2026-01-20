@@ -85,11 +85,20 @@ const scrapeNewUrl = async (
     if (!response.ok) {
       if (response.status === 409) {
         // 409 is dupe conflict
-        toast({
-          title: "Failed to scrape given URL",
-          description: JSON.parse(await response.text()).detail,
-          status: "error",
-        });
+        try {
+          const errorData = JSON.parse(await response.text());
+          toast({
+            title: "Failed to scrape given URL",
+            description: errorData.detail || "URL already exists",
+            status: "error",
+          });
+        } catch {
+          toast({
+            title: "Failed to scrape given URL",
+            description: "URL already exists",
+            status: "error",
+          });
+        }
       } else {
         toast({
           title: "Error",
