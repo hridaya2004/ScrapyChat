@@ -113,10 +113,13 @@ const scrapeNewUrl = async (
     }
   } catch (err) {
     console.error(err);
-    return;
+    toast({
+      title: "Error",
+      description: "An error occurred while starting the scrape.",
+      status: "error",
+    });
+    callback?.(false, false);
   }
-
-  return null;
 };
 
 const getScrapeProgress = async (

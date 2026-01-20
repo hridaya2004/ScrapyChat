@@ -19,8 +19,8 @@ import Github from "./providers/github";
 
 const loginFormSchema = z.object({
   email: z.email(),
-  password: z.string().nonempty({
-    error: "Password is required",
+  password: z.string().min(1, {
+    message: "Password is required",
   }),
   rememberMe: z.boolean(),
 });
@@ -54,8 +54,13 @@ export default function Login() {
           status: "error",
         });
       }
-    } catch {
-      console.error("An error occurred during login");
+    } catch (err) {
+      console.error("An error occurred during login:", err);
+      toast({
+        title: "Login failed",
+        description: "An unexpected error occurred. Please try again.",
+        status: "error",
+      });
     }
   };
 

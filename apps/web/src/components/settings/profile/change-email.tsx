@@ -34,8 +34,9 @@ export default function ChangeEmail() {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof changeEmailSchema>) => {
-    console.log(values);
+  const onSubmit = (_values: z.infer<typeof changeEmailSchema>) => {
+    // TODO: Implement email change functionality
+    // authClient.changeEmail({ newEmail: _values.newEmail });
   };
 
   const { data } = authClient.useSession();

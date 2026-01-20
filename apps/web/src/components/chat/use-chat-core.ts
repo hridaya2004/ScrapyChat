@@ -84,9 +84,20 @@ export const useChatCore = () => {
           ]);
           setStatus("ready");
         }
+      } else {
+        toast({
+          title: "Failed to send message",
+          description: "Unable to process your request. Please try again.",
+          status: "error",
+        });
       }
     } catch (err) {
       console.error(err);
+      toast({
+        title: "Error",
+        description: "An error occurred while sending your message.",
+        status: "error",
+      });
     } finally {
       setStatus("ready");
       abortControllerRef.current = null;
