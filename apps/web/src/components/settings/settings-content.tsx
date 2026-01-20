@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { BYOKSection } from "./api-keys/byok-section";
+import { InfoSection } from "./info";
 import ProfileSettings from "./profile";
-import VersionInfo from "./version-info";
 
 const tabs = [
   {
@@ -15,7 +15,7 @@ const tabs = [
   },
   {
     label: "Info",
-    component: <VersionInfo />,
+    component: <InfoSection />,
   },
 ];
 
