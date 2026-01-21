@@ -2,7 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { CheckIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import z from "zod";
-import { P } from "@/components/typography";
+import { Muted, P } from "@/components/typography";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { authClient } from "@/lib/auth-client";
@@ -57,7 +57,7 @@ export default function ChangeEmail() {
                 {!!data?.user.emailVerified && (
                   <div className="inline-flex items-center gap-1">
                     <CheckIcon className="text-green-600" />
-                    <span className="font-medium text-sm">Verified</span>
+                    <Muted className="font-medium">Verified</Muted>
                   </div>
                 )}
               </div>

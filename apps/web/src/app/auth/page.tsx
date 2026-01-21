@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import Login from "@/components/auth/login";
 import Register from "@/components/auth/register";
+import { Lead } from "@/components/typography";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { authClient } from "@/lib/auth-client";
@@ -22,7 +23,11 @@ export default function Page() {
   const { data: session, isPending } = authClient.useSession();
 
   if (isPending) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex h-full items-center justify-center">
+        <Lead>Loading...</Lead>
+      </div>
+    );
   }
 
   if (session) {

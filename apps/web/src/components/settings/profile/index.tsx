@@ -9,7 +9,7 @@ export default function ProfileSettings() {
     return <OAuthProfile />;
   }
 
-  if (lastMethod === "email") {
+  if (lastMethod === "email" || lastMethod === null) {
     return <EmailProfile />;
   }
 

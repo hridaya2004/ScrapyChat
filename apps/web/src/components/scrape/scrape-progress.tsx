@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Muted } from "@/components/typography";
 import { isEmpty } from "@/lib/utils";
 import type { ScrapeProgress as ScrapeProgressType } from "@/model/scrape/progress";
 import { useAuthJWTProvider } from "@/providers/auth-jwt-provider";
@@ -94,11 +95,11 @@ export const ScrapeProgress = () => {
         <div className="mt-2 flex flex-col rounded-3xl border">
           {scrapeData.map(({ url, progress }) => (
             <div
-              className="flex items-center justify-between gap-4 border-b p-2 px-4 font-mono text-sm last:border-b-0"
+              className="flex items-center justify-between gap-4 border-b p-2 px-4 last:border-b-0"
               key={url}
             >
-              <span className="break-all text-muted-foreground">{url}</span>
-              <span className="font-semibold">
+              <Muted className="break-all font-mono">{url}</Muted>
+              <span className="font-semibold text-sm">
                 {Math.round(progress * 100)}%
               </span>
             </div>
