@@ -1,4 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { EyeIcon, EyeOffIcon } from "lucide-react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
 import { authClient } from "@/lib/auth-client";
@@ -13,6 +15,11 @@ import {
   FormMessage,
 } from "../ui/form";
 import { Input } from "../ui/input";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "../ui/input-group";
 import { toast } from "../ui/toast";
 import Github from "./providers/github";
 
@@ -60,6 +67,8 @@ export default function Register() {
       password: "",
     },
   });
+
+  const [showPassword, setShowPassword] = useState(false);
 
   const onSubmit = async (values: z.infer<typeof signUpFormSchema>) => {
     const { data, error } = await authClient.signUp.email({
@@ -130,12 +139,26 @@ export default function Register() {
             <FormItem>
               <FormLabel>Password</FormLabel>
               <FormControl>
-                <Input
-                  className="rounded-3xl"
-                  placeholder="******"
-                  type="password"
-                  {...field}
-                />
+                <InputGroup className="rounded-3xl">
+                  <InputGroupInput
+                    placeholder="******"
+                    type={showPassword ? "text" : "password"}
+                    {...field}
+                  />
+                  <InputGroupAddon align="inline-end">
+                    <button
+                      className="pe-2 hover:cursor-pointer"
+                      onClick={() => setShowPassword((v) => !v)}
+                      type="button"
+                    >
+                      {showPassword ? (
+                        <EyeOffIcon className="size-4" />
+                      ) : (
+                        <EyeIcon className="size-4" />
+                      )}
+                    </button>
+                  </InputGroupAddon>
+                </InputGroup>
               </FormControl>
               <FormMessage />
             </FormItem>
