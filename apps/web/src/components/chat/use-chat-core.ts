@@ -11,6 +11,7 @@ interface SendMessageParams {
   providerId?: string;
   modelName?: string;
   apiKey?: string;
+  superUrl: boolean;
 }
 
 export const useChatCore = () => {
@@ -27,6 +28,7 @@ export const useChatCore = () => {
     providerId,
     modelName,
     apiKey,
+    superUrl,
   }: SendMessageParams) => {
     try {
       setMessages([
@@ -57,6 +59,7 @@ export const useChatCore = () => {
                   api_key: apiKey,
                 }
               : undefined,
+          match_subpaths: superUrl,
         }),
         signal: abortControllerRef.current.signal,
       });

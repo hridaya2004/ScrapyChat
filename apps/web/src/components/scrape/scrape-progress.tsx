@@ -25,9 +25,11 @@ export const ScrapeProgress = () => {
 
   const [scrapeData, setScrapeData] = useState<ProgressItem[]>([]);
 
-  const previousUrlsRef = useRef<Set<string>>(new Set());
+  // Track all URLs we've ever seen in this session to avoid repeat toasts
+  const seenUrlsRef = useRef<Set<string>>(new Set());
   const lastToastAtRef = useRef(0);
   const startedRef = useRef(false);
+  const pendingToastRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // send the request on mount
   useEffect(() => {
@@ -52,24 +54,37 @@ export const ScrapeProgress = () => {
     });
   }, [token]);
 
-  // show toast only if new URL is shown and
-  // 5sec have passed since last toast
+  // show toast only for truly new URLs we haven't seen before
+  // with debouncing to prevent rapid-fire toasts
   useEffect(() => {
     if (isEmpty(scrapeData)) {
-      previousUrlsRef.current.clear();
-      lastToastAtRef.current = 0;
       return;
     }
 
-    const currentUrls = new Set(scrapeData.map((d) => d.url));
-    const hasNewUrl = [...currentUrls].some(
-      (url) => !previousUrlsRef.current.has(url)
-    );
+    // Find URLs we've never seen before in this session
+    const newUrls = scrapeData.filter((d) => !seenUrlsRef.current.has(d.url));
+
+    if (newUrls.length === 0) {
+      return;
+    }
+
+    // Mark these URLs as seen immediately to prevent duplicate detection
+    for (const { url } of newUrls) {
+      seenUrlsRef.current.add(url);
+    }
 
     const now = Date.now();
-    if (hasNewUrl && now - lastToastAtRef.current >= 5000) {
-      lastToastAtRef.current = now;
+    const timeSinceLastToast = now - lastToastAtRef.current;
 
+    // Clear any pending toast
+    if (pendingToastRef.current) {
+      clearTimeout(pendingToastRef.current);
+      pendingToastRef.current = null;
+    }
+
+    // If enough time has passed, show toast immediately
+    if (timeSinceLastToast >= 5000) {
+      lastToastAtRef.current = now;
       toast({
         title: "User defined website being scraped.",
         button: {
@@ -77,10 +92,31 @@ export const ScrapeProgress = () => {
           onClick: () => setDialogState(true),
         },
       });
+    } else {
+      // Otherwise, schedule a toast for when the cooldown expires
+      const delay = 5000 - timeSinceLastToast;
+      pendingToastRef.current = setTimeout(() => {
+        lastToastAtRef.current = Date.now();
+        toast({
+          title: "User defined website being scraped.",
+          button: {
+            label: "View",
+            onClick: () => setDialogState(true),
+          },
+        });
+        pendingToastRef.current = null;
+      }, delay);
     }
-
-    previousUrlsRef.current = currentUrls;
   }, [scrapeData, setDialogState]);
+
+  // Cleanup pending toast on unmount
+  useEffect(() => {
+    return () => {
+      if (pendingToastRef.current) {
+        clearTimeout(pendingToastRef.current);
+      }
+    };
+  }, []);
 
   if (isEmpty(scrapeData)) {
     return null;

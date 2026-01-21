@@ -2,6 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { LinkIcon } from "lucide-react";
+import { useState } from "react";
 import { useAuthJWTProvider } from "@/providers/auth-jwt-provider";
 import { useDialog } from "@/providers/dialog-context-provider";
 import { useQueryPromptUrlProvider } from "@/providers/query-prompt-url-provider";
@@ -13,16 +14,17 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
-import { Field, FieldContent, FieldLabel, FieldTitle } from "../ui/field";
-import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
+import { RadioGroup } from "../ui/radio-group";
 import { toast } from "../ui/toast";
 import { getScrapeList } from "./scrape-core";
+import ScrapeListItem from "./scrape-list-item";
 import ScrapeNew from "./scrape-new";
 
 export default function ScrapeList() {
   const { token } = useAuthJWTProvider();
-  const { setUrl, url, clearUrl } = useQueryPromptUrlProvider();
+  const { setUrl, url, clearUrl, setSuperUrl } = useQueryPromptUrlProvider();
   const { dialogState, setDialogState } = useDialog("scrape-list");
+  const [moreDialogOpen, setMoreDialogOpen] = useState<string | null>(null);
 
   const { data, refetch } = useQuery({
     queryKey: ["scrapeList"],
@@ -45,12 +47,26 @@ export default function ScrapeList() {
     )
   );
 
+  const getUrlsForBaseUrl = (baseUrl: string) => {
+    return (
+      data?.ingestedUrls.filter((item) => {
+        try {
+          const urlObj = new URL(item);
+          return urlObj.origin === baseUrl;
+        } catch {
+          return item === baseUrl;
+        }
+      }) ?? []
+    );
+  };
+
   const handleValueChange = (value: string) => {
     if (value === url) {
       return;
     }
 
     setUrl?.(value);
+    setSuperUrl(true);
     toast({
       title: "Updated context URL",
       description: `${value}`,
@@ -60,6 +76,27 @@ export default function ScrapeList() {
         onClick: clearUrl,
       },
     });
+    setDialogState(false);
+    setMoreDialogOpen(null);
+  };
+
+  const handleMoreUrlSelect = (value: string) => {
+    if (value === url) {
+      return;
+    }
+
+    setUrl?.(value);
+    setSuperUrl(false);
+    toast({
+      title: "Updated context URL",
+      description: `${value}`,
+      status: "info",
+      button: {
+        label: "Clear",
+        onClick: clearUrl,
+      },
+    });
+    setMoreDialogOpen(null);
     setDialogState(false);
   };
 
@@ -95,21 +132,18 @@ export default function ScrapeList() {
             </Button>
           </div>
           <RadioGroup onValueChange={handleValueChange} value={url}>
-            {uniqueBaseUrls.map((item) => (
-              <FieldLabel
-                className="hover:cursor-pointer"
-                htmlFor={item}
-                key={item}
-              >
-                <Field orientation="horizontal">
-                  <FieldContent>
-                    <FieldTitle className="break-all font-mono text-sm">
-                      {item}
-                    </FieldTitle>
-                  </FieldContent>
-                  <RadioGroupItem aria-label={item} id={item} value={item} />
-                </Field>
-              </FieldLabel>
+            {uniqueBaseUrls.map((baseUrl) => (
+              <ScrapeListItem
+                baseUrl={baseUrl}
+                isMoreDialogOpen={moreDialogOpen === baseUrl}
+                key={baseUrl}
+                onMoreDialogOpenChange={(open) =>
+                  setMoreDialogOpen(open ? baseUrl : null)
+                }
+                onUrlSelect={handleMoreUrlSelect}
+                selectedUrl={url}
+                urls={getUrlsForBaseUrl(baseUrl)}
+              />
             ))}
           </RadioGroup>
         </div>

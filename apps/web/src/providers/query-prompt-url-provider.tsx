@@ -5,6 +5,8 @@ interface QueryPromptUrlContextProps {
   url: string;
   setUrl: (url: string) => void;
   clearUrl: () => void;
+  superUrl: boolean;
+  setSuperUrl: (superUrl: boolean) => void;
 }
 
 const QueryPromptUrlContext = createContext<
@@ -23,11 +25,17 @@ export const useQueryPromptUrlProvider = () => {
 
 export function QueryPromptUrlProvider({ children }: { children: ReactNode }) {
   const [url, setUrl] = useState("");
+  const [superUrl, setSuperUrl] = useState(false);
 
-  const clearUrl = () => setUrl("");
+  const clearUrl = () => {
+    setUrl("");
+    setSuperUrl(false);
+  };
 
   return (
-    <QueryPromptUrlContext.Provider value={{ url, setUrl, clearUrl }}>
+    <QueryPromptUrlContext.Provider
+      value={{ url, setUrl, clearUrl, superUrl, setSuperUrl }}
+    >
       {children}
     </QueryPromptUrlContext.Provider>
   );

@@ -12,7 +12,7 @@ import { useChatCore } from "./use-chat-core";
 
 export const Chat = () => {
   const { chatId } = useChatSession();
-  const { url } = useQueryPromptUrlProvider();
+  const { url, superUrl } = useQueryPromptUrlProvider();
   const {
     input,
     messages,
@@ -86,6 +86,7 @@ export const Chat = () => {
         selectedModel === "google-selfhost"
           ? undefined
           : models[selectedModel].modelName,
+      superUrl,
     });
 
     setInput("");
