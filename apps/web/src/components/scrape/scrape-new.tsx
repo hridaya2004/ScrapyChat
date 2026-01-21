@@ -19,7 +19,15 @@ import {
   AlertDialogTrigger,
 } from "../ui/alert-dialog";
 import { Button } from "../ui/button";
-import { Field, FieldError, FieldGroup } from "../ui/field";
+import { Checkbox } from "../ui/checkbox";
+import {
+  Field,
+  FieldContent,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "../ui/field";
 import { Input } from "../ui/input";
 import { Spinner } from "../ui/spinner";
 import { scrapeNewUrl } from "./scrape-core";
@@ -34,25 +42,32 @@ export default function ScrapeNew() {
     resolver: zodResolver(scrapeNewSchema),
     defaultValues: {
       url: "",
+      deep_search: false,
     },
   });
 
   const htmlFormId = useId();
   const formUrlInputId = useId();
+  const formDeepSearchId = useId();
 
   if (!token?.trim()) {
     return null;
   }
 
   const onSubmit = (data: ScrapeNewType) => {
-    scrapeNewUrl(data.url, token, (success, updatedLoading) => {
-      setLoading(updatedLoading);
-      if (success) {
-        setDialogOpen(false);
-        // cleanup the form after use
-        scrapeNewUrlForm.resetField("url");
+    scrapeNewUrl(
+      data.url,
+      data.deep_search,
+      token,
+      (success, updatedLoading) => {
+        setLoading(updatedLoading);
+        if (success) {
+          setDialogOpen(false);
+          // cleanup the form after use
+          scrapeNewUrlForm.reset();
+        }
       }
-    });
+    );
   };
 
   return (
@@ -91,6 +106,28 @@ export default function ScrapeNew() {
                     {!!fieldState.invalid && (
                       <FieldError errors={[fieldState.error]} />
                     )}
+                  </Field>
+                )}
+              />
+              <Controller
+                control={scrapeNewUrlForm.control}
+                name="deep_search"
+                render={({ field }) => (
+                  <Field orientation="horizontal">
+                    <Checkbox
+                      checked={field.value}
+                      id={formDeepSearchId}
+                      onCheckedChange={field.onChange}
+                    />
+                    <FieldContent>
+                      <FieldLabel htmlFor={formDeepSearchId}>
+                        Deep Search
+                      </FieldLabel>
+                      <FieldDescription>
+                        If selected, all the links within the page will be
+                        ingested as well.
+                      </FieldDescription>
+                    </FieldContent>
                   </Field>
                 )}
               />

@@ -60,6 +60,7 @@ const getScrapeList = async (token: string): Promise<ScrapeList> => {
 
 const scrapeNewUrl = async (
   scrapeUrl: string,
+  isDeepSearchEnabled: boolean,
   token: string,
   callback?: (success: boolean, loading: boolean) => void
 ) => {
@@ -79,6 +80,7 @@ const scrapeNewUrl = async (
 
       body: JSON.stringify({
         url: scrapeUrl,
+        deep_search: isDeepSearchEnabled,
       }),
     });
 
