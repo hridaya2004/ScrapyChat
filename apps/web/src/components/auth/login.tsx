@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 import z from "zod";
 import { authClient } from "@/lib/auth-client";
+import { useAuthJWTProvider } from "@/providers/auth-jwt-provider";
 import { Button, buttonVariants } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";
 import { Field, FieldSeparator, FieldSet } from "../ui/field";
@@ -27,6 +28,8 @@ const loginFormSchema = z.object({
 });
 
 export default function Login() {
+  const { clearAuthState } = useAuthJWTProvider();
+
   const form = useForm<z.infer<typeof loginFormSchema>>({
     resolver: zodResolver(loginFormSchema),
     defaultValues: {
@@ -38,7 +41,7 @@ export default function Login() {
 
   const onSubmit = async (values: z.infer<typeof loginFormSchema>) => {
     try {
-      const { error } = await authClient.signIn.email({
+      const { error, data } = await authClient.signIn.email({
         ...values,
       });
 
@@ -48,12 +51,19 @@ export default function Login() {
           description: "Please check your email and verify your account",
           status: "error",
         });
-      } else if (error?.code === "INVALID_EMAIL_OR_PASSWORD") {
+        return;
+      }
+      if (error?.code === "INVALID_EMAIL_OR_PASSWORD") {
         toast({
           title: "Invalid email or password",
           description: "Please check your email and password",
           status: "error",
         });
+        return;
+      }
+
+      if (data?.user || data?.token) {
+        clearAuthState?.();
       }
     } catch (err) {
       console.error("An error occurred during login:", err);
