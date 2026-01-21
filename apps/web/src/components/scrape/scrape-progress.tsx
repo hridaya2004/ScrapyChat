@@ -45,7 +45,9 @@ export const ScrapeProgress = () => {
           progress === 1 ? map.delete(url) : map.set(url, progress);
         }
 
-        return Array.from(map, ([url, progress]) => ({ url, progress }));
+        return Array.from(map, ([url, progress]) => ({ url, progress })).filter(
+          ({ progress }) => progress < 1
+        );
       });
     });
   }, [token]);
