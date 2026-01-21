@@ -30,6 +30,21 @@ export default function ScrapeList() {
     enabled: !!token?.trim(),
   });
 
+  const uniqueBaseUrls = Array.from(
+    new Set(
+      data?.ingestedUrls
+        .map((item) => {
+          try {
+            const urlObj = new URL(item);
+            return urlObj.origin;
+          } catch {
+            return item;
+          }
+        })
+        .filter(Boolean) ?? []
+    )
+  );
+
   const handleValueChange = (value: string) => {
     if (value === url) {
       return;
@@ -80,7 +95,7 @@ export default function ScrapeList() {
             </Button>
           </div>
           <RadioGroup onValueChange={handleValueChange} value={url}>
-            {data?.ingestedUrls.map((item) => (
+            {uniqueBaseUrls.map((item) => (
               <FieldLabel
                 className="hover:cursor-pointer"
                 htmlFor={item}
