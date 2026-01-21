@@ -1,6 +1,13 @@
 "use client";
 
-import { createContext, useContext, useEffect, useRef, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { authClient } from "@/lib/auth-client";
 
 interface AuthJWTContextProps {
@@ -8,6 +15,7 @@ interface AuthJWTContextProps {
   loading: boolean;
   error?: string;
   errorStatusCode?: number;
+  clearAuthState?: () => void;
 }
 
 const initialAuthState: AuthJWTContextProps = {
@@ -28,6 +36,11 @@ export const AuthJWTProvider = ({
   const [data, setData] = useState<AuthJWTContextProps>(initialAuthState);
   const hasInitialized = useRef(false);
 
+  const clearAuthState = useCallback(() => {
+    setData(initialAuthState);
+    hasInitialized.current = false;
+  }, []);
+
   useEffect(() => {
     if (hasInitialized.current) {
       return;
@@ -42,6 +55,7 @@ export const AuthJWTProvider = ({
           loading: false,
           error: authError.message,
           errorStatusCode: authError.status,
+          clearAuthState,
         });
         hasInitialized.current = true;
         return;
@@ -52,15 +66,18 @@ export const AuthJWTProvider = ({
           token: authData.token,
           loading: false,
           error: undefined,
+          clearAuthState,
         });
         hasInitialized.current = true;
       }
     };
 
     getAuthToken();
-  }, []);
+  }, [clearAuthState]);
 
   return (
-    <AuthJWTContext.Provider value={data}>{children}</AuthJWTContext.Provider>
+    <AuthJWTContext.Provider value={{ ...data, clearAuthState }}>
+      {children}
+    </AuthJWTContext.Provider>
   );
 };

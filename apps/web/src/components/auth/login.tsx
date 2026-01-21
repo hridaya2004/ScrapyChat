@@ -1,10 +1,11 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import Link from "next/link";
 import { useForm } from "react-hook-form";
 import z from "zod";
 import { authClient } from "@/lib/auth-client";
-import { Button } from "../ui/button";
+import { Button, buttonVariants } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";
-import { FieldSeparator, FieldSet } from "../ui/field";
+import { Field, FieldSeparator, FieldSet } from "../ui/field";
 import {
   Form,
   FormControl,
@@ -106,22 +107,34 @@ export default function Login() {
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name="rememberMe"
-          render={({ field }) => (
-            <FormItem className="flex flex-row items-center space-x-1">
-              <FormControl>
-                <Checkbox
-                  checked={field.value}
-                  onCheckedChange={(checked) => field.onChange(checked)}
-                />
-              </FormControl>
-              <FormLabel>Remember me</FormLabel>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <Field className="flex justify-between" orientation="horizontal">
+          <FormField
+            control={form.control}
+            name="rememberMe"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-center space-x-1">
+                <FormControl>
+                  <Checkbox
+                    checked={field.value}
+                    onCheckedChange={(checked) => field.onChange(checked)}
+                  />
+                </FormControl>
+                <FormLabel>Remember me</FormLabel>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Link
+            className={buttonVariants({
+              className: "me-0 py-0",
+              variant: "link",
+            })}
+            href="/reset-password"
+          >
+            Forget password?
+          </Link>
+        </Field>
+
         <Button className="w-full rounded-full" type="submit">
           Login
         </Button>

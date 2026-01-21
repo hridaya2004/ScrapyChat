@@ -16,9 +16,9 @@ import { Input } from "../ui/input";
 import { toast } from "../ui/toast";
 import Github from "./providers/github";
 
-const MINIMUM_PASSWORD_LENGTH = 8;
-const MAXMIMUM_PASSWORD_LENGTH = 100;
-const STRONG_PASSWORD_REGEX =
+export const MINIMUM_PASSWORD_LENGTH = 8;
+export const MAXMIMUM_PASSWORD_LENGTH = 100;
+export const STRONG_PASSWORD_REGEX =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()\-_=+{}[\]|;:'",.<>/?]).{8,}$/;
 
 const signUpFormSchema = z.object({
