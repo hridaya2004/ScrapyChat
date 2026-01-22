@@ -6,13 +6,14 @@ from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel, Field, field_validator
 
 from ..dependencies import get_user
-from ..internal.browser import fetch_page_text
 from ..internal.redis import RedisProvider
+from ..internal.scrape import ScrapeProvider
 from ..internal.vector_store import VectorStoreProvider
 
 router = APIRouter()
 sv_store = VectorStoreProvider()
 redis = RedisProvider()
+scraper = ScrapeProvider()
 
 logger = logging.getLogger("scraper")
 
@@ -26,6 +27,10 @@ class ScrapeUrl(BaseModel):
         return v.removesuffix("/")
 
 
+class ScrapeRequest(ScrapeUrl):
+    deep_search: bool = Field(False, description="Whether to perform a deep search")
+
+
 @router.get("/list")
 async def list_scraped(user_id: str = Depends(get_user)):
     ingested_urls = await sv_store.get_ingested(user_id)
@@ -34,28 +39,39 @@ async def list_scraped(user_id: str = Depends(get_user)):
 
 @router.post("/new")
 async def scrape_new(
-    scrape_url: ScrapeUrl,
+    scrape_request: ScrapeRequest,
     background_tasks: BackgroundTasks,
     user_id: str = Depends(get_user),
 ) -> JSONResponse:
-    # Check if the URL has already been ingested by the same user
+    # Extract text from URL and its internal pages
+    url_texts = await scraper.scrape_text_content(
+        url=scrape_request.url, depth=3 if scrape_request.deep_search else 0
+    )
+    logger.debug("Extracted text from %d pages", len(url_texts))
+
+    # Filter out already ingested URLs
     ingested_urls = await sv_store.get_ingested(user_id)
-    if scrape_url.url in ingested_urls:
+    new_urls = {
+        url: text for url, text in url_texts.items() if url not in ingested_urls
+    }
+
+    if not new_urls:
         raise HTTPException(
-            status_code=409, detail="Duplicate, the URL has already been ingested"
+            status_code=409, detail="All URLs have already been ingested"
         )
 
-    # Extract text from the URL
-    extracted_text = await fetch_page_text(scrape_url.url)
-    logger.debug("Extracted text: %s", extracted_text)
+    # Add ingestion background task for each URL
+    for page_url, text in new_urls.items():
+        background_tasks.add_task(
+            sv_store.ingest, user_id=user_id, url=page_url, text=text
+        )
 
-    # Add ingestion background task
-    background_tasks.add_task(
-        sv_store.ingest, user_id=user_id, url=scrape_url.url, text=extracted_text
-    )
     return JSONResponse(
         status_code=202,
-        content={"message": "Scrape request scheduled", "url": scrape_url.url},
+        content={
+            "message": "Scrape request scheduled",
+            "urls": list(new_urls.keys()),
+        },
     )
 
 
