@@ -21,6 +21,7 @@ logger = logging.getLogger("chat")
 class ChatRequest(ScrapeUrl):
     query: str = Field(..., description="The query from the user")
     llm: Optional[LLMConfig] = Field(None, description="The LLM provider to be used")
+    match_subpaths: bool = Field(False, description="Match all URLs under this path")
 
 
 @router.post("/new")
@@ -39,6 +40,7 @@ async def new_chat(
             text=chat_request.query,
             llm=llm_client,
             filter={"user_id": user_id, "url": chat_request.url},
+            url_prefix_match=chat_request.match_subpaths,
         )
     except GenAI_ClientError as e:
         raise HTTPException(status_code=429, detail=str(e))

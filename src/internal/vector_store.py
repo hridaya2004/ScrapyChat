@@ -5,7 +5,11 @@ from typing import Optional
 from llama_index.core import Document, Settings, VectorStoreIndex
 from llama_index.core.llms.utils import LLMType
 from llama_index.core.node_parser import SimpleNodeParser
-from llama_index.core.vector_stores import MetadataFilter, MetadataFilters
+from llama_index.core.vector_stores import (
+    FilterOperator,
+    MetadataFilter,
+    MetadataFilters,
+)
 from llama_index.vector_stores.qdrant import QdrantVectorStore
 from qdrant_client import AsyncQdrantClient, models
 from qdrant_client.models import Distance, VectorParams
@@ -133,12 +137,21 @@ class VectorStoreProvider(BaseProvider):
         llm: LLMType,
         filter: Optional[dict[str, str]] = None,
         top_k: int = 3,
+        url_prefix_match: bool = False,
     ):
         metadata_filters = None
         if filter:
-            metadata_filters = MetadataFilters(
-                filters=[MetadataFilter(key=k, value=v) for k, v in filter.items()]
-            )
+            filters = []
+            for k, v in filter.items():
+                if k == "url" and url_prefix_match:
+                    filters.append(
+                        MetadataFilter(
+                            key=k, value=v, operator=FilterOperator.TEXT_MATCH
+                        )
+                    )
+                else:
+                    filters.append(MetadataFilter(key=k, value=v))
+            metadata_filters = MetadataFilters(filters=filters)
 
         engine = self._index.as_query_engine(
             llm=llm,
