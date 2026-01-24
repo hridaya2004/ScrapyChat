@@ -1,6 +1,6 @@
 import logging
 
-from fastapi import APIRouter, BackgroundTasks, Depends
+from fastapi import APIRouter, BackgroundTasks, Depends, Response
 from fastapi.exceptions import HTTPException
 from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel, Field, field_validator
@@ -35,6 +35,19 @@ class ScrapeRequest(ScrapeUrl):
 async def list_scraped(user_id: str = Depends(get_user)):
     ingested_urls = await sv_store.get_ingested(user_id)
     return {"urls": ingested_urls}
+
+
+@router.delete("/remove")
+async def remove_ingested_urls(
+    request: ScrapeUrl,
+    user_id: str = Depends(get_user),
+):
+    result = await sv_store.remove(url=request.url, user_id=user_id)
+
+    if not result:
+        raise HTTPException(status_code=404, detail="URL not found")
+
+    return Response(status_code=204, content="Given ingested URL removed")
 
 
 @router.post("/new")

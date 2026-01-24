@@ -2,6 +2,7 @@ import asyncio
 import os
 from typing import Optional
 
+from fastapi import Depends
 from llama_index.core import Document, Settings, VectorStoreIndex
 from llama_index.core.llms.utils import LLMType
 from llama_index.core.node_parser import SimpleNodeParser
@@ -14,6 +15,7 @@ from llama_index.vector_stores.qdrant import QdrantVectorStore
 from qdrant_client import AsyncQdrantClient, models
 from qdrant_client.models import Distance, VectorParams
 
+from ..dependencies import get_user
 from ..types.provider import BaseProvider
 from .embeddings import EmbeddingProvider
 from .llm import LLMProvider
@@ -130,6 +132,26 @@ class VectorStoreProvider(BaseProvider):
         records = [record.model_dump().get("payload", {}) for record in res]
         # Return the unique set of ingested URLs
         return {record.get("url") for record in records}
+
+    async def remove(self, url: str, user_id: str = Depends(get_user)):
+        """
+        Removes the saved ingested URL from the user
+        """
+        return await self._client.delete(
+            collection_name=self._collection,
+            points_selector=models.FilterSelector(
+                filter=models.Filter(
+                    must=[
+                        models.FieldCondition(
+                            key="url", match=models.MatchValue(value=url)
+                        ),
+                        models.FieldCondition(
+                            key="user_id", match=models.MatchValue(value=user_id)
+                        ),
+                    ]
+                )
+            ),
+        )
 
     async def query(
         self,
