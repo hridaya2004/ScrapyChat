@@ -108,7 +108,7 @@ class ScrapeProvider(BaseProvider):
             parser.read()
         except Exception as e:
             logger.warning(f"Could not read robots.txt at {robots_url}: {e}")
-            return False
+            return True
 
         return parser.can_fetch(self._user_agent, url)
 
