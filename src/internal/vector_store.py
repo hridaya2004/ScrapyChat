@@ -126,6 +126,7 @@ class VectorStoreProvider(BaseProvider):
                     )
                 ]
             ),
+            limit=1000,
             with_payload=["document_id", "url"],
         )
 
