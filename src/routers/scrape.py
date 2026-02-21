@@ -31,6 +31,34 @@ class ScrapeRequest(ScrapeUrl):
     deep_search: bool = Field(False, description="Whether to perform a deep search")
 
 
+async def _process_scrape_request(scrape_request: ScrapeRequest, user_id: str) -> None:
+    try:
+        # Extract text from URL and its internal pages
+        url_texts = await scraper.scrape_text_content(
+            url=scrape_request.url, depth=3 if scrape_request.deep_search else 0
+        )
+        logger.debug("Extracted text from %d pages", len(url_texts))
+
+        # Filter out already ingested URLs
+        ingested_urls = await sv_store.get_ingested(user_id)
+        new_urls = {
+            url: text for url, text in url_texts.items() if url not in ingested_urls
+        }
+
+        if not new_urls:
+            raise HTTPException(
+                status_code=409, detail="All URLs have already been ingested"
+            )
+
+        # Ingest each URL
+        for page_url, text in new_urls.items():
+            await sv_store.ingest(user_id=user_id, url=page_url, text=text)
+    except HTTPException as exc:
+        logger.warning(exc.detail)
+    except Exception as e:
+        logger.warning(e)
+
+
 @router.get("/list")
 async def list_scraped(user_id: str = Depends(get_user)):
     ingested_urls = await sv_store.get_ingested(user_id)
@@ -56,34 +84,12 @@ async def scrape_new(
     background_tasks: BackgroundTasks,
     user_id: str = Depends(get_user),
 ) -> JSONResponse:
-    # Extract text from URL and its internal pages
-    url_texts = await scraper.scrape_text_content(
-        url=scrape_request.url, depth=3 if scrape_request.deep_search else 0
-    )
-    logger.debug("Extracted text from %d pages", len(url_texts))
-
-    # Filter out already ingested URLs
-    ingested_urls = await sv_store.get_ingested(user_id)
-    new_urls = {
-        url: text for url, text in url_texts.items() if url not in ingested_urls
-    }
-
-    if not new_urls:
-        raise HTTPException(
-            status_code=409, detail="All URLs have already been ingested"
-        )
-
-    # Add ingestion background task for each URL
-    for page_url, text in new_urls.items():
-        background_tasks.add_task(
-            sv_store.ingest, user_id=user_id, url=page_url, text=text
-        )
+    background_tasks.add_task(_process_scrape_request, scrape_request, user_id)
 
     return JSONResponse(
         status_code=202,
         content={
             "message": "Scrape request scheduled",
-            "urls": list(new_urls.keys()),
         },
     )
 
