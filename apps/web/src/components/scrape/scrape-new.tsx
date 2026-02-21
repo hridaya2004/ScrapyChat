@@ -30,7 +30,7 @@ import {
 } from "../ui/field";
 import { Input } from "../ui/input";
 import { Spinner } from "../ui/spinner";
-import { scrapeNewUrl } from "./scrape-core";
+import { postScrapeNewUrl } from "./scrape-core";
 
 export default function ScrapeNew() {
   const { token } = useAuthJWTProvider();
@@ -55,7 +55,7 @@ export default function ScrapeNew() {
   }
 
   const onSubmit = (data: ScrapeNewType) => {
-    scrapeNewUrl(
+    postScrapeNewUrl(
       data.url,
       data.deep_search,
       token,

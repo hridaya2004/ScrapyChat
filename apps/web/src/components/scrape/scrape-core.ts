@@ -58,7 +58,7 @@ const getScrapeList = async (token: string): Promise<ScrapeList> => {
   };
 };
 
-const scrapeNewUrl = async (
+const postScrapeNewUrl = async (
   scrapeUrl: string,
   isDeepSearchEnabled: boolean,
   token: string,
@@ -166,4 +166,4 @@ const getScrapeProgress = async (
   }
 };
 
-export { getScrapeList, scrapeNewUrl, getScrapeProgress };
+export { getScrapeList, postScrapeNewUrl, getScrapeProgress };
