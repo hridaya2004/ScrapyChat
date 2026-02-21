@@ -14,6 +14,8 @@ export const auth = betterAuth({
     useSecureCookies: true,
   },
 
+  baseURL: process.env.BETTER_AUTH_BASE_URL,
+
   emailAndPassword: {
     enabled: true,
     revokeSessionsOnPasswordReset: true,
