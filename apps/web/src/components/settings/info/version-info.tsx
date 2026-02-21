@@ -93,7 +93,7 @@ export default function VersionInfo() {
       )}
 
       <AlertDialog onOpenChange={setShowDialog} open={showDialog}>
-        <AlertDialogContent>
+        <AlertDialogContent className="rounded-3xl">
           <AlertDialogHeader>
             <AlertDialogTitle>
               Do you want to enable development mode?
@@ -105,10 +105,16 @@ export default function VersionInfo() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <Button onClick={() => setShowDialog(false)} variant="outline">
+            <Button
+              className="rounded-3xl"
+              onClick={() => setShowDialog(false)}
+              variant="outline"
+            >
               Cancel
             </Button>
-            <Button onClick={handleEnableConfirm}>Yes, enable</Button>
+            <Button className="rounded-3xl" onClick={handleEnableConfirm}>
+              Yes, enable
+            </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
