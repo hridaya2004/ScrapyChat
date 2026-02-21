@@ -11,11 +11,11 @@ import {
 import { authClient } from "@/lib/auth-client";
 
 interface AuthJWTContextProps {
-  token: string | null;
-  loading: boolean;
+  clearAuthState?: () => void;
   error?: string;
   errorStatusCode?: number;
-  clearAuthState?: () => void;
+  loading: boolean;
+  token: string | null;
 }
 
 const initialAuthState: AuthJWTContextProps = {

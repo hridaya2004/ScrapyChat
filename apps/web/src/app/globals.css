@@ -55,16 +55,6 @@
 
   --animate-spinner: spinner 1.2s linear infinite;
 
-  @keyframes spinner {
-    0% {
-      opacity: 1;
-    }
-
-    100% {
-      opacity: 0.15;
-    }
-  }
-
   --spacing-scroll-area: calc(
     -1 *
     (var(--spacing-input-area) + var(--spacing-app-header))
@@ -75,6 +65,16 @@
     var(--spacing-scroll-anchor-offset) +
     100dvh
   );
+
+  @keyframes spinner {
+    0% {
+      opacity: 1;
+    }
+
+    100% {
+      opacity: 0.15;
+    }
+  }
 }
 
 :root {
@@ -166,11 +166,10 @@
   }
 
   body {
-    @apply bg-background text-foreground;
-    @apply h-svh antialiased;
-
     font-synthesis-weight: none;
     text-rendering: optimizeLegibility;
+    @apply bg-background text-foreground;
+    @apply h-svh antialiased;
   }
 
   a:active,

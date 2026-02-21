@@ -10,12 +10,12 @@ import { cn } from "@/lib/utils";
 
 interface MessageAgentProps {
   children: string;
-  isLast?: boolean;
-  hasScrollAnchor?: boolean;
+  className?: string;
   copied?: boolean;
   copyToClipboard?: () => void;
+  hasScrollAnchor?: boolean;
+  isLast?: boolean;
   status?: "ready" | "submitted";
-  className?: string;
 }
 
 export function MessageAgent({

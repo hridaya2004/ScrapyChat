@@ -4,16 +4,16 @@ import { createContext, useCallback, useContext, useState } from "react";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 
 interface ModelConfig {
-  providerId: string;
-  modelName: string;
   apiKey: string;
+  modelName: string;
+  providerId: string;
 }
 
 interface ModelProviderContextProps {
   models: Record<string, ModelConfig>;
-  selectedModel: string;
   refreshModels: () => void;
   refreshSelectedModel: () => void;
+  selectedModel: string;
 }
 
 const initialModelContextState: ModelProviderContextProps = {

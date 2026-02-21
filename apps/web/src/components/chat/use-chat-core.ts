@@ -6,11 +6,11 @@ import { useAuthJWTProvider } from "@/providers/auth-jwt-provider";
 import { toast } from "../ui/toast";
 
 interface SendMessageParams {
-  input: string;
-  queryUrl: string;
-  providerId?: string;
-  modelName?: string;
   apiKey?: string;
+  input: string;
+  modelName?: string;
+  providerId?: string;
+  queryUrl: string;
   superUrl: boolean;
 }
 

@@ -14,11 +14,11 @@ import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 
 interface ScrapeUrlDetailsProps {
   baseUrl: string;
-  urls: string[];
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  selectedUrl: string | undefined;
   onUrlSelect: (url: string) => void;
+  selectedUrl: string | undefined;
+  urls: string[];
 }
 
 export default function ScrapeUrlDetails({

@@ -27,14 +27,14 @@ import { apiKeySchema } from "@/model/model/api-key";
 import { useModel } from "@/providers/model-provider";
 
 interface Provider {
+  defaultKey: string;
+  getKeyUrl: string;
+  icon: React.ComponentType<{ className?: string }>;
   id: string;
   model: string;
   name: string;
-  icon: React.ComponentType<{ className?: string }>;
-  placeholder: string;
-  getKeyUrl: string;
   paid: boolean;
-  defaultKey: string;
+  placeholder: string;
 }
 
 const PROVIDERS: Provider[] = [

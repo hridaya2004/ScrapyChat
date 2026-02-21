@@ -14,8 +14,8 @@ import { toast } from "../ui/toast";
 import { getScrapeProgress } from "./scrape-core";
 
 interface ProgressItem {
-  url: string;
   progress: number;
+  url: string;
 }
 
 export const ScrapeProgress = () => {

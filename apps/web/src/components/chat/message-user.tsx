@@ -11,11 +11,11 @@ import {
 import { cn } from "@/lib/utils";
 
 export interface MessageUserProps {
-  hasScrollAnchor?: boolean;
   children: string;
+  className?: string;
   copied: boolean;
   copyToClipboard: () => void;
-  className?: string;
+  hasScrollAnchor?: boolean;
 }
 
 export function MessageUser({

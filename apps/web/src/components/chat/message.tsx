@@ -4,13 +4,13 @@ import { MessageAgent } from "./message-agent";
 import { MessageUser } from "./message-user";
 
 interface MessageProps {
-  variant: MessageType["role"];
   children: string;
-  isLast?: boolean;
+  className?: string;
   // onDelete: (id: string) => void;
   hasScrollAnchor?: boolean;
+  isLast?: boolean;
   status?: "ready" | "submitted";
-  className?: string;
+  variant: MessageType["role"];
 }
 
 export function Message({

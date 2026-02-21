@@ -2,28 +2,28 @@ import type React from "react";
 import { cn } from "@/lib/utils";
 
 interface HeadingProps extends React.HTMLAttributes<HTMLHeadingElement> {
-  className?: string;
   children: React.ReactNode;
+  className?: string;
 }
 
 interface ParagraphProps extends React.HTMLAttributes<HTMLParagraphElement> {
-  className?: string;
   children: React.ReactNode;
+  className?: string;
 }
 
 interface BlockquoteProps extends React.HTMLAttributes<HTMLQuoteElement> {
-  className?: string;
   children: React.ReactNode;
+  className?: string;
 }
 
 interface CodeProps extends React.HTMLAttributes<HTMLElement> {
-  className?: string;
   children: React.ReactNode;
+  className?: string;
 }
 
 interface DivProps extends React.HTMLAttributes<HTMLDivElement> {
-  className?: string;
   children: React.ReactNode;
+  className?: string;
 }
 
 const H1 = ({ className, children, ...props }: HeadingProps) => (

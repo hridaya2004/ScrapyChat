@@ -2,11 +2,11 @@
 import { createContext, type ReactNode, useContext, useState } from "react";
 
 interface QueryPromptUrlContextProps {
-  url: string;
-  setUrl: (url: string) => void;
   clearUrl: () => void;
-  superUrl: boolean;
   setSuperUrl: (superUrl: boolean) => void;
+  setUrl: (url: string) => void;
+  superUrl: boolean;
+  url: string;
 }
 
 const QueryPromptUrlContext = createContext<

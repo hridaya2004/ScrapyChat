@@ -6,11 +6,11 @@ import ScrapeUrlDetails from "./scrape-url-details";
 
 interface ScrapeListItemProps {
   baseUrl: string;
-  urls: string[];
   isMoreDialogOpen: boolean;
   onMoreDialogOpenChange: (open: boolean) => void;
-  selectedUrl: string | undefined;
   onUrlSelect: (url: string) => void;
+  selectedUrl: string | undefined;
+  urls: string[];
 }
 
 export default function ScrapeListItem({

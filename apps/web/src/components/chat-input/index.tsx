@@ -15,13 +15,13 @@ import { HorizontalFadeWrapper } from "../fade-wrapper";
 import ScrapeList from "../scrape/scrape-list";
 
 interface ChatInputProps {
-  value: string;
-  onValueChange: (value: string) => void;
-  onSend: () => void;
-  isSubmitting?: boolean;
   hasMessages?: boolean;
-  stop: () => void;
+  isSubmitting?: boolean;
+  onSend: () => void;
+  onValueChange: (value: string) => void;
   status?: "submitted" | "ready";
+  stop: () => void;
+  value: string;
 }
 
 const WHITESPACE_REGEX = /[^\s]/;
