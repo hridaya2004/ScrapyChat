@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useAuthJWTProvider } from "@/providers/auth-jwt-provider";
 import { useDialog } from "@/providers/dialog-context-provider";
 import { useQueryPromptUrlProvider } from "@/providers/query-prompt-url-provider";
+import { P } from "../typography";
 import { Button } from "../ui/button";
 import {
   Dialog,
@@ -131,6 +132,11 @@ export default function ScrapeList() {
               Refresh
             </Button>
           </div>
+          {uniqueBaseUrls.length === 0 && (
+            <P className="text-center text-muted-foreground text-sm">
+              No websites have been ingested.
+            </P>
+          )}
           <RadioGroup onValueChange={handleValueChange} value={url}>
             {uniqueBaseUrls.map((baseUrl) => (
               <ScrapeListItem
