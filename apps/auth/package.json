@@ -12,16 +12,16 @@
   },
   "dependencies": {
     "@elysiajs/cors": "^1.4.1",
-    "@types/nodemailer": "^7.0.5",
+    "@types/nodemailer": "^7.0.11",
     "@types/pg": "^8.16.0",
     "drizzle-orm": "^0.45.1",
-    "elysia": "1.4.22",
-    "mysql2": "^3.16.1",
-    "nodemailer": "^7.0.12",
-    "pg": "^8.17.1"
+    "elysia": "1.4.25",
+    "mysql2": "^3.17.4",
+    "nodemailer": "^8.0.1",
+    "pg": "^8.18.0"
   },
   "devDependencies": {
-    "drizzle-kit": "^0.31.8",
+    "drizzle-kit": "^0.31.9",
     "tsx": "^4.21.0"
   }
 }
