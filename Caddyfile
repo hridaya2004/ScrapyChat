@@ -1,7 +1,0 @@
-scrapy.local {
-    tls internal
-
-    reverse_proxy /api/auth/* auth:3001
-    reverse_proxy /api/* backend:8080
-    reverse_proxy /* web:3000
-}
