@@ -51,7 +51,7 @@ services:
       POSTGRES_PASSWORD: example
       POSTGRES_DB: express_db
     volumes:
-      - ./data/db:/var/lib/postgresql/data:z
+      - ./data:/var/lib/postgresql:z
     networks:
       - scrapynet
     ports:
