@@ -81,6 +81,10 @@ export const auth = betterAuth({
     },
   },
 
+  rateLimit: {
+    enabled: process.env.NODE_ENV === "production",
+  },
+
   plugins: [
     lastLoginMethod(),
     jwt({
