@@ -1,8 +1,10 @@
 import { cors } from "@elysiajs/cors";
+import { openapi } from "@elysiajs/openapi";
 import { fromNodeHeaders } from "better-auth/node";
 import Elysia from "elysia";
 import z from "zod";
 import { auth } from "./lib/auth";
+import { OpenAPI } from "./lib/openapi";
 import { decryptData, encryptData } from "./lib/utils";
 
 const port = 3001;
@@ -37,6 +39,15 @@ const app = new Elysia()
       methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
       credentials: true,
       allowedHeaders: ["Content-Type", "Authorization"],
+    })
+  )
+  .use(
+    openapi({
+      path: "/openapi.json",
+      documentation: {
+        components: await OpenAPI.components,
+        paths: await OpenAPI.getPaths(),
+      },
     })
   )
   .use(betterAuth)
