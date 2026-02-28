@@ -1,8 +1,8 @@
 services:
   backend:
     build: .
-    image: scrapychat-fastapi
-    container_name: scrapychat-backend
+    image: scrapy-backend
+    container_name: scrapy-backend
     environment:
       HOT_RELOAD: false
       QDRANT_ENDPOINT: http://qdrant:6333
