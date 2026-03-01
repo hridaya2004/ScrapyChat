@@ -50,6 +50,7 @@ class ScrapeProvider(BaseProvider):
         self._default_timeout = DEFAULT_TIMEOUT
         self._default_depth = DEFAULT_DEPTH
         self._default_max_pages = DEFAULT_MAX_PAGES
+        self._robots_cache: dict[str, RobotFileParser | None] = {}
 
     @property
     def client(self):
@@ -97,19 +98,56 @@ class ScrapeProvider(BaseProvider):
 
         return ScrapeProvider._normalize_url(absolute)
 
-    async def _check_robots_txt(self, url: str) -> bool:
+    async def _get_robots_parser(self, url: str) -> RobotFileParser | None:
+        """Fetch and cache robots.txt per domain. Returns None if unavailable (allow all)."""
         parsed = urlparse(url)
-        robots_url = f"{parsed.scheme}://{parsed.netloc}/robots.txt"
+        domain = f"{parsed.scheme}://{parsed.netloc}"
 
+        if domain in self._robots_cache:
+            return self._robots_cache[domain]
+
+        robots_url = f"{domain}/robots.txt"
         parser = RobotFileParser()
         parser.set_url(robots_url)
 
         try:
-            parser.read()
+            async with AsyncClient(
+                timeout=DEFAULT_TIMEOUT, follow_redirects=True
+            ) as client:
+                response = await client.get(robots_url)
+
+                if response.status_code in range(400, 500):
+                    # 4xx: treat as "no robots.txt" -> allow all
+                    logger.debug(
+                        f"robots.txt returned {response.status_code} at {robots_url}, allowing all"
+                    )
+                    self._robots_cache[domain] = None
+                    return None
+
+                if response.status_code >= 500:
+                    # 5xx: server error, be lenient -> allow all
+                    logger.debug(
+                        f"robots.txt returned {response.status_code} at {robots_url}, allowing all"
+                    )
+                    self._robots_cache[domain] = None
+                    return None
+
+                # 2xx/3xx: parse the actual robots.txt content
+                lines = response.text.splitlines()
+                parser.parse(lines)
+
         except Exception as e:
             logger.warning(f"Could not read robots.txt at {robots_url}: {e}")
-            return True
+            self._robots_cache[domain] = None
+            return None
 
+        self._robots_cache[domain] = parser
+        return parser
+
+    async def _check_robots_txt(self, url: str) -> bool:
+        parser = await self._get_robots_parser(url)
+        if parser is None:
+            return True  # No robots.txt or unreachable -> allow
         return parser.can_fetch(self._user_agent, url)
 
     async def _filter_by_robots(self, urls: set[str]) -> list[str]:
