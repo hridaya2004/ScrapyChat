@@ -10,7 +10,7 @@ services:
       REDIS_PORT: 6379
     env_file: .env
     ports:
-      - 8080:8080
+      - 8081:8080
     networks:
       - scrapynet
     restart: unless-stopped
