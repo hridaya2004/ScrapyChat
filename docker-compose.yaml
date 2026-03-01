@@ -1,8 +1,8 @@
 services:
-  backend:
+  fastapi:
     build: .
-    image: scrapy-backend
-    container_name: scrapy-backend
+    image: scrapy-fastapi
+    container_name: scrapy-fastapi
     environment:
       HOT_RELOAD: false
       QDRANT_ENDPOINT: http://qdrant:6333
