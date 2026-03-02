@@ -1,6 +1,5 @@
 import { cors } from "@elysiajs/cors";
 import { openapi } from "@elysiajs/openapi";
-import { fromNodeHeaders } from "better-auth/node";
 import Elysia from "elysia";
 import z from "zod";
 import { auth } from "./lib/auth";
@@ -50,98 +49,79 @@ const app = new Elysia()
     })
   )
   .use(betterAuth)
-  .mount(auth.handler)
+  .get("/api/user", ({ user }) => user, {
+    auth: true,
+  })
+  .post(
+    "/api/api-keys/encrypt",
+    async (ctx) => {
+      if (!process.env.BETTER_AUTH_SECRET) {
+        return ctx.status(500, {
+          error: "Secret not provided.",
+        });
+      }
+
+      const { provider, apiKey, modelName } = ctx.body;
+
+      const uniqueSalt = `${process.env.BETTER_AUTH_SECRET}-${ctx.user.id}`;
+      const encryptedGoodies = await encryptData(apiKey, uniqueSalt);
+
+      return {
+        provider_id: provider,
+        api_key: encryptedGoodies,
+        model: modelName,
+      };
+    },
+    {
+      body: z.object({
+        provider: z.string(),
+        apiKey: z.string(),
+        modelName: z.string(),
+      }),
+      auth: true,
+    }
+  )
+  .post(
+    "/api/api-keys/decrypt",
+    async (ctx) => {
+      const token = ctx.headers.authorization?.split(" ")[1];
+
+      if (!token) {
+        return ctx.status(401, { error: "Token not provided" });
+      }
+
+      const decryptedToken = await auth.api.verifyJWT({
+        body: {
+          token,
+          issuer: process.env.ISSUER_URL,
+        },
+      });
+
+      if (!decryptedToken.payload) {
+        return ctx.status(401, { error: "Token is invalid." });
+      }
+
+      const { apiKey } = ctx.body;
+
+      if (!process.env.BETTER_AUTH_SECRET) {
+        return ctx.status(500, { error: "Secret not provided." });
+      }
+
+      // subject - user.id
+      const uniqueSalt = `${process.env.BETTER_AUTH_SECRET}-${decryptedToken.payload.sub}`;
+
+      const decryptedGoodies = await decryptData(apiKey, uniqueSalt);
+
+      return {
+        api_key: decryptedGoodies,
+      };
+    },
+    {
+      body: z.object({
+        apiKey: z.string(),
+      }),
+    }
+  )
   .listen(port);
 
-app.get("/api/user", ({ user }) => user, {
-  auth: true,
-});
-
-app.post(
-  "/api/api-keys/encrypt",
-  async (ctx) => {
-    const session = await auth.api.getSession({
-      headers: fromNodeHeaders(ctx.headers),
-    });
-
-    const userId = session?.user.id;
-    if (!userId) {
-      return ctx.status(401, { error: "User is unauthorized." });
-    }
-
-    if (!process.env.BETTER_AUTH_SECRET) {
-      return ctx.status(500, {
-        error: "Secret not provided.",
-      });
-    }
-
-    const { provider, apiKey, modelName } = ctx.body;
-
-    const uniqueSalt = `${process.env.BETTER_AUTH_SECRET}-${userId}`;
-    const encryptedGoodies = await encryptData(apiKey, uniqueSalt);
-
-    return {
-      provider_id: provider,
-      api_key: encryptedGoodies,
-      model: modelName,
-    };
-  },
-  {
-    body: z.object({
-      provider: z.string(),
-      apiKey: z.string(),
-      modelName: z.string(),
-    }),
-    auth: true,
-  }
-);
-
-app.post(
-  "/api/api-keys/decrypt",
-  async (ctx) => {
-    const token = ctx.headers.authorization?.split(" ")[1];
-
-    if (!token) {
-      return ctx.status(401, { error: "Token not provided" });
-    }
-
-    const decryptedToken = await auth.api.verifyJWT({
-      body: {
-        token,
-        issuer: process.env.ISSUER_URL,
-      },
-    });
-
-    if (!decryptedToken.payload) {
-      return ctx.status(401, { error: "Token is invalid." });
-    }
-
-    const { apiKey } = ctx.body;
-
-    if (!apiKey) {
-      return ctx.status(400, { error: "API key are required." });
-    }
-
-    if (!process.env.BETTER_AUTH_SECRET) {
-      return ctx.status(500, { error: "Secret not provided." });
-    }
-
-    // subject - user.id
-    const uniqueSalt = `${process.env.BETTER_AUTH_SECRET}-${decryptedToken.payload.sub}`;
-
-    const decryptedGoodies = await decryptData(apiKey, uniqueSalt);
-
-    return {
-      api_key: decryptedGoodies,
-    };
-  },
-  {
-    body: z.object({
-      apiKey: z.string(),
-    }),
-  }
-);
-
-console.log(
-  `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`
-);
+console.log(`Elysia is running at ${app.server?.hostname}:${app.server?.port}`);

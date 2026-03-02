@@ -104,13 +104,17 @@ export function ChatInput({
                     key={"layout-context-container"}
                   >
                     <motion.div
-                      animate={{ opacity: 1 }}
-                      className="font-medium text-sm"
-                      exit={{ opacity: 0 }}
-                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="cursor-pointer font-medium text-sm"
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      initial={{ opacity: 0, scale: 0.95 }}
                       layout
                       onClick={clearContextUrl}
                       style={{ transformOrigin: "left" }}
+                      transition={{
+                        duration: 0.15,
+                        ease: [0.25, 0.46, 0.45, 0.94],
+                      }}
                     >
                       {url}
                     </motion.div>

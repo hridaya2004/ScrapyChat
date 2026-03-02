@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ModeSwitcher } from "../mode-switcher";
 import { H3 } from "../typography";
@@ -7,8 +8,7 @@ export default function Header() {
   return (
     <header className="flex max-h-app-header items-center justify-between py-4">
       <Link className="flex items-center gap-2" href={"/"}>
-        {/** biome-ignore lint/performance/noImgElement: Ignore */}
-        <img
+        <Image
           alt="ScrapyChat Logo"
           className="dark:invert"
           height={32}

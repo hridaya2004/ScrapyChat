@@ -33,8 +33,8 @@ const signUpFormSchema = z.object({
     .string({
       error: "Name is required",
     })
-    .min(8, {
-      error: "Name must be at least 8 characters",
+    .min(2, {
+      error: "Name must be at least 2 characters",
     })
     .max(100, {
       error: "Name must be at most 100 characters",

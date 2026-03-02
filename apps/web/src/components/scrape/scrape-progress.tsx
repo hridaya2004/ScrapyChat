@@ -1,6 +1,7 @@
+import { motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
+
 import { Muted } from "@/components/typography";
-import { isEmpty } from "@/lib/utils";
 import type { ScrapeProgress as ScrapeProgressType } from "@/model/scrape/progress";
 import { useAuthJWTProvider } from "@/providers/auth-jwt-provider";
 import { useDialog } from "@/providers/dialog-context-provider";
@@ -20,23 +21,38 @@ interface ProgressItem {
 
 export const ScrapeProgress = () => {
   const { token } = useAuthJWTProvider();
-
   const { dialogState, setDialogState } = useDialog("scrape-progress");
 
   const [scrapeData, setScrapeData] = useState<ProgressItem[]>([]);
 
-  // Track all URLs we've ever seen in this session to avoid repeat toasts
-  const seenUrlsRef = useRef<Set<string>>(new Set());
-  const lastToastAtRef = useRef(0);
   const startedRef = useRef(false);
-  const pendingToastRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const hasShownToastRef = useRef(false);
 
-  // send the request on mount
+  // Show toast only once per scrape batch, and never while dialog is open
+  useEffect(() => {
+    if (scrapeData.length === 0) {
+      hasShownToastRef.current = false;
+      return;
+    }
+
+    if (hasShownToastRef.current || dialogState) {
+      return;
+    }
+
+    hasShownToastRef.current = true;
+    toast({
+      title: "Website is being scraped",
+      button: {
+        label: "View progress",
+        onClick: () => setDialogState(true),
+      },
+    });
+  }, [scrapeData, dialogState, setDialogState]);
+
   useEffect(() => {
     if (!token?.trim() || startedRef.current) {
       return;
     }
-
     startedRef.current = true;
 
     getScrapeProgress(token, (data: ScrapeProgressType) => {
@@ -44,105 +60,54 @@ export const ScrapeProgress = () => {
         const map = new Map(prev.map(({ url, progress }) => [url, progress]));
 
         for (const [url, progress] of Object.entries(data)) {
-          progress === 1 ? map.delete(url) : map.set(url, progress);
+          if (progress >= 1) {
+            map.delete(url);
+          } else {
+            map.set(url, progress);
+          }
         }
 
-        return Array.from(map, ([url, progress]) => ({ url, progress })).filter(
-          ({ progress }) => progress < 1
-        );
+        return Array.from(map, ([url, progress]) => ({ url, progress }));
       });
     });
   }, [token]);
 
-  // show toast only for truly new URLs we haven't seen before
-  // with debouncing to prevent rapid-fire toasts
-  useEffect(() => {
-    if (isEmpty(scrapeData)) {
-      return;
-    }
-
-    // Find URLs we've never seen before in this session
-    const newUrls = scrapeData.filter((d) => !seenUrlsRef.current.has(d.url));
-
-    if (newUrls.length === 0) {
-      return;
-    }
-
-    // Mark these URLs as seen immediately to prevent duplicate detection
-    for (const { url } of newUrls) {
-      seenUrlsRef.current.add(url);
-    }
-
-    const now = Date.now();
-    const timeSinceLastToast = now - lastToastAtRef.current;
-
-    // Clear any pending toast
-    if (pendingToastRef.current) {
-      clearTimeout(pendingToastRef.current);
-      pendingToastRef.current = null;
-    }
-
-    // If enough time has passed, show toast immediately
-    if (timeSinceLastToast >= 5000) {
-      lastToastAtRef.current = now;
-      toast({
-        title: "User defined website being scraped.",
-        button: {
-          label: "View",
-          onClick: () => setDialogState(true),
-        },
-      });
-    } else {
-      // Otherwise, schedule a toast for when the cooldown expires
-      const delay = 5000 - timeSinceLastToast;
-      pendingToastRef.current = setTimeout(() => {
-        lastToastAtRef.current = Date.now();
-        toast({
-          title: "User defined website being scraped.",
-          button: {
-            label: "View",
-            onClick: () => setDialogState(true),
-          },
-        });
-        pendingToastRef.current = null;
-      }, delay);
-    }
-  }, [scrapeData, setDialogState]);
-
-  // Cleanup pending toast on unmount
-  useEffect(() => {
-    return () => {
-      if (pendingToastRef.current) {
-        clearTimeout(pendingToastRef.current);
-      }
-    };
-  }, []);
-
-  if (isEmpty(scrapeData)) {
-    return null;
-  }
-
   return (
     <Dialog onOpenChange={setDialogState} open={dialogState}>
       <DialogContent className="rounded-3xl">
-        <DialogTitle>Progress</DialogTitle>
-        <DialogDescription>
-          Currently being scraped websites' progress
-        </DialogDescription>
+        <DialogTitle>Scraping progress</DialogTitle>
+        <DialogDescription>Websites currently being scraped</DialogDescription>
 
-        <div className="mt-2 flex flex-col rounded-3xl border">
-          {scrapeData.map(({ url, progress }) => (
-            <div
-              className="flex items-center justify-between gap-4 border-b p-2 px-4 last:border-b-0"
-              key={url}
-            >
-              <Muted className="break-all font-mono">{url}</Muted>
-              <span className="font-semibold text-sm">
-                {Math.round(progress * 100)}%
-              </span>
-            </div>
-          ))}
-        </div>
+        {scrapeData.length > 0 ? (
+          <div className="mt-2 flex flex-col overflow-hidden rounded-2xl border">
+            {scrapeData.map(({ url, progress }) => (
+              <div
+                className="relative flex items-center justify-between gap-4 border-b p-2 px-4 last:border-b-0"
+                key={url}
+              >
+                <motion.div
+                  animate={{ width: `${Math.round(progress * 100)}%` }}
+                  className="absolute inset-y-0 left-0 bg-primary/5"
+                  initial={{ width: 0 }}
+                  transition={{
+                    duration: 0.4,
+                    ease: [0.25, 0.46, 0.45, 0.94],
+                  }}
+                />
+                <Muted className="relative z-10 break-all font-mono text-xs">
+                  {url}
+                </Muted>
+                <span className="relative z-10 font-semibold text-sm tabular-nums">
+                  {Math.round(progress * 100)}%
+                </span>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <Muted className="py-6 text-center">
+            No websites are currently being scraped.
+          </Muted>
+        )}
       </DialogContent>
     </Dialog>
   );

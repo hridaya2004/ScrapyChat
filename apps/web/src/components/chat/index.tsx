@@ -117,17 +117,17 @@ export const Chat = () => {
       <AnimatePresence initial={false} mode="popLayout">
         {showOnboarding ? (
           <motion.div
-            animate={{ opacity: 1 }}
+            animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
             className="absolute bottom-[60%] mx-auto max-w-200 md:relative md:bottom-auto"
-            exit={{ opacity: 0 }}
+            exit={{ opacity: 0, scale: 0.98, filter: "blur(4px)" }}
             initial={{ opacity: 0 }}
             key="onboarding"
             layout="position"
             layoutId="onboarding"
             transition={{
-              layout: {
-                duration: 0,
-              },
+              duration: 0.2,
+              ease: [0.25, 0.46, 0.45, 0.94],
+              layout: { duration: 0 },
             }}
           >
             <h1 className="mb-6 font-medium text-3xl tracking-tight">
@@ -147,7 +147,8 @@ export const Chat = () => {
         layoutId="chat-input-container"
         transition={{
           layout: {
-            duration: messages.length === 1 ? 0.3 : 0,
+            duration: messages.length === 1 ? 0.25 : 0,
+            ease: [0.23, 1, 0.32, 1],
           },
         }}
       >

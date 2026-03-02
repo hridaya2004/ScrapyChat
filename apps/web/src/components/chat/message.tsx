@@ -6,7 +6,6 @@ import { MessageUser } from "./message-user";
 interface MessageProps {
   children: string;
   className?: string;
-  // onDelete: (id: string) => void;
   hasScrollAnchor?: boolean;
   isLast?: boolean;
   status?: "ready" | "submitted";

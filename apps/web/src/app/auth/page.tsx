@@ -1,6 +1,7 @@
 "use client";
 
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import Login from "@/components/auth/login";
 import Register from "@/components/auth/register";
 import { Lead } from "@/components/typography";
@@ -21,17 +22,20 @@ const tabs = [
 
 export default function Page() {
   const { data: session, isPending } = authClient.useSession();
+  const router = useRouter();
 
-  if (isPending) {
+  useEffect(() => {
+    if (session) {
+      router.push("/");
+    }
+  }, [session, router]);
+
+  if (isPending || session) {
     return (
       <div className="flex h-full items-center justify-center">
         <Lead>Loading...</Lead>
       </div>
     );
-  }
-
-  if (session) {
-    return redirect("/");
   }
 
   return (

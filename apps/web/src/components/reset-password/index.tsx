@@ -50,7 +50,7 @@ export function ResetPassword({
     try {
       const { data, error } = await authClient.requestPasswordReset({
         email: formData.email,
-        redirectTo: "/reset-password",
+        redirectTo: `${window.location.origin}/reset-password`,
         fetchOptions: {
           credentials: "include",
         },
