@@ -71,12 +71,22 @@ async def get_user(request: Request) -> str:
     if not verify_token(token):
         raise HTTPException(status_code=401, detail="Invalid token")
 
+    # Extract session token from the cookie
+    session_cookie = request.cookies.get("better-auth.session_token")
+    if not session_cookie:
+        raise HTTPException(status_code=401, detail="Session cookie missing")
+
+    # The cookie value is "<session_token>.<signature>", we need the part before "."
+    session_token = session_cookie.split(".")[0]
+
     # Validate session and grab userId from the sessions endpoint
     try:
+        cookies = dict(request.cookies)
         async with httpx.AsyncClient(verify=False) as client:
             response = await client.get(
                 SESSIONS_URL,
                 headers={"Authorization": auth_header},
+                cookies=cookies,
             )
 
         if response.status_code != 200:
@@ -88,7 +98,7 @@ async def get_user(request: Request) -> str:
         sessions = response.json()
 
         for session in sessions:
-            if session.get("token") == token:
+            if session.get("token") == session_token:
                 user_id = session.get("userId")
                 if user_id is None:
                     raise HTTPException(status_code=401, detail="Unauthorized")
