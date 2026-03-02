@@ -1,7 +1,11 @@
 "use client";
 
-import { ArrowUpIcon, SquareIcon } from "lucide-react";
-import { AnimatePresence, motion } from "motion/react";
+import {
+  ArrowUpIcon,
+  MessageCircleIcon,
+  SquareIcon,
+  XIcon,
+} from "lucide-react";
 import { useCallback, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,7 +15,6 @@ import {
   PromptInputTextarea,
 } from "@/components/ui/prompt-input";
 import { useQueryPromptUrlProvider } from "@/providers/query-prompt-url-provider";
-import { HorizontalFadeWrapper } from "../fade-wrapper";
 import ScrapeList from "../scrape/scrape-list";
 
 interface ChatInputProps {
@@ -80,11 +83,31 @@ export function ChatInput({
         onClick={() => textareaRef.current?.focus()}
       >
         <PromptInput
-          className="relative z-10 overflow-hidden bg-popover p-0 pt-1 shadow-xs backdrop-blur-xl"
+          className="relative z-10 overflow-hidden bg-popover p-0 shadow-xs backdrop-blur-xl"
           maxHeight={200}
           onValueChange={onValueChange}
           value={value}
         >
+          {url && (
+            <div className="flex w-full items-center justify-between rounded-t-3xl bg-secondary p-2 text-foreground/50">
+              <div className="flex min-w-0 flex-1 items-center gap-1">
+                <div className="inline-flex size-8 shrink-0 items-center justify-center">
+                  <MessageCircleIcon className="size-5" />
+                </div>
+                <span className="scrollbar-none overflow-x-auto truncate whitespace-nowrap">
+                  {url}
+                </span>
+              </div>
+              <Button
+                className="shrink-0 text-foreground"
+                onClick={clearContextUrl}
+                size="icon-sm"
+                variant="ghost"
+              >
+                <XIcon />
+              </Button>
+            </div>
+          )}
           <PromptInputTextarea
             className="min-h-11 pt-3 pl-4 text-base leading-[1.3] sm:text-base md:text-base dark:bg-popover"
             onKeyDown={handleKeyDown}
@@ -95,32 +118,7 @@ export function ChatInput({
             <PromptInputAction
               tooltip={url.trim() ? "Clear context URL" : "Select context URL"}
             >
-              <AnimatePresence mode="popLayout">
-                <ScrapeList />
-                {url && (
-                  // maybe that much width is enough
-                  <HorizontalFadeWrapper
-                    className="scrollbar-width-0 max-w-40 rounded-full border bg-background px-2 py-1.5 lg:max-w-72 dark:bg-input/30"
-                    key={"layout-context-container"}
-                  >
-                    <motion.div
-                      animate={{ opacity: 1, scale: 1 }}
-                      className="cursor-pointer font-medium text-sm"
-                      exit={{ opacity: 0, scale: 0.95 }}
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      layout
-                      onClick={clearContextUrl}
-                      style={{ transformOrigin: "left" }}
-                      transition={{
-                        duration: 0.15,
-                        ease: [0.25, 0.46, 0.45, 0.94],
-                      }}
-                    >
-                      {url}
-                    </motion.div>
-                  </HorizontalFadeWrapper>
-                )}
-              </AnimatePresence>
+              <ScrapeList />
             </PromptInputAction>
             <PromptInputAction
               tooltip={status === "submitted" ? "Stop" : "Send"}
