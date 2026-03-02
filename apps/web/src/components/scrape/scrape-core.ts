@@ -14,6 +14,7 @@ const getScrapeList = async (token: string): Promise<ScrapeList> => {
   try {
     const response = await fetch(`${apiConfig.baseUrl}/scrape/list`, {
       method: "GET",
+      credentials: "include",
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -73,6 +74,7 @@ const postScrapeNewUrl = async (
     callback?.(false, true);
     const response = await fetch(`${apiConfig.baseUrl}/scrape/new`, {
       method: "POST",
+      credentials: "include",
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
@@ -144,6 +146,7 @@ const getScrapeProgress = async (
   try {
     const response = await fetch(`${apiConfig.baseUrl}/scrape/progress`, {
       method: "GET",
+      credentials: "include",
       headers: {
         Authorization: `Bearer ${token}`,
       },

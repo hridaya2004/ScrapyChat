@@ -73,6 +73,7 @@ export default function DeleteUser({ oauth = false }: { oauth: boolean }) {
         callbackURL: "/auth",
         ...(!oauth && { password: values.password }),
         fetchOptions: {
+          credentials: "include",
           auth: {
             type: "Bearer",
             token: data?.token,

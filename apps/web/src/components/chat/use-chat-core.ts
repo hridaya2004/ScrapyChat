@@ -43,6 +43,7 @@ export const useChatCore = () => {
       abortControllerRef.current = new AbortController();
 
       const response = await fetch(`${apiConfig.baseUrl}/chat/new`, {
+        credentials: "include",
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
