@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation } from "@tanstack/react-query";
-import { KeyIcon, Loader2, PlusIcon, Trash2 } from "lucide-react";
+import { KeyIcon, PlusIcon, Trash2 } from "lucide-react";
 import { useState } from "react";
 import GeminiIcon from "@/components/icons/gemini";
 import GoogleIcon from "@/components/icons/google";
@@ -19,6 +19,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Spinner } from "@/components/ui/spinner";
 import { toast } from "@/components/ui/toast";
 import { apiConfig } from "@/config/global";
 import { useLocalStorage } from "@/hooks/use-local-storage";
@@ -326,7 +327,10 @@ export const BYOKSection = () => {
                     type="button"
                   >
                     {saveMutation.isPending ? (
-                      <Loader2 className="size-4 animate-spin" />
+                      <Spinner
+                        className="bg-primary-foreground"
+                        size="size-4"
+                      />
                     ) : (
                       "Save"
                     )}
@@ -339,7 +343,7 @@ export const BYOKSection = () => {
       </div>
 
       <AlertDialog onOpenChange={setDeleteDialogOpen} open={deleteDialogOpen}>
-        <AlertDialogContent>
+        <AlertDialogContent className="rounded-3xl">
           <AlertDialogHeader>
             <AlertDialogTitle>Delete API Key</AlertDialogTitle>
             <AlertDialogDescription>
@@ -350,13 +354,16 @@ export const BYOKSection = () => {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="rounded-3xl">
+              Cancel
+            </AlertDialogCancel>
             <AlertDialogAction
+              className="rounded-3xl"
               disabled={deleteMutation.isPending}
               onClick={handleConfirmDelete}
             >
               {deleteMutation.isPending ? (
-                <Loader2 className="mr-2 size-4 animate-spin" />
+                <Spinner className="bg-primary-foreground" size="size-4" />
               ) : null}
               Delete
             </AlertDialogAction>
