@@ -17,8 +17,8 @@ ssl_context.check_hostname = False
 ssl_context.verify_mode = ssl.CERT_NONE
 
 FRONTEND_URL = os.environ["FRONTEND_URL"]
-JWKS_URL = os.environ["JWKS_URL"] + "/api/auth/.well-known/jwks.json"
-SESSIONS_URL = os.environ["JWKS_URL"] + "/api/auth/list-sessions"
+JWKS_URL = os.environ["AUTH_URL"] + "/api/auth/.well-known/jwks.json"
+SESSIONS_URL = os.environ["AUTH_URL"] + "/api/auth/list-sessions"
 
 
 def verify_token(token: str) -> bool:
