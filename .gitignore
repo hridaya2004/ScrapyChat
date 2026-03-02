@@ -38,3 +38,6 @@ data
 
 # Turborepo
 *.turbo
+
+# Agents
+**/.agents
