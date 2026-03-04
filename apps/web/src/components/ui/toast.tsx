@@ -4,6 +4,7 @@ import { toast as sonnerToast } from "sonner"
 import { Button } from "./button"
 import { CheckCircle2Icon, InfoIcon, MessageCircleWarningIcon } from "lucide-react"
 import { Spinner } from "./spinner"
+import { WebHaptics } from "web-haptics"
 
 type ToastProps = {
   id: string | number
@@ -14,6 +15,44 @@ type ToastProps = {
     onClick: () => void
   }
   status?: "error" | "info" | "success" | "warning" | "loading"
+}
+
+let haptics: WebHaptics | null = null
+
+function getHaptics() {
+  if (typeof window === "undefined") return null
+  if (!haptics) haptics = new WebHaptics()
+  return haptics
+}
+
+function isHapticsEnabled() {
+  if (typeof window === "undefined") return false
+  try {
+    const stored = window.localStorage.getItem("haptics-enabled")
+    return stored === null ? true : JSON.parse(stored)
+  } catch {
+    return true
+  }
+}
+
+function triggerToastHaptic(status?: ToastProps["status"]) {
+  if (!isHapticsEnabled()) return
+  const h = getHaptics()
+  if (!h) return
+
+  switch (status) {
+    case "success":
+      h.trigger("success")
+      break
+    case "error":
+      h.trigger("error")
+      break
+    case "warning":
+      h.trigger("warning")
+      break
+    default:
+      break
+  }
 }
 
 function Toast({ title, description, button, id, status }: ToastProps) {
@@ -63,6 +102,8 @@ function Toast({ title, description, button, id, status }: ToastProps) {
 }
 
 function toast(toast: Omit<ToastProps, "id">) {
+  triggerToastHaptic(toast.status)
+
   return sonnerToast.custom(
     (id) => (
       <Toast

@@ -4,6 +4,7 @@ import { AlertDialog as AlertDialogPrimitive } from "radix-ui";
 import type * as React from "react";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useHaptics } from "@/providers/haptics-provider";
 
 function AlertDialog({
   ...props
@@ -119,11 +120,20 @@ function AlertDialogDescription({
 
 function AlertDialogAction({
   className,
+  onClick,
   ...props
 }: React.ComponentProps<typeof AlertDialogPrimitive.Action>) {
+  const { trigger } = useHaptics();
+
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    trigger("warning");
+    onClick?.(e);
+  };
+
   return (
     <AlertDialogPrimitive.Action
       className={cn(buttonVariants(), className)}
+      onClick={handleClick}
       {...props}
     />
   );

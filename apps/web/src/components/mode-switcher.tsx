@@ -2,14 +2,17 @@
 
 import { useTheme } from "next-themes";
 import { useCallback } from "react";
+import { useHaptics } from "@/providers/haptics-provider";
 import { Button } from "./ui/button";
 
 export function ModeSwitcher() {
   const { setTheme, resolvedTheme } = useTheme();
+  const { trigger } = useHaptics();
 
   const toggleTheme = useCallback(() => {
+    trigger("selection");
     setTheme(resolvedTheme === "dark" ? "light" : "dark");
-  }, [resolvedTheme, setTheme]);
+  }, [resolvedTheme, setTheme, trigger]);
 
   return (
     <Button

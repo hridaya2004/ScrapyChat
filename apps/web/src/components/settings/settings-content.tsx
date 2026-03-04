@@ -2,12 +2,17 @@ import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { BYOKSection } from "./api-keys/byok-section";
 import { InfoSection } from "./info";
+import PreferencesSettings from "./preferences";
 import ProfileSettings from "./profile";
 
 const tabs = [
   {
     label: "Profile",
     component: <ProfileSettings />,
+  },
+  {
+    label: "Preferences",
+    component: <PreferencesSettings />,
   },
   {
     label: "API Keys",

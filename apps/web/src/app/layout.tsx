@@ -7,6 +7,7 @@ import { globalMetadata } from "@/config/metadata";
 import { geistMono, geistSans } from "@/lib/geist";
 import { AuthJWTProvider } from "@/providers/auth-jwt-provider";
 import { DialogProvider } from "@/providers/dialog-context-provider";
+import { HapticsProvider } from "@/providers/haptics-provider";
 import { ModelContextProvider } from "@/providers/model-provider";
 import { QueryPromptUrlProvider } from "@/providers/query-prompt-url-provider";
 import { QueryClientWrapper } from "@/providers/query-provider";
@@ -49,11 +50,13 @@ export default function RootLayout({
               <QueryPromptUrlProvider>
                 <ModelContextProvider>
                   <DialogProvider>
-                    <main className="container-wrapper flex h-full flex-col">
-                      <Header />
-                      <div className="flex-1 overflow-y-auto">{children}</div>
-                    </main>
-                    <Toaster />
+                    <HapticsProvider>
+                      <main className="container-wrapper flex h-full flex-col">
+                        <Header />
+                        <div className="flex-1 overflow-y-auto">{children}</div>
+                      </main>
+                      <Toaster />
+                    </HapticsProvider>
                   </DialogProvider>
                 </ModelContextProvider>
               </QueryPromptUrlProvider>

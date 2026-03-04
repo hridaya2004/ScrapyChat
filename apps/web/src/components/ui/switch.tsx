@@ -4,11 +4,20 @@ import { Switch as SwitchPrimitive } from "radix-ui";
 import type * as React from "react";
 
 import { cn } from "@/lib/utils";
+import { useHaptics } from "@/providers/haptics-provider";
 
 function Switch({
   className,
+  onCheckedChange,
   ...props
 }: React.ComponentProps<typeof SwitchPrimitive.Root>) {
+  const { trigger } = useHaptics();
+
+  const handleCheckedChange = (checked: boolean) => {
+    trigger("light");
+    onCheckedChange?.(checked);
+  };
+
   return (
     <SwitchPrimitive.Root
       className={cn(
@@ -16,6 +25,7 @@ function Switch({
         className
       )}
       data-slot="switch"
+      onCheckedChange={handleCheckedChange}
       {...props}
     >
       <SwitchPrimitive.Thumb

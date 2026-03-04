@@ -5,11 +5,22 @@ import { Checkbox as CheckboxPrimitive } from "radix-ui";
 import type * as React from "react";
 
 import { cn } from "@/lib/utils";
+import { useHaptics } from "@/providers/haptics-provider";
 
 function Checkbox({
   className,
+  onCheckedChange,
   ...props
 }: React.ComponentProps<typeof CheckboxPrimitive.Root>) {
+  const { trigger } = useHaptics();
+
+  const handleCheckedChange = (
+    checked: boolean | "indeterminate"
+  ) => {
+    trigger("light");
+    onCheckedChange?.(checked);
+  };
+
   return (
     <CheckboxPrimitive.Root
       className={cn(
@@ -17,6 +28,7 @@ function Checkbox({
         className
       )}
       data-slot="checkbox"
+      onCheckedChange={handleCheckedChange}
       {...props}
     >
       <CheckboxPrimitive.Indicator
