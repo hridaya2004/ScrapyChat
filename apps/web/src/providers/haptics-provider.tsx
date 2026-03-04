@@ -35,7 +35,7 @@ export function HapticsProvider({
   children: React.ReactNode;
 }): React.ReactNode {
   const { getItem, setItem } = useLocalStorage(STORAGE_KEY);
-  const [enabled, setEnabledState] = useState(() => getItem() ?? true);
+  const [enabled, setEnabledState] = useState(() => getItem() ?? false);
   const haptic = useWebHaptics();
 
   const setEnabled = useCallback(
