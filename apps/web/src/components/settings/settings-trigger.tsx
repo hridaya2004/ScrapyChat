@@ -1,7 +1,7 @@
 import { SettingsIcon, XIcon } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useDialog } from "@/providers/dialog-context-provider";
-import { H3 } from "../typography";
+import { H4 } from "../typography";
 import { Button } from "../ui/button";
 import {
   Dialog,
@@ -54,9 +54,11 @@ export default function SettingsTrigger({
         <DrawerTrigger asChild className="cursor-pointer">
           {trigger}
         </DrawerTrigger>
-        <DrawerContent>
+        <DrawerContent className="h-[85vh] max-h-[85vh]">
           <DrawerHeader className="flex flex-row items-center justify-between border-b">
-            <DrawerTitle className="text-xl">Settings</DrawerTitle>
+            <DrawerTitle className="font-semibold text-xl tracking-tight">
+              Settings
+            </DrawerTitle>
             <DrawerClose>
               <XIcon className="size-4" />
             </DrawerClose>
@@ -78,7 +80,7 @@ export default function SettingsTrigger({
         <DialogHeader>
           <DialogTitle asChild>
             <div className="flex flex-row items-center justify-between border-b px-4 py-2">
-              <H3>Settings</H3>
+              <H4>Settings</H4>
               <DialogClose asChild>
                 <Button
                   className="rounded-full hover:bg-accent"

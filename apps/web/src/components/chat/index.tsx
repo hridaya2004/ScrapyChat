@@ -6,6 +6,7 @@ import { useQueryPromptUrlProvider } from "@/providers/query-prompt-url-provider
 import { useChatSession } from "@/providers/session-provider";
 import { ChatInput } from "../chat-input";
 import { ScrapeProgress } from "../scrape/scrape-progress";
+import { H2 } from "../typography";
 import { toast } from "../ui/toast";
 import { Conversation } from "./conversation";
 import { useChatCore } from "./use-chat-core";
@@ -130,9 +131,7 @@ export const Chat = () => {
               layout: { duration: 0 },
             }}
           >
-            <h1 className="mb-6 font-medium text-3xl tracking-tight">
-              What&apos;s on your mind?
-            </h1>
+            <H2 className="mb-6">What&apos;s on your mind?</H2>
           </motion.div>
         ) : (
           <Conversation key="conversation" {...conversationProps} />

@@ -1,4 +1,4 @@
-import { H3 } from "@/components/typography";
+import { H4 } from "@/components/typography";
 import { FieldSeparator } from "@/components/ui/field";
 import ChangeEmail from "./change-email";
 import ChangePassword from "./change-password";
@@ -8,8 +8,8 @@ import DeleteUser from "./delete-user";
 export default function EmailProfile() {
   return (
     <div className="container px-4 py-2">
-      <H3>Profile</H3>
-      <div className="flex flex-col gap-8 py-2">
+      <H4>Profile</H4>
+      <div className="mt-4 flex flex-col gap-8">
         <ChangeUserDetails />
         <FieldSeparator />
         <ChangeEmail />

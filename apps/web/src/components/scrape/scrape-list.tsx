@@ -6,7 +6,7 @@ import { useState } from "react";
 import { useAuthJWTProvider } from "@/providers/auth-jwt-provider";
 import { useDialog } from "@/providers/dialog-context-provider";
 import { useQueryPromptUrlProvider } from "@/providers/query-prompt-url-provider";
-import { P } from "../typography";
+import { Muted } from "../typography";
 import { Button } from "../ui/button";
 import {
   Dialog,
@@ -133,9 +133,9 @@ export default function ScrapeList() {
             </Button>
           </div>
           {uniqueBaseUrls.length === 0 && (
-            <P className="text-center text-muted-foreground text-sm">
+            <Muted className="text-center">
               No websites have been ingested.
-            </P>
+            </Muted>
           )}
           <RadioGroup onValueChange={handleValueChange} value={url}>
             {uniqueBaseUrls.map((baseUrl) => (

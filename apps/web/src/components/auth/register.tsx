@@ -168,7 +168,7 @@ export default function Register() {
           Register
         </Button>
 
-        <FieldSeparator className="my-4 font-bold" spanClassName="bg-card">
+        <FieldSeparator className="my-4 font-semibold" spanClassName="bg-card">
           OR
         </FieldSeparator>
 

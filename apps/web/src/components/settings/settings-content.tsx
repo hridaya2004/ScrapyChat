@@ -78,7 +78,7 @@ export default function SettingsContent({
       <div className="container flex-1 overflow-y-auto">
         {tabs.map((tab) => (
           <TabsContent
-            className="h-fit pb-16"
+            className="min-h-full pb-16"
             key={tab.label}
             value={tab.label}
           >

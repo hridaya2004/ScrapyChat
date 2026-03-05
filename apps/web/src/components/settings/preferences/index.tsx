@@ -1,6 +1,8 @@
 "use client";
 
 import { SmartphoneIcon } from "lucide-react";
+
+import { H4 } from "@/components/typography";
 import {
   FieldDescription,
   FieldGroup,
@@ -15,25 +17,33 @@ export default function PreferencesSettings() {
   const { enabled, setEnabled } = useHaptics();
 
   return (
-    <FieldGroup>
-      <FieldSet>
-        <FieldLegend>Haptic Feedback</FieldLegend>
-        <FieldDescription>
-          Enable vibration feedback on supported mobile devices when interacting
-          with buttons, toggles, and other controls.
-        </FieldDescription>
-        <div className="flex items-center gap-3 pt-1">
-          <Switch
-            checked={enabled}
-            id="haptics-toggle"
-            onCheckedChange={setEnabled}
-          />
-          <Label className="flex items-center gap-2" htmlFor="haptics-toggle">
-            <SmartphoneIcon className="size-4 text-muted-foreground" />
-            {enabled ? "Haptics enabled" : "Haptics disabled"}
-          </Label>
-        </div>
-      </FieldSet>
-    </FieldGroup>
+    <section className="container px-4 py-2">
+      <div className="flex flex-col gap-6">
+        <H4>Preferences</H4>
+        <FieldGroup>
+          <FieldSet>
+            <FieldLegend>Haptic Feedback</FieldLegend>
+            <FieldDescription>
+              Enable vibration feedback on supported mobile devices when
+              interacting with buttons, toggles, and other controls.
+            </FieldDescription>
+            <div className="flex items-center gap-3 pt-1">
+              <Switch
+                checked={enabled}
+                id="haptics-toggle"
+                onCheckedChange={setEnabled}
+              />
+              <Label
+                className="flex items-center gap-2"
+                htmlFor="haptics-toggle"
+              >
+                <SmartphoneIcon className="size-4 text-muted-foreground" />
+                {enabled ? "Haptics enabled" : "Haptics disabled"}
+              </Label>
+            </div>
+          </FieldSet>
+        </FieldGroup>
+      </div>
+    </section>
   );
 }

@@ -5,7 +5,7 @@ import { KeyIcon, PlusIcon, Trash2 } from "lucide-react";
 import { useState } from "react";
 import GeminiIcon from "@/components/icons/gemini";
 import GoogleIcon from "@/components/icons/google";
-import { H3, Muted } from "@/components/typography";
+import { H4, Muted } from "@/components/typography";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -226,8 +226,8 @@ export const BYOKSection = () => {
 
   return (
     <section className="container px-4 py-2">
-      <div className="flex flex-col gap-2">
-        <H3>Model Providers</H3>
+      <div className="flex flex-col gap-3">
+        <H4>Model Providers</H4>
         <div className="flex flex-col gap-1">
           <Muted>Add your own API keys to unlock access to models.</Muted>
           <Muted>

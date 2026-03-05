@@ -73,7 +73,7 @@ export default function VersionInfo() {
       </div>
       {developmentModeEnabled && (
         <div className="flex flex-col gap-3">
-          <Muted className="font-semibold">Backend development URL</Muted>
+          <Muted className="font-medium">Backend development URL</Muted>
           <form
             className="flex max-w-sm flex-row items-center gap-2"
             onSubmit={handleFormSubmit}

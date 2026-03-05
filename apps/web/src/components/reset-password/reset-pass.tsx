@@ -92,7 +92,7 @@ export default function ResetPass({ token }: { token: string }) {
   return (
     <div className="flex h-full flex-col items-center justify-center">
       <Card className="w-full max-w-sm gap-4 rounded-3xl p-4">
-        <div className="flex flex-col">
+        <div className="flex flex-col gap-1">
           <CardTitle className="text-xl tracking-tight">
             Reset your password
           </CardTitle>
@@ -100,7 +100,7 @@ export default function ResetPass({ token }: { token: string }) {
         </div>
         <Form {...resetForm}>
           <form
-            className="ga flex flex-col"
+            className="flex flex-col gap-2"
             onSubmit={resetForm.handleSubmit(onReset)}
           >
             <FormField

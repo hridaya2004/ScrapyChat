@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ModeSwitcher } from "../mode-switcher";
-import { H3 } from "../typography";
+import { H4 } from "../typography";
 import UserToggle from "./user-toggle";
 
 export default function Header() {
@@ -15,7 +15,7 @@ export default function Header() {
           src="/logo.svg"
           width={32}
         />
-        <H3>ScrapyChat</H3>
+        <H4>ScrapyChat</H4>
       </Link>
       <div className="flex flex-row items-center gap-2">
         <ModeSwitcher />
