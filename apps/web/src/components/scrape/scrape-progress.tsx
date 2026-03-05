@@ -27,8 +27,10 @@ export const ScrapeProgress = () => {
 
   const startedRef = useRef(false);
   const hasShownToastRef = useRef(false);
+  const lastToastTimeRef = useRef(0);
 
   // Show toast only once per scrape batch, and never while dialog is open
+  // Throttled to fire at most once every 10 seconds
   useEffect(() => {
     if (scrapeData.length === 0) {
       hasShownToastRef.current = false;
@@ -39,7 +41,13 @@ export const ScrapeProgress = () => {
       return;
     }
 
+    const now = Date.now();
+    if (now - lastToastTimeRef.current < 10_000) {
+      return;
+    }
+
     hasShownToastRef.current = true;
+    lastToastTimeRef.current = now;
     toast({
       title: "Website is being scraped",
       button: {
