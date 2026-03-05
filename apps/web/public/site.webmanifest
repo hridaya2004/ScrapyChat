@@ -1,6 +1,10 @@
 {
   "name": "ScrapyChat",
   "short_name": "ScrapyChat",
+  "description": "Scrape any website and chat with its content using AI.",
+  "start_url": "/",
+  "scope": "/",
+  "id": "/",
   "icons": [
     {
       "src": "/web-app-manifest-192x192.png",
