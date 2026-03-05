@@ -66,7 +66,7 @@ export default function SettingsContent({
       onValueChange={setActiveTab}
     >
       <div className="container flex items-center">
-        <TabsList className="mx-auto mt-4 h-full min-w-40 items-start overflow-y-auto bg-sidebar">
+        <TabsList className="mx-auto mt-4 h-fit min-w-40 items-start overflow-y-auto bg-sidebar">
           {tabs.map((tab) => (
             <TabsTrigger className="h-fit" key={tab.label} value={tab.label}>
               {tab.label}
