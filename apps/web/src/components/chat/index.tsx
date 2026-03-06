@@ -1,19 +1,26 @@
+import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "motion/react";
+import { useMemo } from "react";
 import { cn } from "@/lib/utils";
+import { useAuthJWTProvider } from "@/providers/auth-jwt-provider";
 import { useDialog } from "@/providers/dialog-context-provider";
 import { useModel } from "@/providers/model-provider";
 import { useQueryPromptUrlProvider } from "@/providers/query-prompt-url-provider";
 import { useChatSession } from "@/providers/session-provider";
 import { ChatInput } from "../chat-input";
+import { getScrapeList } from "../scrape/scrape-core";
 import { ScrapeProgress } from "../scrape/scrape-progress";
 import { H2 } from "../typography";
 import { toast } from "../ui/toast";
 import { Conversation } from "./conversation";
 import { useChatCore } from "./use-chat-core";
 
+const WWW_PREFIX_REGEX = /^www\./;
+
 export const Chat = () => {
   const { chatId } = useChatSession();
   const { url, superUrl } = useQueryPromptUrlProvider();
+  const { token } = useAuthJWTProvider();
   const {
     input,
     messages,
@@ -24,6 +31,29 @@ export const Chat = () => {
     stop,
   } = useChatCore();
   const { selectedModel, models } = useModel();
+
+  const { data: scrapeData } = useQuery({
+    queryKey: ["scrapeList"],
+    queryFn: () => getScrapeList(token?.trim() ? token : ""),
+    enabled: !!token?.trim(),
+  });
+
+  const headline = useMemo(() => {
+    if (url) {
+      try {
+        const hostname = new URL(url).hostname.replace(WWW_PREFIX_REGEX, "");
+        return `Ask anything about ${hostname}`;
+      } catch {
+        return "Ask anything about your data";
+      }
+    }
+
+    if (scrapeData?.ingestedUrls && scrapeData.ingestedUrls.length > 0) {
+      return "Pick a website to start querying";
+    }
+
+    return "Scrape a website to get started";
+  }, [url, scrapeData?.ingestedUrls]);
 
   const showOnboarding = !chatId && messages.length === 0;
 
@@ -131,7 +161,7 @@ export const Chat = () => {
               layout: { duration: 0 },
             }}
           >
-            <H2 className="mb-6">What&apos;s on your mind?</H2>
+            <H2 className="mb-6">{headline}</H2>
           </motion.div>
         ) : (
           <Conversation key="conversation" {...conversationProps} />

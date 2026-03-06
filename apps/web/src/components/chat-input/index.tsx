@@ -6,7 +6,7 @@ import {
   SquareIcon,
   XIcon,
 } from "lucide-react";
-import { useCallback, useRef } from "react";
+import { useCallback, useMemo, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import {
   PromptInput,
@@ -41,6 +41,13 @@ export function ChatInput({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const { url, clearUrl } = useQueryPromptUrlProvider();
+
+  const placeholder = useMemo(() => {
+    if (url) {
+      return "Ask a question...";
+    }
+    return "Select a website first...";
+  }, [url]);
 
   const clearContextUrl = () => {
     clearUrl();
@@ -111,7 +118,7 @@ export function ChatInput({
           <PromptInputTextarea
             className="min-h-11 pt-3 pl-4 text-base leading-[1.3] sm:text-base md:text-base dark:bg-popover"
             onKeyDown={handleKeyDown}
-            placeholder="Ask anything"
+            placeholder={placeholder}
             ref={textareaRef}
           />
           <PromptInputActions className="mt-3 w-full justify-between p-2">
