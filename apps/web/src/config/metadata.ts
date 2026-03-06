@@ -29,12 +29,6 @@ export const globalMetadata: Metadata = {
   },
   description: SITE_DESCRIPTION,
   applicationName: SITE_NAME,
-  authors: [
-    {
-      name: "Hridaya Prajapati",
-      url: "https://github.com/hridaya2004",
-    },
-  ],
   keywords: [
     "web scraping",
     "AI chat",
