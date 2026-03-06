@@ -101,7 +101,7 @@ export function ChatInput({
                 <div className="inline-flex size-8 shrink-0 items-center justify-center">
                   <MessageCircleIcon className="size-5" />
                 </div>
-                <span className="scrollbar-none overflow-x-auto truncate whitespace-nowrap">
+                <span className="scrollbar-none overflow-x-auto whitespace-nowrap">
                   {url}
                 </span>
               </div>

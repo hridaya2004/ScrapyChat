@@ -78,7 +78,6 @@ export default function ScrapeUrlDetails({
         </Button>
       </DialogTrigger>
       <DialogContent className="flex max-h-[80vh] flex-col gap-0 overflow-hidden rounded-3xl p-0">
-        {/* Header */}
         <div className="flex flex-col gap-1 px-6 pt-6 pb-4">
           <DialogTitle className="truncate">{hostname}</DialogTitle>
           <DialogDescription>
@@ -89,7 +88,6 @@ export default function ScrapeUrlDetails({
 
         <Separator />
 
-        {/* URL list */}
         <div className="min-h-0 flex-1 overflow-y-auto">
           <div className="flex flex-col gap-1.5 px-4 py-3">
             {urls.map((specificUrl) => {

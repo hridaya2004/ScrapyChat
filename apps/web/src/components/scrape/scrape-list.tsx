@@ -3,9 +3,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { Globe, LinkIcon, RefreshCw, Trash2 } from "lucide-react";
 import { useState } from "react";
+import { useDebounce } from "@/hooks/use-debounce";
 import { useAuthJWTProvider } from "@/providers/auth-jwt-provider";
 import { useDialog } from "@/providers/dialog-context-provider";
 import { useQueryPromptUrlProvider } from "@/providers/query-prompt-url-provider";
+import { Muted } from "../typography";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -44,6 +46,8 @@ export default function ScrapeList() {
     queryFn: () => getScrapeList(token?.trim() ? token : ""),
     enabled: !!token?.trim(),
   });
+
+  const [debouncedRefetch, isRefreshing] = useDebounce(() => refetch(), 2000);
 
   const handleUrlDeleted = () => {
     refetch();
@@ -149,7 +153,6 @@ export default function ScrapeList() {
     <Dialog onOpenChange={setDialogState} open={dialogState}>
       {trigger}
       <DialogContent className="flex max-h-[85vh] flex-col gap-0 overflow-hidden rounded-3xl p-0">
-        {/* Header */}
         <div className="flex flex-col gap-1 px-6 pt-6 pb-4">
           <DialogTitle>Scraped Websites</DialogTitle>
           <DialogDescription>
@@ -161,7 +164,6 @@ export default function ScrapeList() {
 
         <Separator />
 
-        {/* Action bar */}
         <div className="flex flex-row items-center gap-2 px-6 py-3">
           <ScrapeNew />
           <div className="flex-1" />
@@ -216,11 +218,14 @@ export default function ScrapeList() {
             <TooltipTrigger asChild>
               <Button
                 className="rounded-full"
-                onClick={() => refetch()}
+                disabled={isRefreshing}
+                onClick={() => debouncedRefetch()}
                 size="icon"
                 variant="ghost"
               >
-                <RefreshCw className="h-4 w-4" />
+                <RefreshCw
+                  className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`}
+                />
               </Button>
             </TooltipTrigger>
             <TooltipContent>Refresh</TooltipContent>
@@ -229,7 +234,6 @@ export default function ScrapeList() {
 
         <Separator />
 
-        {/* List */}
         {uniqueBaseUrls.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-3 px-6 py-12">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
@@ -237,9 +241,9 @@ export default function ScrapeList() {
             </div>
             <div className="flex flex-col items-center gap-1 text-center">
               <p className="font-medium text-sm">No websites ingested</p>
-              <p className="max-w-[240px] text-muted-foreground text-xs">
+              <Muted className="max-w-[240px] text-xs">
                 Add a website to start scraping and chatting with its content.
-              </p>
+              </Muted>
             </div>
           </div>
         ) : (

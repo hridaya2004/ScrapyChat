@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronRight, Globe, Trash2 } from "lucide-react";
+import { Globe, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { useAuthJWTProvider } from "@/providers/auth-jwt-provider";
@@ -88,12 +88,10 @@ export default function ScrapeListItem({
       }}
       type="button"
     >
-      {/* Favicon / icon */}
       <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted">
         <Globe className="h-4 w-4 text-muted-foreground" />
       </div>
 
-      {/* Content */}
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
         <span className="truncate font-medium text-sm">{hostname}</span>
         <span className="truncate text-muted-foreground text-xs">
@@ -101,15 +99,7 @@ export default function ScrapeListItem({
         </span>
       </div>
 
-      {/* Right side: badge + actions */}
       <div className="flex shrink-0 items-center gap-1">
-        {hasMultipleUrls && (
-          <Badge className="tabular-nums" variant="secondary">
-            {urls.length}
-          </Badge>
-        )}
-
-        {/* Delete */}
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
@@ -131,8 +121,13 @@ export default function ScrapeListItem({
           </TooltipContent>
         </Tooltip>
 
-        {/* Expand sub-URLs */}
-        {hasMultipleUrls ? (
+        {hasMultipleUrls && (
+          <Badge className="tabular-nums" variant="secondary">
+            {urls.length}
+          </Badge>
+        )}
+
+        {hasMultipleUrls && (
           <ScrapeUrlDetails
             baseUrl={baseUrl}
             isOpen={isMoreDialogOpen}
@@ -142,8 +137,6 @@ export default function ScrapeListItem({
             selectedUrl={selectedUrl}
             urls={urls}
           />
-        ) : (
-          <ChevronRight className="h-4 w-4 text-muted-foreground" />
         )}
       </div>
     </button>
