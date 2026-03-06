@@ -18,7 +18,7 @@ export default function PreferencesSettings() {
 
   return (
     <section className="container px-4 py-2">
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-3">
         <H4>Preferences</H4>
         <FieldGroup>
           <FieldSet>

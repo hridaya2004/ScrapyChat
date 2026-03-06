@@ -16,16 +16,16 @@ const tabs = [
     component: <PreferencesSettings />,
   },
   {
-    label: "API Keys",
+    label: "Model Providers",
     component: <BYOKSection />,
-  },
-  {
-    label: "Info",
-    component: <InfoSection />,
   },
   {
     label: "About",
     component: <AboutSection />,
+  },
+  {
+    label: "Info",
+    component: <InfoSection />,
   },
 ];
 

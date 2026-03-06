@@ -91,7 +91,7 @@ export default function AboutSection() {
 
   return (
     <section className="container px-4 py-2">
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-3">
         <H4>About</H4>
 
         <FieldGroup>

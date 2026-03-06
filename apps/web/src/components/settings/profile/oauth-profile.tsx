@@ -5,13 +5,15 @@ import DeleteUser from "./delete-user";
 
 export default function OAuthProfile() {
   return (
-    <div className="container px-4 py-2">
-      <H4>Profile</H4>
-      <div className="mt-4 flex flex-col gap-8">
-        <ChangeUserDetails />
-        <FieldSeparator />
-        <DeleteUser oauth />
+    <section className="container px-4 py-2">
+      <div className="flex flex-col gap-3">
+        <H4>Profile</H4>
+        <div className="flex flex-col gap-8">
+          <ChangeUserDetails />
+          <FieldSeparator />
+          <DeleteUser oauth />
+        </div>
       </div>
-    </div>
+    </section>
   );
 }

@@ -1,5 +1,5 @@
 import { useId, useRef, useState } from "react";
-import { H4, Muted } from "@/components/typography";
+import { Muted } from "@/components/typography";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -63,8 +63,7 @@ export default function VersionInfo() {
   };
 
   return (
-    <div className="flex flex-col gap-4">
-      <H4>Version Information</H4>
+    <div className="flex flex-col gap-3">
       <div className="flex flex-wrap items-center gap-2">
         <Muted>Current version: </Muted>
         <Button onClick={handleEnableDevelopment} variant="ghost">

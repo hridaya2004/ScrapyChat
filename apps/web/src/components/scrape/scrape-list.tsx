@@ -241,7 +241,7 @@ export default function ScrapeList() {
             </div>
             <div className="flex flex-col items-center gap-1 text-center">
               <p className="font-medium text-sm">No websites ingested</p>
-              <Muted className="max-w-[240px] text-xs">
+              <Muted className="max-w-60 text-xs">
                 Add a website to start scraping and chatting with its content.
               </Muted>
             </div>

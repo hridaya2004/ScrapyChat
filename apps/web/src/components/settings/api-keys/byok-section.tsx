@@ -5,7 +5,7 @@ import { KeyIcon, PlusIcon, Trash2 } from "lucide-react";
 import { useState } from "react";
 import GeminiIcon from "@/components/icons/gemini";
 import GoogleIcon from "@/components/icons/google";
-import { H4, Muted } from "@/components/typography";
+import { H4 } from "@/components/typography";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,8 +17,13 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import {
+  FieldDescription,
+  FieldGroup,
+  FieldLegend,
+  FieldSet,
+} from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "@/components/ui/toast";
 import { apiConfig } from "@/config/global";
@@ -228,58 +233,58 @@ export const BYOKSection = () => {
     <section className="container px-4 py-2">
       <div className="flex flex-col gap-3">
         <H4>Model Providers</H4>
-        <div className="flex flex-col gap-1">
-          <Muted>Add your own API keys to unlock access to models.</Muted>
-          <Muted>
-            Your keys are stored securely on your own browser with our hashing
-            algorithm.
-          </Muted>
-        </div>
+        <FieldGroup>
+          <FieldSet>
+            <FieldLegend>Select a provider</FieldLegend>
+            <FieldDescription>
+              Add your own API keys to unlock access to models. Your keys are
+              stored securely on your own browser with our hashing algorithm.
+            </FieldDescription>
 
-        <div className="mt-4 grid grid-cols-2 gap-3 min-[400px]:grid-cols-3 min-[500px]:grid-cols-4">
-          {PROVIDERS.map((provider) => (
-            <button
-              className={cn(
-                "relative flex aspect-square min-w-28 flex-col items-center justify-center gap-2 rounded-lg border p-4",
-                selectedProvider === provider.id
-                  ? "border-primary ring-2 ring-primary/30"
-                  : "border-border"
-              )}
-              key={provider.id}
-              onClick={() => {
-                setSelectedProvider(provider.id);
-                refreshSelectedModel();
-              }}
-              type="button"
-            >
-              {models[provider.id] && (
-                <span className="absolute top-1 right-1 rounded-sm border bg-secondary p-1">
-                  <KeyIcon className="size-3.5 text-secondary-foreground" />
-                </span>
-              )}
-              <provider.icon className="size-4" />
-              <span>{provider.name}</span>
-            </button>
-          ))}
-          <button
-            className={cn(
-              "flex aspect-square min-w-28 flex-col items-center justify-center gap-2 rounded-lg border p-4 opacity-20",
-              "border-primary border-dashed"
-            )}
-            disabled
-            key="soon"
-            type="button"
-          >
-            <PlusIcon className="size-4" />
-          </button>
-        </div>
+            <div className="grid grid-cols-2 gap-3 min-[400px]:grid-cols-3 min-[500px]:grid-cols-4">
+              {PROVIDERS.map((provider) => (
+                <button
+                  className={cn(
+                    "relative flex aspect-square min-w-28 flex-col items-center justify-center gap-2 rounded-lg border p-4",
+                    selectedProvider === provider.id
+                      ? "border-primary ring-2 ring-primary/30"
+                      : "border-border"
+                  )}
+                  key={provider.id}
+                  onClick={() => {
+                    setSelectedProvider(provider.id);
+                    refreshSelectedModel();
+                  }}
+                  type="button"
+                >
+                  {models[provider.id] && (
+                    <span className="absolute top-1 right-1 rounded-sm border bg-secondary p-1">
+                      <KeyIcon className="size-3.5 text-secondary-foreground" />
+                    </span>
+                  )}
+                  <provider.icon className="size-4" />
+                  <span>{provider.name}</span>
+                </button>
+              ))}
+              <button
+                className={cn(
+                  "flex aspect-square min-w-28 flex-col items-center justify-center gap-2 rounded-lg border p-4 opacity-20",
+                  "border-primary border-dashed"
+                )}
+                disabled
+                key="soon"
+                type="button"
+              >
+                <PlusIcon className="size-4" />
+              </button>
+            </div>
+          </FieldSet>
 
-        {selectedProviderConfig?.paid && (
-          <div className="mt-4">
-            <div className="flex flex-col">
-              <Label className="mb-3" htmlFor={`${selectedProvider}-key`}>
+          {selectedProviderConfig?.paid && (
+            <FieldSet>
+              <FieldLegend variant="label">
                 {selectedProviderConfig.name} API Key
-              </Label>
+              </FieldLegend>
               <Input
                 className="rounded-3xl"
                 disabled={saveMutation.isPending}
@@ -294,9 +299,9 @@ export const BYOKSection = () => {
                 type="password"
                 value={getProviderValue(selectedProvider)}
               />
-              <div className="mt-0 flex items-center justify-between pl-1">
+              <div className="flex items-center justify-between pl-1">
                 <a
-                  className="mt-1 text-muted-foreground text-xs hover:underline"
+                  className="text-muted-foreground text-xs hover:underline"
                   href={selectedProviderConfig.getKeyUrl}
                   rel="noopener noreferrer"
                   target="_blank"
@@ -306,7 +311,7 @@ export const BYOKSection = () => {
                 <div className="flex gap-2">
                   {models[selectedProvider] && (
                     <Button
-                      className="mt-2 rounded-3xl"
+                      className="rounded-3xl"
                       disabled={
                         deleteMutation.isPending || saveMutation.isPending
                       }
@@ -319,7 +324,7 @@ export const BYOKSection = () => {
                     </Button>
                   )}
                   <Button
-                    className="mt-2 rounded-3xl"
+                    className="rounded-3xl"
                     disabled={
                       saveMutation.isPending || deleteMutation.isPending
                     }
@@ -337,9 +342,9 @@ export const BYOKSection = () => {
                   </Button>
                 </div>
               </div>
-            </div>
-          </div>
-        )}
+            </FieldSet>
+          )}
+        </FieldGroup>
       </div>
 
       <AlertDialog onOpenChange={setDeleteDialogOpen} open={deleteDialogOpen}>
