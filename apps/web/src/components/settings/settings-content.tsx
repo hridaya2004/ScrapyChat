@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
+import AboutSection from "./about";
 import { BYOKSection } from "./api-keys/byok-section";
 import { InfoSection } from "./info";
 import PreferencesSettings from "./preferences";
@@ -21,6 +22,10 @@ const tabs = [
   {
     label: "Info",
     component: <InfoSection />,
+  },
+  {
+    label: "About",
+    component: <AboutSection />,
   },
 ];
 
