@@ -25,6 +25,7 @@ import {
 } from "../ui/input-group";
 import { toast } from "../ui/toast";
 import Github from "./providers/github";
+import Google from "./providers/google";
 
 const loginFormSchema = z.object({
   email: z.email(),
@@ -178,6 +179,10 @@ export default function Login() {
 
         <FieldSet className="items-center">
           <Github />
+        </FieldSet>
+
+        <FieldSet className="items-center">
+          <Google />
         </FieldSet>
       </form>
     </Form>

@@ -22,6 +22,7 @@ import {
 } from "../ui/input-group";
 import { toast } from "../ui/toast";
 import Github from "./providers/github";
+import Google from "./providers/google";
 
 export const MINIMUM_PASSWORD_LENGTH = 8;
 export const MAXMIMUM_PASSWORD_LENGTH = 100;
@@ -174,6 +175,10 @@ export default function Register() {
 
         <FieldSet className="items-center">
           <Github />
+        </FieldSet>
+
+        <FieldSet className="items-center">
+          <Google />
         </FieldSet>
       </form>
     </Form>

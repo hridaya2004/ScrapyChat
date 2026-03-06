@@ -70,6 +70,14 @@ export const auth = betterAuth({
       clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
       redirectURI: process.env.GITHUB_REDIRECT_URI as string,
     },
+
+    google: {
+      clientId: process.env.GOOGLE_CLIENT_ID as string,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+      redirectURI: process.env.GOOGLE_REDIRECT_URI as string,
+      accessType: "offline",
+      prompt: "select_account consent",
+    },
   },
 
   rateLimit: {

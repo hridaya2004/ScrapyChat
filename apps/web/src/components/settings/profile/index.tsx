@@ -5,7 +5,7 @@ import OAuthProfile from "./oauth-profile";
 export default function ProfileSettings() {
   const lastMethod = authClient.getLastUsedLoginMethod();
 
-  if (lastMethod === "github") {
+  if (lastMethod === "github" || lastMethod === "google") {
     return <OAuthProfile />;
   }
 
