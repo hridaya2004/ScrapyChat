@@ -1,6 +1,9 @@
 "use client";
 
-import { MoreHorizontal } from "lucide-react";
+import { ChevronRight, FileText, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { cn } from "@/lib/utils";
+import { useAuthJWTProvider } from "@/providers/auth-jwt-provider";
 import { Button } from "../ui/button";
 import {
   Dialog,
@@ -9,13 +12,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
-import { Field, FieldContent, FieldLabel, FieldTitle } from "../ui/field";
-import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
+import { Separator } from "../ui/separator";
+import { Spinner } from "../ui/spinner";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import { deleteScrapeUrl } from "./scrape-core";
 
 interface ScrapeUrlDetailsProps {
   baseUrl: string;
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
+  onUrlDeleted: () => void;
   onUrlSelect: (url: string) => void;
   selectedUrl: string | undefined;
   urls: string[];
@@ -28,51 +34,106 @@ export default function ScrapeUrlDetails({
   onOpenChange,
   selectedUrl,
   onUrlSelect,
+  onUrlDeleted,
 }: ScrapeUrlDetailsProps) {
+  const { token } = useAuthJWTProvider();
+  const [deletingUrl, setDeletingUrl] = useState<string | null>(null);
+
+  let hostname = baseUrl;
+  try {
+    hostname = new URL(baseUrl).hostname;
+  } catch {
+    // keep as-is
+  }
+
+  const handleDelete = (e: React.MouseEvent, url: string) => {
+    e.stopPropagation();
+    if (!token?.trim()) {
+      return;
+    }
+    setDeletingUrl(url);
+    deleteScrapeUrl(url, token, (success, loading) => {
+      if (!loading) {
+        setDeletingUrl(null);
+      }
+      if (success) {
+        onUrlDeleted();
+      }
+    });
+  };
+
   return (
     <Dialog onOpenChange={onOpenChange} open={isOpen}>
       <DialogTrigger asChild>
         <Button
-          className="h-6 rounded-full px-2 text-xs"
+          className="h-7 w-7 rounded-full"
           onClick={(e) => {
-            e.preventDefault();
             e.stopPropagation();
             onOpenChange(true);
           }}
-          size="sm"
+          size="icon"
           variant="ghost"
         >
-          <MoreHorizontal className="mr-1 h-3 w-3" />
-          More ({urls.length})
+          <ChevronRight className="h-4 w-4 text-muted-foreground" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-h-[80vh] overflow-y-auto rounded-3xl">
-        <DialogTitle>URLs for {baseUrl}</DialogTitle>
-        <DialogDescription>
-          Select a specific URL from this domain.
-        </DialogDescription>
-        <RadioGroup onValueChange={onUrlSelect} value={selectedUrl}>
-          {urls.map((specificUrl) => (
-            <FieldLabel
-              className="hover:cursor-pointer"
-              htmlFor={specificUrl}
-              key={specificUrl}
-            >
-              <Field orientation="horizontal">
-                <FieldContent>
-                  <FieldTitle className="break-all font-mono text-sm">
+      <DialogContent className="flex max-h-[80vh] flex-col gap-0 overflow-hidden rounded-3xl p-0">
+        {/* Header */}
+        <div className="flex flex-col gap-1 px-6 pt-6 pb-4">
+          <DialogTitle className="truncate">{hostname}</DialogTitle>
+          <DialogDescription>
+            {urls.length} {urls.length === 1 ? "page" : "pages"} scraped from
+            this domain.
+          </DialogDescription>
+        </div>
+
+        <Separator />
+
+        {/* URL list */}
+        <div className="min-h-0 flex-1 overflow-y-auto">
+          <div className="flex flex-col gap-1.5 px-4 py-3">
+            {urls.map((specificUrl) => {
+              const isActive = selectedUrl === specificUrl;
+
+              return (
+                <button
+                  className={cn(
+                    "group flex w-full cursor-pointer items-center gap-3 rounded-lg border-none bg-transparent px-3 py-2.5 text-left transition-colors",
+                    isActive
+                      ? "bg-primary/10 dark:bg-primary/15"
+                      : "hover:bg-accent/50"
+                  )}
+                  key={specificUrl}
+                  onClick={() => onUrlSelect(specificUrl)}
+                  type="button"
+                >
+                  <FileText className="h-4 w-4 shrink-0 text-muted-foreground" />
+                  <span className="scrollbar-none min-w-0 flex-1 overflow-x-auto whitespace-nowrap font-mono text-sm">
                     {specificUrl}
-                  </FieldTitle>
-                </FieldContent>
-                <RadioGroupItem
-                  aria-label={specificUrl}
-                  id={specificUrl}
-                  value={specificUrl}
-                />
-              </Field>
-            </FieldLabel>
-          ))}
-        </RadioGroup>
+                  </span>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        className="h-7 w-7 shrink-0 rounded-full"
+                        disabled={deletingUrl === specificUrl}
+                        onClick={(e) => handleDelete(e, specificUrl)}
+                        size="icon"
+                        variant="ghost"
+                      >
+                        {deletingUrl === specificUrl ? (
+                          <Spinner size="size-3.5" />
+                        ) : (
+                          <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                        )}
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Delete page</TooltipContent>
+                  </Tooltip>
+                </button>
+              );
+            })}
+          </div>
+        </div>
       </DialogContent>
     </Dialog>
   );

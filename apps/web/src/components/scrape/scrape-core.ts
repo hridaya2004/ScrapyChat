@@ -2,6 +2,7 @@ import { apiConfig } from "@/config/global";
 import { streamSSEResponse } from "@/lib/sse-parser";
 import { type ScrapeList, scrapeListSchema } from "@/model/scrape/list";
 import type { ScrapeProgress } from "@/model/scrape/progress";
+import { scrapeRemoveSchema } from "@/model/scrape/remove";
 import { toast } from "../ui/toast";
 
 const getScrapeList = async (token: string): Promise<ScrapeList> => {
@@ -169,4 +170,117 @@ const getScrapeProgress = async (
   }
 };
 
-export { getScrapeList, postScrapeNewUrl, getScrapeProgress };
+const deleteScrapeUrl = async (
+  url: string,
+  token: string,
+  callback?: (success: boolean, loading: boolean) => void
+) => {
+  if (!token.trim()) {
+    callback?.(false, false);
+    return;
+  }
+
+  const parsed = scrapeRemoveSchema.safeParse({ url });
+
+  if (parsed.error) {
+    toast({
+      title: "Invalid URL",
+      description: "The URL provided is not valid.",
+      status: "error",
+    });
+    callback?.(false, false);
+    return;
+  }
+
+  try {
+    callback?.(false, true);
+    const response = await fetch(`${apiConfig.baseUrl}/scrape/remove`, {
+      method: "DELETE",
+      credentials: "include",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ url: parsed.data.url }),
+    });
+
+    if (response.ok) {
+      toast({
+        title: "Deleted",
+        description: "Scraped URL has been removed.",
+        status: "success",
+      });
+      callback?.(true, false);
+      return;
+    }
+
+    toast({
+      title: "Error",
+      description: "Failed to delete the scraped URL.",
+      status: "error",
+    });
+    callback?.(false, false);
+  } catch (err) {
+    console.error(err);
+    toast({
+      title: "Error",
+      description: "An error occurred while deleting the scraped URL.",
+      status: "error",
+    });
+    callback?.(false, false);
+  }
+};
+
+const deleteAllScrapeUrls = async (
+  token: string,
+  callback?: (success: boolean, loading: boolean) => void
+) => {
+  if (!token.trim()) {
+    callback?.(false, false);
+    return;
+  }
+
+  try {
+    callback?.(false, true);
+    const response = await fetch(`${apiConfig.baseUrl}/scrape/remove-all`, {
+      method: "DELETE",
+      credentials: "include",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (response.ok) {
+      toast({
+        title: "Deleted",
+        description: "All scraped URLs have been removed.",
+        status: "success",
+      });
+      callback?.(true, false);
+      return;
+    }
+
+    toast({
+      title: "Error",
+      description: "Failed to delete all scraped URLs.",
+      status: "error",
+    });
+    callback?.(false, false);
+  } catch (err) {
+    console.error(err);
+    toast({
+      title: "Error",
+      description: "An error occurred while deleting all scraped URLs.",
+      status: "error",
+    });
+    callback?.(false, false);
+  }
+};
+
+export {
+  getScrapeList,
+  postScrapeNewUrl,
+  getScrapeProgress,
+  deleteScrapeUrl,
+  deleteAllScrapeUrls,
+};
