@@ -69,7 +69,7 @@ class ScrapeProvider(BaseProvider):
         parsed = urlparse(url)
         scheme = parsed.scheme.lower()
         netloc = parsed.netloc.lower()
-        path = parsed.path.rstrip("/") if parsed.path != "/" else parsed.path
+        path = parsed.path.rstrip("/")
 
         if parsed.query:
             return f"{scheme}://{netloc}{path}?{parsed.query}"

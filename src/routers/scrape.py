@@ -1,4 +1,5 @@
 import logging
+from urllib.parse import urlparse
 
 from fastapi import APIRouter, BackgroundTasks, Depends, Response
 from fastapi.exceptions import HTTPException
@@ -23,8 +24,15 @@ class ScrapeUrl(BaseModel):
 
     @field_validator("url", mode="before")
     @classmethod
-    def strip_trailing_slash(cls, v: str) -> str:
-        return v.removesuffix("/")
+    def normalize_url(cls, v: str) -> str:
+        parsed = urlparse(v)
+        scheme = parsed.scheme.lower()
+        netloc = parsed.netloc.lower()
+        path = parsed.path.rstrip("/")
+
+        if parsed.query:
+            return f"{scheme}://{netloc}{path}?{parsed.query}"
+        return f"{scheme}://{netloc}{path}"
 
 
 class ScrapeRequest(ScrapeUrl):
@@ -75,7 +83,19 @@ async def remove_ingested_urls(
     if not result:
         raise HTTPException(status_code=404, detail="URL not found")
 
-    return Response(status_code=204, content="Given ingested URL removed")
+    return Response(status_code=204)
+
+
+@router.delete("/remove-all")
+async def remove_all_ingested_urls(
+    user_id: str = Depends(get_user),
+):
+    result = await sv_store.remove_all(user_id=user_id)
+
+    if not result:
+        raise HTTPException(status_code=404, detail="No ingested URLs found")
+
+    return Response(status_code=204)
 
 
 @router.post("/new")

@@ -154,6 +154,24 @@ class VectorStoreProvider(BaseProvider):
             ),
         )
 
+    async def remove_all(self, user_id: str):
+        """
+        Removes all saved ingested URLs for the user
+        """
+        return await self._client.delete(
+            collection_name=self._collection,
+            points_selector=models.FilterSelector(
+                filter=models.Filter(
+                    must=[
+                        models.FieldCondition(
+                            key="user_id",
+                            match=models.MatchValue(value=user_id),
+                        ),
+                    ]
+                )
+            ),
+        )
+
     async def query(
         self,
         text: str,
