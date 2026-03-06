@@ -55,7 +55,7 @@ export default function SettingsTrigger({
           {trigger}
         </DrawerTrigger>
         <DrawerContent className="h-[85vh] max-h-[85vh]">
-          <DrawerHeader className="flex flex-row items-center justify-between border-b">
+          <DrawerHeader className="flex flex-row items-center justify-between border-b pt-2">
             <DrawerTitle className="font-semibold text-xl tracking-tight">
               Settings
             </DrawerTitle>
@@ -83,7 +83,7 @@ export default function SettingsTrigger({
               <H4>Settings</H4>
               <DialogClose asChild>
                 <Button
-                  className="rounded-full hover:bg-accent"
+                  className="rounded-full px-0! hover:bg-background dark:hover:bg-background"
                   variant="ghost"
                 >
                   <XIcon />

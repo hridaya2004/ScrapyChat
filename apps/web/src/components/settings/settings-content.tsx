@@ -70,10 +70,14 @@ export default function SettingsContent({
       defaultValue={activeTab}
       onValueChange={setActiveTab}
     >
-      <div className="container flex items-center">
-        <TabsList className="mx-auto mt-4 h-fit min-w-40 items-start overflow-y-auto bg-sidebar">
+      <div className="no-scrollbar shrink-0 overflow-x-auto px-4 py-4">
+        <TabsList className="bg-sidebar">
           {tabs.map((tab) => (
-            <TabsTrigger className="h-fit" key={tab.label} value={tab.label}>
+            <TabsTrigger
+              className="h-fit min-w-24 flex-initial shrink-0"
+              key={tab.label}
+              value={tab.label}
+            >
               {tab.label}
             </TabsTrigger>
           ))}
