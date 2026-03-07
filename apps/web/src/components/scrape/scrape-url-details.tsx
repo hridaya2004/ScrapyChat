@@ -4,6 +4,7 @@ import { ChevronRight, FileText, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { useAuthJWTProvider } from "@/providers/auth-jwt-provider";
+import { useDialog } from "@/providers/dialog-context-provider";
 import { Button } from "../ui/button";
 import {
   Dialog,
@@ -19,7 +20,6 @@ import { deleteScrapeUrl } from "./scrape-core";
 
 interface ScrapeUrlDetailsProps {
   baseUrl: string;
-  isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   onUrlDeleted: () => void;
   onUrlSelect: (url: string) => void;
@@ -30,13 +30,14 @@ interface ScrapeUrlDetailsProps {
 export default function ScrapeUrlDetails({
   baseUrl,
   urls,
-  isOpen,
   onOpenChange,
   selectedUrl,
   onUrlSelect,
   onUrlDeleted,
 }: ScrapeUrlDetailsProps) {
   const { token } = useAuthJWTProvider();
+  const { dialogState, setDialogState } = useDialog("scrape-url-details");
+
   const [deletingUrl, setDeletingUrl] = useState<string | null>(null);
 
   let hostname = baseUrl;
@@ -63,7 +64,7 @@ export default function ScrapeUrlDetails({
   };
 
   return (
-    <Dialog onOpenChange={onOpenChange} open={isOpen}>
+    <Dialog onOpenChange={setDialogState} open={dialogState}>
       <DialogTrigger asChild>
         <Button
           className="h-7 w-7 rounded-full"
@@ -77,7 +78,12 @@ export default function ScrapeUrlDetails({
           <ChevronRight className="h-4 w-4 text-muted-foreground" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="flex max-h-[80vh] flex-col gap-0 overflow-hidden rounded-3xl p-0">
+      <DialogContent
+        className="flex max-h-[80vh] flex-col gap-0 overflow-hidden rounded-3xl p-0"
+        onInteractOutside={() => {
+          setDialogState(false);
+        }}
+      >
         <div className="flex flex-col gap-1 px-6 pt-6 pb-4">
           <DialogTitle className="truncate">{hostname}</DialogTitle>
           <DialogDescription>
@@ -103,7 +109,10 @@ export default function ScrapeUrlDetails({
                       : "hover:bg-accent/50"
                   )}
                   key={specificUrl}
-                  onClick={() => onUrlSelect(specificUrl)}
+                  onClick={() => {
+                    onUrlSelect(specificUrl);
+                    setDialogState(false);
+                  }}
                 >
                   <FileText className="h-4 w-4 shrink-0 text-muted-foreground" />
                   <span className="scrollbar-none min-w-0 flex-1 overflow-x-auto whitespace-nowrap font-mono text-sm">

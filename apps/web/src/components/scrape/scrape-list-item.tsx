@@ -130,7 +130,6 @@ export default function ScrapeListItem({
         {hasMultipleUrls && (
           <ScrapeUrlDetails
             baseUrl={baseUrl}
-            isOpen={isMoreDialogOpen}
             onOpenChange={onMoreDialogOpenChange}
             onUrlDeleted={onUrlDeleted}
             onUrlSelect={onUrlSelect}
