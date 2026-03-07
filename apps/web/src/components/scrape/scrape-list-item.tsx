@@ -74,7 +74,8 @@ export default function ScrapeListItem({
   };
 
   return (
-    <button
+    // biome-ignore lint/a11y: "Hydration issue prevents it from being a button"
+    <div
       className={cn(
         "group relative flex w-full cursor-pointer items-center gap-3 rounded-xl border p-3 text-left transition-colors",
         isSelected
@@ -86,7 +87,6 @@ export default function ScrapeListItem({
           onSelect(baseUrl);
         }
       }}
-      type="button"
     >
       <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted">
         <Globe className="h-4 w-4 text-muted-foreground" />
@@ -139,6 +139,6 @@ export default function ScrapeListItem({
           />
         )}
       </div>
-    </button>
+    </div>
   );
 }

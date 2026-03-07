@@ -94,7 +94,8 @@ export default function ScrapeUrlDetails({
               const isActive = selectedUrl === specificUrl;
 
               return (
-                <button
+                // biome-ignore lint/a11y: "this should actually be a button but hydration issue prevents it"
+                <div
                   className={cn(
                     "group flex w-full cursor-pointer items-center gap-3 rounded-lg border-none bg-transparent px-3 py-2.5 text-left transition-colors",
                     isActive
@@ -103,7 +104,6 @@ export default function ScrapeUrlDetails({
                   )}
                   key={specificUrl}
                   onClick={() => onUrlSelect(specificUrl)}
-                  type="button"
                 >
                   <FileText className="h-4 w-4 shrink-0 text-muted-foreground" />
                   <span className="scrollbar-none min-w-0 flex-1 overflow-x-auto whitespace-nowrap font-mono text-sm">
@@ -127,7 +127,7 @@ export default function ScrapeUrlDetails({
                     </TooltipTrigger>
                     <TooltipContent>Delete page</TooltipContent>
                   </Tooltip>
-                </button>
+                </div>
               );
             })}
           </div>
