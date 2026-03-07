@@ -3,6 +3,7 @@ import { GoogleAnalytics, GoogleTagManager } from "@next/third-parties/google";
 import type { Metadata, Viewport } from "next";
 import Header from "@/components/header";
 import { Toaster } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { globalMetadata, globalViewport } from "@/config/metadata";
 import { geistMono, geistSans } from "@/lib/geist";
 import { AuthJWTProvider } from "@/providers/auth-jwt-provider";
@@ -32,23 +33,27 @@ export default function RootLayout({
       <GoogleAnalytics gaId="G-57KPX2KXVZ" />
       <body className={`${geistSans.variable} ${geistMono.variable} font-sans`}>
         <ThemeProvider>
-          <AuthJWTProvider>
-            <QueryClientWrapper>
-              <QueryPromptUrlProvider>
-                <ModelContextProvider>
-                  <DialogProvider>
-                    <HapticsProvider>
-                      <main className="container-wrapper flex h-full flex-col">
-                        <Header />
-                        <div className="flex-1 overflow-y-auto">{children}</div>
-                      </main>
-                      <Toaster />
-                    </HapticsProvider>
-                  </DialogProvider>
-                </ModelContextProvider>
-              </QueryPromptUrlProvider>
-            </QueryClientWrapper>
-          </AuthJWTProvider>
+          <TooltipProvider>
+            <AuthJWTProvider>
+              <QueryClientWrapper>
+                <QueryPromptUrlProvider>
+                  <ModelContextProvider>
+                    <DialogProvider>
+                      <HapticsProvider>
+                        <main className="container-wrapper flex h-full flex-col">
+                          <Header />
+                          <div className="flex-1 overflow-y-auto">
+                            {children}
+                          </div>
+                        </main>
+                        <Toaster />
+                      </HapticsProvider>
+                    </DialogProvider>
+                  </ModelContextProvider>
+                </QueryPromptUrlProvider>
+              </QueryClientWrapper>
+            </AuthJWTProvider>
+          </TooltipProvider>
         </ThemeProvider>
       </body>
     </html>
