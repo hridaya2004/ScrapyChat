@@ -135,6 +135,14 @@ export default function ScrapeList() {
     setDialogState(false);
   };
 
+  const getBaseUrl = (url: string) => {
+    try {
+      return new URL(url).hostname;
+    } catch {
+      return url;
+    }
+  };
+
   const trigger = (
     <DialogTrigger asChild>
       <Button className="rounded-full" size="icon" variant="outline">
@@ -253,7 +261,7 @@ export default function ScrapeList() {
                 <ScrapeListItem
                   baseUrl={baseUrl}
                   isMoreDialogOpen={moreDialogOpen === baseUrl}
-                  isSelected={url === baseUrl}
+                  isSelected={getBaseUrl(url) === getBaseUrl(baseUrl)}
                   key={baseUrl}
                   onMoreDialogOpenChange={(open) =>
                     setMoreDialogOpen(open ? baseUrl : null)
