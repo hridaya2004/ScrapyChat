@@ -42,8 +42,9 @@ export default function SettingsContent({
         className="flex h-full w-full flex-row overflow-hidden"
         defaultValue={activeTab}
         onValueChange={setActiveTab}
+        orientation="vertical"
       >
-        <TabsList className="h-full min-w-40 items-start overflow-y-auto bg-sidebar">
+        <TabsList className="min-h-full min-w-40 items-start justify-start overflow-y-auto rounded-none! bg-sidebar">
           <div className="flex w-full flex-col gap-1">
             {tabs.map((tab) => (
               <TabsTrigger className="h-fit" key={tab.label} value={tab.label}>
