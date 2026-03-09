@@ -38,7 +38,6 @@ export default function ScrapeList() {
   const { token } = useAuthJWTProvider();
   const { setUrl, url, clearUrl, setSuperUrl } = useQueryPromptUrlProvider();
   const { dialogState, setDialogState } = useDialog("scrape-list");
-  const [moreDialogOpen, setMoreDialogOpen] = useState<string | null>(null);
   const [deletingAll, setDeletingAll] = useState(false);
 
   const { data, refetch } = useQuery({
@@ -112,7 +111,6 @@ export default function ScrapeList() {
       },
     });
     setDialogState(false);
-    setMoreDialogOpen(null);
   };
 
   const handleMoreUrlSelect = (value: string) => {
@@ -131,7 +129,6 @@ export default function ScrapeList() {
         onClick: clearUrl,
       },
     });
-    setMoreDialogOpen(null);
     setDialogState(false);
   };
 
@@ -151,11 +148,11 @@ export default function ScrapeList() {
     </DialogTrigger>
   );
 
+  const totalUrls = data?.ingestedUrls.length ?? 0;
+
   if (!token?.trim()) {
     return null;
   }
-
-  const totalUrls = data?.ingestedUrls.length ?? 0;
 
   return (
     <Dialog onOpenChange={setDialogState} open={dialogState}>
@@ -260,12 +257,8 @@ export default function ScrapeList() {
               {uniqueBaseUrls.map((baseUrl) => (
                 <ScrapeListItem
                   baseUrl={baseUrl}
-                  isMoreDialogOpen={moreDialogOpen === baseUrl}
                   isSelected={getBaseUrl(url) === getBaseUrl(baseUrl)}
                   key={baseUrl}
-                  onMoreDialogOpenChange={(open) =>
-                    setMoreDialogOpen(open ? baseUrl : null)
-                  }
                   onSelect={handleValueChange}
                   onUrlDeleted={handleUrlDeleted}
                   onUrlSelect={handleMoreUrlSelect}

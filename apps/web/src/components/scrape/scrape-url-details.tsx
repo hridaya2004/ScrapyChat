@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronRight, FileText, Trash2 } from "lucide-react";
+import { ChevronRight, FileText, Trash2, XIcon } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { useAuthJWTProvider } from "@/providers/auth-jwt-provider";
@@ -8,8 +8,10 @@ import { useDialog } from "@/providers/dialog-context-provider";
 import { Button } from "../ui/button";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
+  DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
@@ -20,7 +22,6 @@ import { deleteScrapeUrl } from "./scrape-core";
 
 interface ScrapeUrlDetailsProps {
   baseUrl: string;
-  onOpenChange: (open: boolean) => void;
   onUrlDeleted: () => void;
   onUrlSelect: (url: string) => void;
   selectedUrl: string | undefined;
@@ -30,13 +31,14 @@ interface ScrapeUrlDetailsProps {
 export default function ScrapeUrlDetails({
   baseUrl,
   urls,
-  onOpenChange,
   selectedUrl,
   onUrlSelect,
   onUrlDeleted,
 }: ScrapeUrlDetailsProps) {
   const { token } = useAuthJWTProvider();
-  const { dialogState, setDialogState } = useDialog("scrape-url-details");
+  const { dialogState, setDialogState } = useDialog(
+    `scrape-url-details${baseUrl}`
+  );
 
   const [deletingUrl, setDeletingUrl] = useState<string | null>(null);
 
@@ -70,7 +72,6 @@ export default function ScrapeUrlDetails({
           className="h-7 w-7 rounded-full"
           onClick={(e) => {
             e.stopPropagation();
-            onOpenChange(true);
           }}
           size="icon"
           variant="ghost"
@@ -80,17 +81,30 @@ export default function ScrapeUrlDetails({
       </DialogTrigger>
       <DialogContent
         className="flex max-h-[80vh] flex-col gap-0 overflow-hidden rounded-3xl p-0"
-        onInteractOutside={() => {
-          setDialogState(false);
+        onInteractOutside={(e) => {
+          setDialogState(true);
+          e.preventDefault();
         }}
+        onPointerDownOutside={(e) => {
+          setDialogState(true);
+          e.preventDefault();
+        }}
+        showCloseButton={false}
       >
-        <div className="flex flex-col gap-1 px-6 pt-6 pb-4">
-          <DialogTitle className="truncate">{hostname}</DialogTitle>
-          <DialogDescription>
-            {urls.length} {urls.length === 1 ? "page" : "pages"} scraped from
-            this domain.
-          </DialogDescription>
-        </div>
+        <DialogHeader className="flex-row items-center justify-between px-6 pt-6 pb-4">
+          <div className="flex flex-col gap-1">
+            <DialogTitle className="truncate">{hostname}</DialogTitle>
+            <DialogDescription>
+              {urls.length} {urls.length === 1 ? "page" : "pages"} scraped from
+              this domain.
+            </DialogDescription>
+          </div>
+          <DialogClose asChild>
+            <Button size="icon-lg" variant="ghost">
+              <XIcon className="size-4" />
+            </Button>
+          </DialogClose>
+        </DialogHeader>
 
         <Separator />
 

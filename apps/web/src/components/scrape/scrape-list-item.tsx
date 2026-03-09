@@ -4,6 +4,7 @@ import { Globe, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { useAuthJWTProvider } from "@/providers/auth-jwt-provider";
+import { useDialog } from "@/providers/dialog-context-provider";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Spinner } from "../ui/spinner";
@@ -13,9 +14,7 @@ import ScrapeUrlDetails from "./scrape-url-details";
 
 interface ScrapeListItemProps {
   baseUrl: string;
-  isMoreDialogOpen: boolean;
   isSelected: boolean;
-  onMoreDialogOpenChange: (open: boolean) => void;
   onSelect: (url: string) => void;
   onUrlDeleted: () => void;
   onUrlSelect: (url: string) => void;
@@ -26,9 +25,7 @@ interface ScrapeListItemProps {
 export default function ScrapeListItem({
   baseUrl,
   urls,
-  isMoreDialogOpen,
   isSelected,
-  onMoreDialogOpenChange,
   onSelect,
   selectedUrl,
   onUrlSelect,
@@ -73,6 +70,10 @@ export default function ScrapeListItem({
     deleteNext(0);
   };
 
+  const { dialogState: scrapeUrlDetailsDialogOpen } = useDialog(
+    `scrape-url-details${baseUrl}`
+  );
+
   return (
     // biome-ignore lint/a11y: "Hydration issue prevents it from being a button"
     <div
@@ -83,7 +84,7 @@ export default function ScrapeListItem({
           : "border-border hover:bg-accent/50"
       )}
       onClick={() => {
-        if (!isMoreDialogOpen) {
+        if (!scrapeUrlDetailsDialogOpen) {
           onSelect(baseUrl);
         }
       }}
@@ -130,7 +131,6 @@ export default function ScrapeListItem({
         {hasMultipleUrls && (
           <ScrapeUrlDetails
             baseUrl={baseUrl}
-            onOpenChange={onMoreDialogOpenChange}
             onUrlDeleted={onUrlDeleted}
             onUrlSelect={onUrlSelect}
             selectedUrl={selectedUrl}
