@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import spinners, { type BrailleSpinnerName } from "unicode-animations";
+import { ShimmeringText } from "./shimmering-text";
 
 export default function AgentThinkingSpinner({
   children,
@@ -48,8 +49,9 @@ export default function AgentThinkingSpinner({
   }, [s]);
 
   return (
-    <span style={{ fontFamily: "monospace" }}>
-      {s.frames[frame]} {children}
-    </span>
+    <div className="inline-flex place-items-start gap-2">
+      <span style={{ fontFamily: "monospace" }}>{s.frames[frame]}</span>
+      <ShimmeringText text={children} />
+    </div>
   );
 }
