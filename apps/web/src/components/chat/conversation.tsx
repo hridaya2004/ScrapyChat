@@ -5,7 +5,7 @@ import {
 } from "@/components/ui/chat-container";
 import { ScrollButton } from "@/components/ui/scroll-button";
 import type { Message as MessageType } from "@/lib/types";
-import { Spinner } from "../ui/spinner";
+import AgentThinkingSpinner from "../agent-thinking";
 import { Message } from "./message";
 
 interface ConversationProps {
@@ -63,7 +63,7 @@ export function Conversation({
             // biome-ignore lint/style/useAtIndex: ignore
             messages[messages.length - 1].role === "user" && (
               <div className="group flex min-h-scroll-anchor w-full max-w-3xl flex-col items-start gap-2 px-6 pb-2">
-                <Spinner />
+                <AgentThinkingSpinner>Thinking</AgentThinkingSpinner>
               </div>
             )}
           <div className="absolute bottom-0 flex w-full max-w-3xl flex-1 items-end justify-end gap-4 px-6 pb-2">
