@@ -12,10 +12,11 @@ RUN bun install
 COPY --from=prepare /app/out/full/ .
 RUN bunx turbo build
 
-FROM base AS runner
-RUN addgroup --system --gid 1001 elysiajs
-RUN adduser --system --uid 1001 elysiajs
-COPY --from=builder --chown=elysiajs:elysiajs /app/apps/auth/server .
+FROM alpine:3.23 AS runner
+RUN apk add --no-cache libstdc++ libgcc
+RUN addgroup -g 1001 -S elysiajs \
+ && adduser -S -u 1001 -G elysiajs elysiajs
 USER elysiajs
+COPY --from=builder /app/apps/auth/server /server
 
 CMD ["./server"]
