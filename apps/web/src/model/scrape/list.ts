@@ -10,4 +10,4 @@ const scrapeListSchema = rawScrapeListSchema.transform((data) => ({
 
 type ScrapeList = z.infer<typeof scrapeListSchema>;
 
-export { scrapeListSchema, type ScrapeList };
+export { type ScrapeList, scrapeListSchema };

@@ -6,4 +6,5 @@ const rawResponseMessageSchema = z.object({
 });
 
 type ResponseMessage = z.infer<typeof rawResponseMessageSchema>;
+
 export { type ResponseMessage, rawResponseMessageSchema };

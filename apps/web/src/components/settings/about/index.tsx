@@ -71,7 +71,7 @@ function ContributorCard({ contributor }: { contributor: GitHubContributor }) {
       </TooltipTrigger>
       <TooltipContent>
         {contributor.login} - {contributor.contributions} contribution
-        {contributor.contributions !== 1 ? "s" : ""}
+        {contributor.contributions === 1 ? "" : "s"}
       </TooltipContent>
     </Tooltip>
   );

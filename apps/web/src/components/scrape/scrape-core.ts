@@ -278,9 +278,9 @@ const deleteAllScrapeUrls = async (
 };
 
 export {
-  getScrapeList,
-  postScrapeNewUrl,
-  getScrapeProgress,
-  deleteScrapeUrl,
   deleteAllScrapeUrls,
+  deleteScrapeUrl,
+  getScrapeList,
+  getScrapeProgress,
+  postScrapeNewUrl,
 };

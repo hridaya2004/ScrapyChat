@@ -77,4 +77,4 @@ const Muted = ({ className, children, ...props }: ParagraphProps) => (
   </p>
 );
 
-export { H1, H2, H3, H4, P, Lead, Muted };
+export { H1, H2, H3, H4, Lead, Muted, P };

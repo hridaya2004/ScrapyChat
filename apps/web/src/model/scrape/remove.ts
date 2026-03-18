@@ -8,4 +8,4 @@ const scrapeRemoveSchema = z.object({
 
 type ScrapeRemove = z.infer<typeof scrapeRemoveSchema>;
 
-export { scrapeRemoveSchema, type ScrapeRemove };
+export { type ScrapeRemove, scrapeRemoveSchema };

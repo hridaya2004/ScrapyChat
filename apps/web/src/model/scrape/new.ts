@@ -7,4 +7,4 @@ const scrapeNewSchema = z.object({
 
 type ScrapeNew = z.infer<typeof scrapeNewSchema>;
 
-export { scrapeNewSchema, type ScrapeNew };
+export { type ScrapeNew, scrapeNewSchema };

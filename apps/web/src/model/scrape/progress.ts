@@ -4,4 +4,4 @@ const scrapeProgressSchema = z.record(z.url(), z.number().min(0).max(1));
 
 type ScrapeProgress = z.infer<typeof scrapeProgressSchema>;
 
-export { scrapeProgressSchema, type ScrapeProgress };
+export { type ScrapeProgress, scrapeProgressSchema };
