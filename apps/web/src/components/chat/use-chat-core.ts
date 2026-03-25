@@ -3,6 +3,7 @@ import { apiConfig } from "@/config/global";
 import type { Message } from "@/lib/types";
 import { rawResponseMessageSchema } from "@/model/chat/new";
 import { useAuthJWTProvider } from "@/providers/auth-jwt-provider";
+import { useHaptics } from "@/providers/haptics-provider";
 import { toast } from "../ui/toast";
 
 interface SendMessageParams {
@@ -21,6 +22,8 @@ export const useChatCore = () => {
   const [input, setInput] = useState("");
   const [status, setStatus] = useState<"submitted" | "ready">("ready");
   const [messages, setMessages] = useState<Message[]>([]);
+
+  const { trigger } = useHaptics();
 
   const sendMessage = async ({
     input,
@@ -78,6 +81,7 @@ export const useChatCore = () => {
         }
 
         if (parsed.data) {
+          trigger("success");
           setMessages((prev) => [
             ...prev,
             {
