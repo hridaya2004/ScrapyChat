@@ -98,10 +98,6 @@ export const auth = betterAuth({
         jwksPath: "/.well-known/jwks.json",
         rotationInterval: 86_400,
       },
-      jwt: {
-        expirationTime: "1d",
-        audience: process.env.ISSUER_URL,
-      },
     }),
     openAPI(),
   ],
