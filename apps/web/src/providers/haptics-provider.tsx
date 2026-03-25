@@ -1,12 +1,13 @@
 "use client";
-
 import {
   createContext,
   useCallback,
   useContext,
   useMemo,
+  useRef,
   useState,
 } from "react";
+import { WebHaptics } from "web-haptics";
 import { useWebHaptics } from "web-haptics/react";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 
@@ -21,13 +22,18 @@ type HapticType =
 
 interface HapticsContextValue {
   isHapticsEnabled: boolean;
-  setHapticsEnabled: (enabled: boolean) => void;
+  isSoundEnabled: boolean;
+
+  setHapticsEnabled: (isHapticsEnabled: boolean) => void;
+  setSoundEnabled: (isSoundEnabled: boolean) => void;
+
   trigger: (type?: HapticType) => void;
 }
 
 const HapticsContext = createContext<HapticsContextValue | null>(null);
 
 const ENABLE_HAPTICS_KEY = "haptics-enabled";
+const ENABLE_SOUND_KEY = "sound-enabled";
 
 export function HapticsProvider({
   children,
@@ -36,13 +42,21 @@ export function HapticsProvider({
 }): React.ReactNode {
   const { getItem: getHapticsEnabledValue, setItem: setHapticsEnabledValue } =
     useLocalStorage(ENABLE_HAPTICS_KEY);
+  const { getItem: getSoundEnabledValue, setItem: setSoundEnabledValue } =
+    useLocalStorage(ENABLE_SOUND_KEY);
 
   // local state
   const [isHapticsEnabled, setHapticsEnabledState] = useState(
     () => getHapticsEnabledValue() ?? false
   );
+  const [isSoundEnabled, setSoundEnabledState] = useState(
+    () => getSoundEnabledValue() ?? false
+  );
 
-  const haptic = useWebHaptics();
+  const stateRef = useRef({ isHapticsEnabled, isSoundEnabled });
+  stateRef.current = { isHapticsEnabled, isSoundEnabled };
+
+  const haptic = useWebHaptics({ debug: isSoundEnabled });
 
   const setHapticsEnabled = useCallback(
     (value: boolean) => {
@@ -52,21 +66,44 @@ export function HapticsProvider({
     [setHapticsEnabledValue]
   );
 
+  const setSoundEnabled = useCallback(
+    (value: boolean) => {
+      setSoundEnabledState(value);
+      setSoundEnabledValue(value);
+    },
+    [setSoundEnabledValue]
+  );
+
   const trigger = useCallback(
     (type?: HapticType) => {
-      if (!isHapticsEnabled) {
-        return;
+      const { isHapticsEnabled, isSoundEnabled } = stateRef.current;
+
+      if (isSoundEnabled) {
+        haptic.trigger(type);
       }
-      if (haptic.isSupported) {
+
+      if (isHapticsEnabled && WebHaptics.isSupported) {
         haptic.trigger(type);
       }
     },
-    [isHapticsEnabled, haptic]
+    [haptic]
   );
 
   const value = useMemo(
-    () => ({ isHapticsEnabled, setHapticsEnabled, trigger }),
-    [isHapticsEnabled, setHapticsEnabled, trigger]
+    () => ({
+      isHapticsEnabled,
+      setHapticsEnabled,
+      isSoundEnabled,
+      setSoundEnabled,
+      trigger,
+    }),
+    [
+      isHapticsEnabled,
+      setHapticsEnabled,
+      isSoundEnabled,
+      setSoundEnabled,
+      trigger,
+    ]
   );
 
   return (
@@ -76,18 +113,23 @@ export function HapticsProvider({
 
 const noopHaptics: HapticsContextValue = {
   isHapticsEnabled: false,
+  isSoundEnabled: false,
+
   setHapticsEnabled: () => {
-    //noop
+    // noop
   },
+
+  setSoundEnabled: () => {
+    // noop
+  },
+
   trigger: () => {
-    //noop
+    // noop
   },
 };
 
 export function useHaptics() {
   const context = useContext(HapticsContext);
-  if (!context) {
-    return noopHaptics;
-  }
-  return context;
+
+  return context ?? noopHaptics;
 }

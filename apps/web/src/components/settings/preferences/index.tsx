@@ -1,6 +1,6 @@
 "use client";
 
-import { SmartphoneIcon } from "lucide-react";
+import { VibrateIcon, Volume2Icon } from "lucide-react";
 
 import { H4 } from "@/components/typography";
 import {
@@ -15,7 +15,12 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useHaptics } from "@/providers/haptics-provider";
 
 export default function PreferencesSettings() {
-  const { enabled, setEnabled } = useHaptics();
+  const {
+    isSoundEnabled,
+    setSoundEnabled,
+    isHapticsEnabled,
+    setHapticsEnabled,
+  } = useHaptics();
   const isMobile = useIsMobile();
 
   return (
@@ -32,20 +37,38 @@ export default function PreferencesSettings() {
               </FieldDescription>
               <div className="flex items-center gap-3 pt-1">
                 <Switch
-                  checked={enabled}
+                  checked={isHapticsEnabled}
                   id="haptics-toggle"
-                  onCheckedChange={setEnabled}
+                  onCheckedChange={setHapticsEnabled}
                 />
                 <Label
                   className="flex items-center gap-2"
                   htmlFor="haptics-toggle"
                 >
-                  <SmartphoneIcon className="size-4 text-muted-foreground" />
-                  {enabled ? "Haptics enabled" : "Haptics disabled"}
+                  <VibrateIcon className="size-4 text-muted-foreground" />
+                  {isHapticsEnabled ? "Haptics enabled" : "Haptics disabled"}
                 </Label>
               </div>
             </FieldSet>
           )}
+          <FieldSet>
+            <FieldLegend>Sound Feedback</FieldLegend>
+            <FieldDescription>
+              Enable sound feedback when interacting with buttons, toggles, and
+              other controls.
+            </FieldDescription>
+            <div className="flex items-center gap-3 pt-1">
+              <Switch
+                checked={isSoundEnabled}
+                id="sound-toggle"
+                onCheckedChange={setSoundEnabled}
+              />
+              <Label className="flex items-center gap-2" htmlFor="sound-toggle">
+                <Volume2Icon className="size-4 text-muted-foreground" />
+                {isSoundEnabled ? "Sound enabled" : "Sound disabled"}
+              </Label>
+            </div>
+          </FieldSet>
         </FieldGroup>
       </div>
     </section>

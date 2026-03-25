@@ -21,11 +21,13 @@ let haptics: WebHaptics | null = null
 
 function getHaptics() {
   if (typeof window === "undefined") return null
-  if (!haptics) haptics = new WebHaptics()
+  if (!haptics) haptics = new WebHaptics({
+    debug: getSoundEnabled()
+  })
   return haptics
 }
 
-function isHapticsEnabled() {
+function getHapticsEnabled(): boolean {
   if (typeof window === "undefined") return false
   try {
     const stored = window.localStorage.getItem("haptics-enabled")
@@ -35,23 +37,27 @@ function isHapticsEnabled() {
   }
 }
 
+function getSoundEnabled(): boolean {
+  if (typeof window === "undefined") return false
+  try {
+    const stored = window.localStorage.getItem("sound-enabled")
+    return stored === null ? true : JSON.parse(stored)
+  } catch {
+    return true
+  }
+}
+
 function triggerToastHaptic(status?: ToastProps["status"]) {
-  if (!isHapticsEnabled()) return
   const h = getHaptics()
   if (!h) return
 
-  switch (status) {
-    case "success":
-      h.trigger("success")
-      break
-    case "error":
-      h.trigger("error")
-      break
-    case "warning":
-      h.trigger("warning")
-      break
-    default:
-      break
+  let updatedStatus
+  if (getHapticsEnabled() && WebHaptics.isSupported || getSoundEnabled()) {
+    // default to medium for unavailable status
+    if (status === "loading" || status === "info") {
+      updatedStatus = "medium"
+    }
+    h.trigger(updatedStatus ?? status)
   }
 }
 
