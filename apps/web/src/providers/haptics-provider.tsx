@@ -78,11 +78,7 @@ export function HapticsProvider({
     (type?: HapticType) => {
       const { isHapticsEnabled, isSoundEnabled } = stateRef.current;
 
-      if (isSoundEnabled) {
-        haptic.trigger(type);
-      }
-
-      if (isHapticsEnabled && WebHaptics.isSupported) {
+      if ((isHapticsEnabled && WebHaptics.isSupported) || isSoundEnabled) {
         haptic.trigger(type);
       }
     },
