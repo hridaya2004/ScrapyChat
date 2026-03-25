@@ -93,7 +93,6 @@ const app = new Elysia()
       const decryptedToken = await auth.api.verifyJWT({
         body: {
           token,
-          issuer: process.env.ISSUER_URL,
         },
       });
 
