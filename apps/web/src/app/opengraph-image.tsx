@@ -60,10 +60,10 @@ export default async function Image() {
           {/* biome-ignore lint/performance/noImgElement: ImageResponse requires native <img> */}
           <img
             alt="ScrapyChat"
-            height="32"
+            height={32}
             src={faviconSrc}
             style={{ borderRadius: "6px" }}
-            width="32"
+            width={32}
           />
           <span
             style={{

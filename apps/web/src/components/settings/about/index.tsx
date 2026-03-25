@@ -1,8 +1,9 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { ExternalLinkIcon, GithubIcon, UsersIcon } from "lucide-react";
+import { ExternalLinkIcon, UsersIcon } from "lucide-react";
 import Link from "next/link";
+import GitHubIcon from "@/components/icons/github";
 import { H4, Muted, P } from "@/components/typography";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -111,7 +112,7 @@ export default function AboutSection() {
                 rel="noopener noreferrer"
                 target="_blank"
               >
-                <GithubIcon className="size-4" />
+                <GitHubIcon className="size-4" />
                 GitHub
                 <ExternalLinkIcon className="size-3" />
               </Link>
