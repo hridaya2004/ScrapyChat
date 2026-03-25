@@ -11,6 +11,10 @@ export const auth = betterAuth({
   appName: "ScrapyChat",
   advanced: {
     useSecureCookies: process.env.NODE_ENV === "production",
+    crossSubDomainCookies: {
+      enabled: true,
+      domain: "hridaya.tech",
+    },
   },
 
   baseURL: process.env.BETTER_AUTH_BASE_URL,
