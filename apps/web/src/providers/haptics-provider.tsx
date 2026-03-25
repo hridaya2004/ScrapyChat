@@ -20,47 +20,53 @@ type HapticType =
   | "selection";
 
 interface HapticsContextValue {
-  enabled: boolean;
-  setEnabled: (enabled: boolean) => void;
+  isHapticsEnabled: boolean;
+  setHapticsEnabled: (enabled: boolean) => void;
   trigger: (type?: HapticType) => void;
 }
 
 const HapticsContext = createContext<HapticsContextValue | null>(null);
 
-const STORAGE_KEY = "haptics-enabled";
+const ENABLE_HAPTICS_KEY = "haptics-enabled";
 
 export function HapticsProvider({
   children,
 }: {
   children: React.ReactNode;
 }): React.ReactNode {
-  const { getItem, setItem } = useLocalStorage(STORAGE_KEY);
-  const [enabled, setEnabledState] = useState(() => getItem() ?? false);
+  const { getItem: getHapticsEnabledValue, setItem: setHapticsEnabledValue } =
+    useLocalStorage(ENABLE_HAPTICS_KEY);
+
+  // local state
+  const [isHapticsEnabled, setHapticsEnabledState] = useState(
+    () => getHapticsEnabledValue() ?? false
+  );
+
   const haptic = useWebHaptics();
 
-  const setEnabled = useCallback(
+  const setHapticsEnabled = useCallback(
     (value: boolean) => {
-      setEnabledState(value);
-      setItem(value);
+      setHapticsEnabledState(value);
+      setHapticsEnabledValue(value);
     },
-    [setItem]
+    [setHapticsEnabledValue]
   );
 
   const trigger = useCallback(
     (type?: HapticType) => {
-      if (!enabled) {
+      if (!isHapticsEnabled) {
         return;
       }
       if (haptic.isSupported) {
         haptic.trigger(type);
       }
     },
-    [enabled, haptic]
+    [isHapticsEnabled, haptic]
   );
 
   const value = useMemo(
-    () => ({ enabled, setEnabled, trigger }),
-    [enabled, setEnabled, trigger]
+    () => ({ isHapticsEnabled, setHapticsEnabled, trigger }),
+    [isHapticsEnabled, setHapticsEnabled, trigger]
   );
 
   return (
@@ -69,8 +75,8 @@ export function HapticsProvider({
 }
 
 const noopHaptics: HapticsContextValue = {
-  enabled: false,
-  setEnabled: () => {
+  isHapticsEnabled: false,
+  setHapticsEnabled: () => {
     //noop
   },
   trigger: () => {
