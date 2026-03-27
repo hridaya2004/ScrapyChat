@@ -1,29 +1,29 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Streamdown } from "streamdown";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from "@/components/ui/tooltip"
-import { cn } from "@/lib/utils"
-import { Streamdown } from "streamdown";
+} from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
 
 export type MessageProps = {
-  children: React.ReactNode
-  className?: string
-} & React.HTMLProps<HTMLDivElement>
+  children: React.ReactNode;
+  className?: string;
+} & React.HTMLProps<HTMLDivElement>;
 
 const Message = ({ children, className, ...props }: MessageProps) => (
   <div className={cn("flex gap-3", className)} {...props}>
     {children}
   </div>
-)
+);
 
-export type MessageAvatarProps = {
-  src: string
-  alt: string
-  fallback?: string
-  delayMs?: number
-  className?: string
+export interface MessageAvatarProps {
+  alt: string;
+  className?: string;
+  delayMs?: number;
+  fallback?: string;
+  src: string;
 }
 
 const MessageAvatar = ({
@@ -35,19 +35,19 @@ const MessageAvatar = ({
 }: MessageAvatarProps) => {
   return (
     <Avatar className={cn("h-8 w-8 shrink-0", className)}>
-      <AvatarImage src={src} alt={alt} />
+      <AvatarImage alt={alt} src={src} />
       {fallback && (
         <AvatarFallback delayMs={delayMs}>{fallback}</AvatarFallback>
       )}
     </Avatar>
-  )
-}
+  );
+};
 
 export type MessageContentProps = {
-  children: React.ReactNode
-  className?: string
+  children: React.ReactNode;
+  className?: string;
 } & React.ComponentProps<typeof Streamdown> &
-  React.HTMLProps<HTMLDivElement>
+  React.HTMLProps<HTMLDivElement>;
 
 const MessageContent = ({
   children,
@@ -55,21 +55,21 @@ const MessageContent = ({
   ...props
 }: MessageContentProps) => {
   const classNames = cn(
-    "rounded-lg p-2 text-foreground bg-secondary break-words whitespace-normal",
+    "whitespace-normal break-words rounded-lg bg-secondary p-2 text-foreground",
     className
-  )
+  );
 
   return (
     <Streamdown className={classNames} {...props}>
       {children}
     </Streamdown>
-  )
-}
+  );
+};
 
 export type MessageActionsProps = {
-  children: React.ReactNode
-  className?: string
-} & React.HTMLProps<HTMLDivElement>
+  children: React.ReactNode;
+  className?: string;
+} & React.HTMLProps<HTMLDivElement>;
 
 const MessageActions = ({
   children,
@@ -77,19 +77,19 @@ const MessageActions = ({
   ...props
 }: MessageActionsProps) => (
   <div
-    className={cn("text-muted-foreground flex items-center gap-2", className)}
+    className={cn("flex items-center gap-2 text-muted-foreground", className)}
     {...props}
   >
     {children}
   </div>
-)
+);
 
 export type MessageActionProps = {
-  className?: string
-  tooltip: React.ReactNode
-  children: React.ReactNode
-  side?: "top" | "bottom" | "left" | "right"
-} & React.ComponentProps<typeof Tooltip>
+  className?: string;
+  tooltip: React.ReactNode;
+  children: React.ReactNode;
+  side?: "top" | "bottom" | "left" | "right";
+} & React.ComponentProps<typeof Tooltip>;
 
 const MessageAction = ({
   tooltip,
@@ -101,11 +101,17 @@ const MessageAction = ({
   return (
     <Tooltip {...props}>
       <TooltipTrigger asChild>{children}</TooltipTrigger>
-      <TooltipContent side={side} className={className}>
+      <TooltipContent className={className} side={side}>
         {tooltip}
       </TooltipContent>
     </Tooltip>
-  )
-}
+  );
+};
 
-export { Message, MessageAvatar, MessageContent, MessageActions, MessageAction }
+export {
+  Message,
+  MessageAction,
+  MessageActions,
+  MessageAvatar,
+  MessageContent,
+};

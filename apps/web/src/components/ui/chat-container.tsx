@@ -1,22 +1,22 @@
-"use client"
+"use client";
 
-import { cn } from "@/lib/utils"
-import { StickToBottom } from "use-stick-to-bottom"
+import { StickToBottom } from "use-stick-to-bottom";
+import { cn } from "@/lib/utils";
 
 export type ChatContainerRootProps = {
-  children: React.ReactNode
-  className?: string
-} & React.HTMLAttributes<HTMLDivElement>
+  children: React.ReactNode;
+  className?: string;
+} & React.HTMLAttributes<HTMLDivElement>;
 
 export type ChatContainerContentProps = {
-  children: React.ReactNode
-  className?: string
-} & React.HTMLAttributes<HTMLDivElement>
+  children: React.ReactNode;
+  className?: string;
+} & React.HTMLAttributes<HTMLDivElement>;
 
 export type ChatContainerScrollAnchorProps = {
-  className?: string
-  ref?: React.RefObject<HTMLDivElement>
-} & React.HTMLAttributes<HTMLDivElement>
+  className?: string;
+  ref?: React.RefObject<HTMLDivElement>;
+} & React.HTMLAttributes<HTMLDivElement>;
 
 function ChatContainerRoot({
   children,
@@ -26,14 +26,14 @@ function ChatContainerRoot({
   return (
     <StickToBottom
       className={cn("flex overflow-y-auto", className)}
-      resize="smooth"
       initial="instant"
+      resize="smooth"
       role="log"
       {...props}
     >
       {children}
     </StickToBottom>
-  )
+  );
 }
 
 function ChatContainerContent({
@@ -48,7 +48,7 @@ function ChatContainerContent({
     >
       {children}
     </StickToBottom.Content>
-  )
+  );
 }
 
 function ChatContainerScrollAnchor({
@@ -57,11 +57,11 @@ function ChatContainerScrollAnchor({
 }: ChatContainerScrollAnchorProps) {
   return (
     <div
-      className={cn("h-px w-full shrink-0 scroll-mt-4", className)}
       aria-hidden="true"
+      className={cn("h-px w-full shrink-0 scroll-mt-4", className)}
       {...props}
     />
-  )
+  );
 }
 
-export { ChatContainerRoot, ChatContainerContent, ChatContainerScrollAnchor }
+export { ChatContainerContent, ChatContainerRoot, ChatContainerScrollAnchor };

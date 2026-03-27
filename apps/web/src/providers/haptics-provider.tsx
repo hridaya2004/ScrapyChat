@@ -11,7 +11,7 @@ import { WebHaptics } from "web-haptics";
 import { useWebHaptics } from "web-haptics/react";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 
-type HapticType =
+export type HapticType =
   | "success"
   | "warning"
   | "error"

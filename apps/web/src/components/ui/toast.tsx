@@ -1,101 +1,114 @@
-"use client"
+"use client";
 
-import { toast as sonnerToast } from "sonner"
-import { Button } from "./button"
-import { CheckCircle2Icon, InfoIcon, MessageCircleWarningIcon } from "lucide-react"
-import { Spinner } from "./spinner"
-import { WebHaptics } from "web-haptics"
+import {
+  CheckCircle2Icon,
+  InfoIcon,
+  MessageCircleWarningIcon,
+} from "lucide-react";
+import { toast as sonnerToast } from "sonner";
+import { WebHaptics } from "web-haptics";
+import type { HapticType } from "@/providers/haptics-provider";
+import { Button } from "./button";
+import { Spinner } from "./spinner";
 
-type ToastProps = {
-  id: string | number
-  title: string
-  description?: string
+interface ToastProps {
   button?: {
-    label: string
-    onClick: () => void
-  }
-  status?: "error" | "info" | "success" | "warning" | "loading"
+    label: string;
+    onClick: () => void;
+  };
+  description?: string;
+  id: string | number;
+  status?: "error" | "info" | "success" | "warning" | "loading";
+  title: string;
 }
 
-let haptics: WebHaptics | null = null
+let haptics: WebHaptics | null = null;
 
 function getHaptics() {
-  if (typeof window === "undefined") return null
-  if (!haptics) haptics = new WebHaptics({
-    debug: getSoundEnabled()
-  })
-  return haptics
+  if (typeof window === "undefined") {
+    return null;
+  }
+  if (!haptics) {
+    haptics = new WebHaptics({
+      debug: getSoundEnabled(),
+    });
+  }
+  return haptics;
 }
 
 function getHapticsEnabled(): boolean {
-  if (typeof window === "undefined") return false
+  if (typeof window === "undefined") {
+    return false;
+  }
   try {
-    const stored = window.localStorage.getItem("haptics-enabled")
-    return stored === null ? true : JSON.parse(stored)
+    const stored = window.localStorage.getItem("haptics-enabled");
+    return stored === null ? true : JSON.parse(stored);
   } catch {
-    return true
+    return true;
   }
 }
 
 function getSoundEnabled(): boolean {
-  if (typeof window === "undefined") return false
+  if (typeof window === "undefined") {
+    return false;
+  }
   try {
-    const stored = window.localStorage.getItem("sound-enabled")
-    return stored === null ? true : JSON.parse(stored)
+    const stored = window.localStorage.getItem("sound-enabled");
+    return stored === null ? true : JSON.parse(stored);
   } catch {
-    return true
+    return true;
   }
 }
 
 function triggerToastHaptic(status?: ToastProps["status"]) {
-  const h = getHaptics()
-  if (!h) return
+  const h = getHaptics();
+  if (!h) {
+    return;
+  }
 
-  let updatedStatus
-  if (getHapticsEnabled() && WebHaptics.isSupported || getSoundEnabled()) {
+  let updatedStatus: HapticType | undefined;
+  if ((getHapticsEnabled() && WebHaptics.isSupported) || getSoundEnabled()) {
     // default to medium for unavailable status
     if (status === "loading" || status === "info") {
-      updatedStatus = "medium"
+      updatedStatus = "medium";
     }
-    h.trigger(updatedStatus ?? status)
+    h.trigger(updatedStatus ?? status);
   }
 }
 
 function Toast({ title, description, button, id, status }: ToastProps) {
   return (
-    <div className="border-input bg-popover font-sans flex items-center overflow-hidden rounded-xl border p-4 shadow-xs backdrop-blur-xl">
+    <div className="flex items-center overflow-hidden rounded-xl border border-input bg-popover p-4 font-sans shadow-xs backdrop-blur-xl">
       <div className="flex flex-1 items-center">
         {status === "error" ? (
-          <MessageCircleWarningIcon className="text-primary mr-3 size-4" />
+          <MessageCircleWarningIcon className="mr-3 size-4 text-primary" />
         ) : null}
         {status === "info" ? (
-          <InfoIcon className="text-primary mr-3 size-4" />
+          <InfoIcon className="mr-3 size-4 text-primary" />
         ) : null}
         {status === "success" ? (
-          <CheckCircle2Icon className="text-primary mr-3 size-4" />
+          <CheckCircle2Icon className="mr-3 size-4 text-primary" />
         ) : null}
-        {
-          status === "loading" ? (
-            <div className="mr-3">
-              <Spinner className="text-primary" size="size-4" />
-            </div>
-          ) : null
-        }
+        {status === "loading" ? (
+          <div className="mr-3">
+            <Spinner className="text-primary" size="size-4" />
+          </div>
+        ) : null}
         <div className="w-full">
-          <p className="text-foreground text-sm font-medium">{title}</p>
+          <p className="font-medium text-foreground text-sm">{title}</p>
           {description && (
-            <p className="text-muted-foreground mt-1 text-sm">{description}</p>
+            <p className="mt-1 text-muted-foreground text-sm">{description}</p>
           )}
         </div>
       </div>
       {button ? (
         <div className="shrink-0">
           <Button
-            size="sm"
             onClick={() => {
-              button?.onClick()
-              sonnerToast.dismiss(id)
+              button?.onClick();
+              sonnerToast.dismiss(id);
             }}
+            size="sm"
             type="button"
             variant="secondary"
           >
@@ -104,26 +117,26 @@ function Toast({ title, description, button, id, status }: ToastProps) {
         </div>
       ) : null}
     </div>
-  )
+  );
 }
 
 function toast(toast: Omit<ToastProps, "id">) {
-  triggerToastHaptic(toast.status)
+  triggerToastHaptic(toast.status);
 
   return sonnerToast.custom(
     (id) => (
       <Toast
-        id={id}
-        title={toast.title}
-        description={toast?.description}
         button={toast?.button}
+        description={toast?.description}
+        id={id}
         status={toast?.status}
+        title={toast.title}
       />
     ),
     {
       position: "top-center",
     }
-  )
+  );
 }
 
-export { toast }
+export { toast };

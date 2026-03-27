@@ -1,9 +1,6 @@
 {
   "root": false,
   "$schema": "../../node_modules/@biomejs/biome/configuration_schema.json",
-  "files": {
-    "includes": ["!**/components/ui"]
-  },
   "css": {
     "parser": {
       "tailwindDirectives": true
