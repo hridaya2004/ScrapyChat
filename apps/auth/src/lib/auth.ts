@@ -20,7 +20,6 @@ export const auth = betterAuth({
   session: {
     cookieCache: {
       enabled: process.env.NODE_ENV === "production",
-      refreshCache: true,
     },
   },
 
