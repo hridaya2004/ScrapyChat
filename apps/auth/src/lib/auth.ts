@@ -1,4 +1,4 @@
-import { betterAuth } from "better-auth";
+import { betterAuth } from "better-auth/minimal";
 import { jwt, lastLoginMethod, openAPI } from "better-auth/plugins";
 import MailSender from "../controller/mail-sender";
 import { dbAdapter } from "../db/adapter";
