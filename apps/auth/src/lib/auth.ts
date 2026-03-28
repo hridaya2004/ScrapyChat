@@ -17,6 +17,13 @@ export const auth = betterAuth({
     },
   },
 
+  session: {
+    cookieCache: {
+      enabled: process.env.NODE_ENV === "production",
+      refreshCache: true,
+    },
+  },
+
   baseURL: process.env.BETTER_AUTH_BASE_URL,
 
   emailAndPassword: {
