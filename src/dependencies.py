@@ -27,7 +27,11 @@ def verify_token(token: str) -> bool:
     Returns True if valid, False otherwise.
     """
     try:
-        jwks_client = PyJWKClient(JWKS_URL, ssl_context=ssl_context)
+        jwks_client = PyJWKClient(
+            JWKS_URL,
+            ssl_context=ssl_context,
+            headers={"User-Agent": "ScrapyChat JWKS Client v1.0"},
+        )
         signing_key = jwks_client.get_signing_key_from_jwt(token)
 
         decoded = jwt.decode(
