@@ -15,6 +15,9 @@ export const auth = betterAuth({
       enabled: process.env.NODE_ENV === "production",
       domain: "hridaya.tech",
     },
+    defaultCookieAttributes: {
+      sameSite: process.env.NODE_ENV === "production" ? "Lax" : "None",
+    },
   },
 
   session: {
