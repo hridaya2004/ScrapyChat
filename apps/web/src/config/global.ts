@@ -1,7 +1,3 @@
-export const siteConfig = {
-  title: "ScrapyChat",
-} as const;
-
 const getDevelopmentUrl = () => {
   if (typeof window === "undefined") {
     return "/api";
