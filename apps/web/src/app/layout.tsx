@@ -28,10 +28,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html data-scroll-behavior="smooth" lang="en" suppressHydrationWarning>
+    <html
+      className={`${geistSans.variable} ${geistMono.variable}`}
+      data-scroll-behavior="smooth"
+      lang="en"
+      suppressHydrationWarning
+    >
       <GoogleTagManager gtmId="GTM-N8J7XBGV" />
       <GoogleAnalytics gaId="G-57KPX2KXVZ" />
-      <body className={`${geistSans.variable} ${geistMono.variable} font-sans`}>
+      <body>
         <ThemeProvider>
           <TooltipProvider>
             <AuthJWTProvider>
