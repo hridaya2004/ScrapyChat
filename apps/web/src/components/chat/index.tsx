@@ -104,19 +104,14 @@ export const Chat = () => {
       return;
     }
 
+    const isSelfHost = selectedModel === "google-selfhost";
+
     send({
       input,
       queryUrl: url,
-      providerId:
-        selectedModel === "google-selfhost" ? undefined : selectedModel,
-      apiKey:
-        selectedModel === "google-selfhost"
-          ? undefined
-          : models[selectedModel].apiKey,
-      modelName:
-        selectedModel === "google-selfhost"
-          ? undefined
-          : models[selectedModel].modelName,
+      providerId: isSelfHost ? undefined : selectedModel,
+      apiKey: isSelfHost ? undefined : models[selectedModel].apiKey,
+      modelName: isSelfHost ? undefined : models[selectedModel].modelName,
       superUrl,
     });
 

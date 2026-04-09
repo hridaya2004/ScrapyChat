@@ -9,7 +9,7 @@ const rawApiKeySchema = z.object({
 const apiKeySchema = rawApiKeySchema.transform((data) => ({
   providerId: data.provider_id,
   apiKey: data.api_key,
-  model: data.model,
+  modelName: data.model,
 }));
 
 type ModelApiKey = z.infer<typeof apiKeySchema>;
