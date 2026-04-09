@@ -54,11 +54,22 @@ def verify_token(token: str) -> bool:
         return False
 
 
+def _user_id_from_jwt(token: str) -> str | None:
+    """Extracts sub from an already-verified JWT without re-checking the signature."""
+    try:
+        decoded = jwt.decode(token, options={"verify_signature": False})
+        return decoded.get("sub")
+    except PyJWTError as e:
+        logger.error("Exception while extracting sub from token: %s", e)
+        return None
+
+
 async def get_user(request: Request) -> str:
     """
     Verifies the JWT token, then validates the session by calling the
     auth server's list-sessions endpoint and extracts the userId from
-    the matching session.
+    the matching session. Falls back to the JWT sub claim if session
+    validation fails.
     """
     auth_header = request.headers.get("Authorization")
 
@@ -75,10 +86,17 @@ async def get_user(request: Request) -> str:
     if not verify_token(token):
         raise HTTPException(status_code=401, detail="Invalid token")
 
+    def jwt_fallback() -> str:
+        user_id = _user_id_from_jwt(token)
+        if user_id is None:
+            raise HTTPException(status_code=401, detail="Unauthorized")
+        return user_id
+
     # Extract session token from the cookie
     session_cookie = request.cookies.get("better-auth.session_token")
     if not session_cookie:
-        raise HTTPException(status_code=401, detail="Session cookie missing")
+        logger.warning("Session cookie missing, falling back to JWT sub")
+        return jwt_fallback()
 
     # The cookie value is "<session_token>.<signature>", we need the part before "."
     session_token = session_cookie.split(".")[0]
@@ -94,10 +112,11 @@ async def get_user(request: Request) -> str:
             )
 
         if response.status_code != 200:
-            logger.error(
-                "Session list request failed with status %d", response.status_code
+            logger.warning(
+                "Session list request failed with status %d, falling back to JWT sub",
+                response.status_code,
             )
-            raise HTTPException(status_code=401, detail="Unauthorized")
+            return jwt_fallback()
 
         sessions = response.json()
 
@@ -108,8 +127,9 @@ async def get_user(request: Request) -> str:
                     raise HTTPException(status_code=401, detail="Unauthorized")
                 return user_id
 
-        raise HTTPException(status_code=401, detail="Session not found")
+        logger.warning("Session not found in list, falling back to JWT sub")
+        return jwt_fallback()
 
     except httpx.HTTPError as e:
-        logger.error("Error contacting auth server: %s", e)
-        raise HTTPException(status_code=502, detail="Auth service unavailable")
+        logger.warning("Error contacting auth server: %s, falling back to JWT sub", e)
+        return jwt_fallback()
