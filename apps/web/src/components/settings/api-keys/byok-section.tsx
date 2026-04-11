@@ -1,11 +1,19 @@
 "use client";
 
 import { useMutation } from "@tanstack/react-query";
-import { KeyIcon, PlusIcon, Trash2 } from "lucide-react";
+import {
+  EyeIcon,
+  EyeOffIcon,
+  InfoIcon,
+  KeyIcon,
+  PlusIcon,
+  Trash2,
+} from "lucide-react";
 import { useState } from "react";
 import GeminiIcon from "@/components/icons/gemini";
 import GoogleIcon from "@/components/icons/google";
 import { H4 } from "@/components/typography";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -23,7 +31,11 @@ import {
   FieldLegend,
   FieldSet,
 } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/components/ui/input-group";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "@/components/ui/toast";
 import { apiConfig } from "@/config/global";
@@ -76,6 +88,8 @@ export const BYOKSection = () => {
     selectedModel: selectedProvider,
   } = useModel();
 
+  const [showApiKey, setShowApiKey] = useState(false);
+
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [providerToDelete, setProviderToDelete] = useState<string>("");
   const [apiKeys, setApiKeys] = useState<Record<string, string>>({});
@@ -91,7 +105,7 @@ export const BYOKSection = () => {
     }
 
     const hasKey = !!models[providerId];
-    const fallbackValue = hasKey ? provider.defaultKey : "";
+    const fallbackValue = hasKey ? models[providerId].apiKey : "";
     return apiKeys[providerId] || fallbackValue;
   };
 
@@ -150,7 +164,7 @@ export const BYOKSection = () => {
       refreshModels();
       setApiKeys((prev) => ({
         ...prev,
-        [provider]: providerConfig?.defaultKey || "",
+        [provider]: parsed.apiKey || "",
       }));
     },
     onError: (_, { provider }) => {
@@ -285,20 +299,46 @@ export const BYOKSection = () => {
               <FieldLegend variant="label">
                 {selectedProviderConfig.name} API Key
               </FieldLegend>
-              <Input
-                className="rounded-3xl"
-                disabled={saveMutation.isPending}
-                id={`${selectedProvider}-key`}
-                onChange={(e) =>
-                  setApiKeys((prev) => ({
-                    ...prev,
-                    [selectedProvider]: e.target.value,
-                  }))
-                }
-                placeholder={selectedProviderConfig.placeholder}
-                type="password"
-                value={getProviderValue(selectedProvider)}
-              />
+              <InputGroup className="rounded-3xl">
+                <InputGroupInput
+                  className="rounded-3xl"
+                  disabled={saveMutation.isPending}
+                  id={`${selectedProvider}-key`}
+                  onChange={(e) =>
+                    setApiKeys((prev) => ({
+                      ...prev,
+                      [selectedProvider]: e.target.value,
+                    }))
+                  }
+                  placeholder={selectedProviderConfig.placeholder}
+                  type={showApiKey ? "text" : "password"}
+                  value={getProviderValue(selectedProvider)}
+                />
+                <InputGroupAddon align="inline-end">
+                  <button
+                    className="pe-2 hover:cursor-pointer"
+                    onClick={() => setShowApiKey((v) => !v)}
+                    type="button"
+                  >
+                    {showApiKey ? (
+                      <EyeOffIcon className="size-4" />
+                    ) : (
+                      <EyeIcon className="size-4" />
+                    )}
+                  </button>
+                </InputGroupAddon>
+              </InputGroup>
+              {getProviderValue(selectedProvider).trim() && (
+                <Alert>
+                  <InfoIcon />
+                  <AlertTitle>Keep your API key safe</AlertTitle>
+                  <AlertDescription>
+                    If your key appears hashed, it's already saved. Entering it
+                    again will hash the hash, breaking authentication. Only
+                    paste a new key if you're replacing the existing one.
+                  </AlertDescription>
+                </Alert>
+              )}
               <div className="flex items-center justify-between pl-1">
                 <a
                   className="text-muted-foreground text-xs hover:underline"
@@ -308,6 +348,7 @@ export const BYOKSection = () => {
                 >
                   Get API key
                 </a>
+
                 <div className="flex gap-2">
                   {models[selectedProvider] && (
                     <Button
@@ -359,11 +400,11 @@ export const BYOKSection = () => {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="rounded-3xl">
+            <AlertDialogCancel className="rounded-3xl!">
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
-              className="rounded-3xl"
+              className="rounded-3xl!"
               disabled={deleteMutation.isPending}
               onClick={handleConfirmDelete}
             >
