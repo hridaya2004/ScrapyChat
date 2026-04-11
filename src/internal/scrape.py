@@ -6,7 +6,7 @@ from urllib.robotparser import RobotFileParser
 
 from bs4 import BeautifulSoup
 from fastapi.exceptions import HTTPException
-from httpx import AsyncClient, HTTPStatusError, RequestError
+from httpx import AsyncClient
 
 from ..internal.browser import fetch_page_html, fetch_page_text
 from ..types.provider import BaseProvider
