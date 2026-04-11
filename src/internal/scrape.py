@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 from fastapi.exceptions import HTTPException
 from httpx import AsyncClient, HTTPStatusError, RequestError
 
-from ..internal.browser import fetch_page_text
+from ..internal.browser import fetch_page_html, fetch_page_text
 from ..types.provider import BaseProvider
 
 USER_AGENT = "ScrapyChat Crawler"
@@ -161,20 +161,12 @@ class ScrapeProvider(BaseProvider):
 
     async def _fetch_page_links(self, url: str, timeout: float) -> set[str]:
         try:
-            async with AsyncClient(timeout=timeout, follow_redirects=True) as client:
-                response = await client.get(url)
-                response.raise_for_status()
-        except HTTPStatusError as e:
-            logger.warning(f"HTTP {e.response.status_code} for {url}")
-            return set()
-        except RequestError as e:
-            logger.warning(f"Request failed for {url}: {e}")
-            return set()
+            html = await fetch_page_html(url)
         except Exception as e:
             logger.error(f"Error fetching {url}: {e}")
             return set()
 
-        soup = BeautifulSoup(response.content, "html.parser")
+        soup = BeautifulSoup(html, "html.parser")
         links: set[str] = set()
 
         for anchor in soup.find_all("a", href=True):
