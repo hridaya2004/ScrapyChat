@@ -41,3 +41,9 @@ data
 
 # Agents
 **/.agents
+
+# Qdrant
+qdrant_data
+
+# Ollama
+ollama
