@@ -1,0 +1,67 @@
+services:
+  fastapi:
+    build: .
+    image: scrapy-fastapi
+    container_name: scrapy-fastapi
+    environment:
+      HOT_RELOAD: false
+      QDRANT_ENDPOINT: http://localhost:6333
+      REDIS_HOST: localhost
+      REDIS_PORT: 6379
+    env_file: .env
+    network_mode: host
+    ports:
+      - 8080:8080
+    restart: unless-stopped
+    develop:
+      watch:
+        - action: sync
+          path: src
+          target: /app/src
+        - action: rebuild
+          path: ./pyproject.toml
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: qdrant
+    ports:
+      - 6333:6333
+      - 6334:6334
+    network_mode: host
+    expose:
+      - 6333
+      - 6334
+      - 6335
+    configs:
+      - source: qdrant_config
+        target: /qdrant/config/production.yaml
+    volumes:
+      - ./qdrant_data:/qdrant/storage:z
+    restart: unless-stopped
+
+  redis:
+    image: redis:8.2-alpine
+    container_name: redis
+    ports:
+      - 6379:6379
+    network_mode: host
+    expose:
+      - 6379
+    restart: unless-stopped
+
+  redis-insight:
+    image: redis/redisinsight:2.70
+    container_name: redis-insight
+    ports:
+      - 5540:5540
+    expose:
+      - 5540
+    network_mode: host
+    environment:
+      RI_REDIS_HOST: "localhost"
+    restart: unless-stopped
+
+configs:
+  qdrant_config:
+    content: |
+      log_level: INFO

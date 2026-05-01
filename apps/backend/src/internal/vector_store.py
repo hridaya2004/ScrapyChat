@@ -1,0 +1,204 @@
+import asyncio
+import os
+from typing import Optional
+
+from fastapi import Depends
+from llama_index.core import Document, Settings, VectorStoreIndex
+from llama_index.core.llms.utils import LLMType
+from llama_index.core.node_parser import SimpleNodeParser
+from llama_index.core.vector_stores import (
+    FilterOperator,
+    MetadataFilter,
+    MetadataFilters,
+)
+from llama_index.vector_stores.qdrant import QdrantVectorStore
+from qdrant_client import AsyncQdrantClient, models
+from qdrant_client.models import Distance, VectorParams
+
+from ..dependencies import get_user
+from ..types.provider import BaseProvider
+from .embeddings import EmbeddingProvider
+from .llm import LLMProvider
+from .redis import RedisProvider
+
+
+class VectorStoreProvider(BaseProvider):
+    """
+    The Scrapy vector store provider based on Qdrant
+    """
+
+    def __init__(self) -> None:
+        self._initialized = False
+        self._init_lock = asyncio.Lock()
+
+        # Initialize dependent providers
+        self._llm = LLMProvider()
+        self._embed_model = EmbeddingProvider()
+        self._redis = RedisProvider()
+
+        Settings.llm = self._llm.client
+        Settings.embed_model = self._embed_model.client
+
+        # Qdrant
+        self._endpoint = os.getenv("QDRANT_ENDPOINT", "localhost")
+        self._collection = os.getenv("QDRANT_COLLECTION", "scrapy")
+
+        self._parser = SimpleNodeParser.from_defaults(chunk_size=768, chunk_overlap=16)
+
+        self._client = AsyncQdrantClient(url=self._endpoint, prefer_grpc=True)
+        self._store = QdrantVectorStore(
+            aclient=self._client,
+            collection_name=self._collection,
+        )
+        self._index = VectorStoreIndex.from_vector_store(
+            vector_store=self._store,
+            use_async=True,
+        )
+
+        self._query_engine = self._index.as_query_engine(use_async=True)
+
+    async def init(self) -> None:
+        async with self._init_lock:
+            if self._initialized:
+                return
+
+            await self._ensure_collection_exists(self._collection)
+            self._initialized = True
+
+    @property
+    def client(self):
+        return self._client
+
+    async def _ensure_collection_exists(self, collection_name: str) -> None:
+        try:
+            await self._client.get_collection(collection_name)
+        except Exception:
+            await self._client.create_collection(
+                collection_name=collection_name,
+                vectors_config=VectorParams(
+                    size=768,
+                    distance=Distance.COSINE,
+                ),
+            )
+
+    async def ingest(
+        self, user_id: str, url: str, text: str, metadata: dict[str, str] = {}
+    ) -> None:
+        """
+        Ingests a document in the vector store and updates progress in redis.
+        """
+
+        # Add user_id and url to metadata
+        metadata["user_id"] = user_id
+        metadata["url"] = url
+
+        docs = [Document(text=text, metadata=metadata)]
+        nodes = self._parser.get_nodes_from_documents(docs)
+        total_nodes = len(nodes)
+
+        # Set initial progress
+        await self._redis.set_progress(user_id, url, f"{0 / total_nodes:.2f}")
+
+        for n, node in enumerate(nodes, start=1):
+            # Save node embeddings
+            node.embedding = await self._embed_model.get_embeddings(node.get_content())
+
+            # Update progress
+            await self._redis.set_progress(user_id, url, f"{n / total_nodes:.2f}")
+
+        # Insert all nodes
+        await self._index.ainsert_nodes(nodes)
+
+        # Eventually delete the finished task progress
+        await self._redis.expire_progress(user_id, url)
+
+    async def get_ingested(self, user_id: str) -> set[str]:
+        """
+        Set of ingested URLs by the particular user
+        """
+        res, _ = await self._client.scroll(
+            collection_name=self._collection,
+            scroll_filter=models.Filter(
+                must=[
+                    models.FieldCondition(
+                        key="user_id",
+                        match=models.MatchValue(value=user_id),
+                    )
+                ]
+            ),
+            limit=1000,
+            with_payload=["document_id", "url"],
+        )
+
+        records = [record.model_dump().get("payload", {}) for record in res]
+        # Return the unique set of ingested URLs
+        return {record.get("url") for record in records}
+
+    async def remove(self, url: str, user_id: str = Depends(get_user)):
+        """
+        Removes the saved ingested URL from the user
+        """
+        return await self._client.delete(
+            collection_name=self._collection,
+            points_selector=models.FilterSelector(
+                filter=models.Filter(
+                    must=[
+                        models.FieldCondition(
+                            key="url", match=models.MatchValue(value=url)
+                        ),
+                        models.FieldCondition(
+                            key="user_id", match=models.MatchValue(value=user_id)
+                        ),
+                    ]
+                )
+            ),
+        )
+
+    async def remove_all(self, user_id: str):
+        """
+        Removes all saved ingested URLs for the user
+        """
+        return await self._client.delete(
+            collection_name=self._collection,
+            points_selector=models.FilterSelector(
+                filter=models.Filter(
+                    must=[
+                        models.FieldCondition(
+                            key="user_id",
+                            match=models.MatchValue(value=user_id),
+                        ),
+                    ]
+                )
+            ),
+        )
+
+    async def query(
+        self,
+        text: str,
+        llm: LLMType,
+        filter: Optional[dict[str, str]] = None,
+        top_k: int = 3,
+        url_prefix_match: bool = False,
+    ):
+        metadata_filters = None
+        if filter:
+            filters = []
+            for k, v in filter.items():
+                if k == "url" and url_prefix_match:
+                    filters.append(
+                        MetadataFilter(
+                            key=k, value=v, operator=FilterOperator.TEXT_MATCH
+                        )
+                    )
+                else:
+                    filters.append(MetadataFilter(key=k, value=v))
+            metadata_filters = MetadataFilters(filters=filters)
+
+        engine = self._index.as_query_engine(
+            llm=llm,
+            use_async=True,
+            filters=metadata_filters,
+            similarity_top_k=top_k,
+        )
+
+        return await engine.aquery(text)
