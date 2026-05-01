@@ -42,7 +42,7 @@ services:
     restart: "no"
 
   db:
-    image: postgres:18.3
+    image: postgres:17
     container_name: postgres_db
     restart: unless-stopped
     shm_size: 128mb
@@ -51,7 +51,7 @@ services:
       POSTGRES_PASSWORD: example
       POSTGRES_DB: express_db
     volumes:
-      - ./data:/var/lib/postgresql:z
+      - ./data:/var/lib/postgresql/data:z
     networks:
       - scrapynet
     ports:
@@ -60,7 +60,7 @@ services:
   fastapi:
     build:
       context: ./apps/backend
-      dockerfile: apps/backend/Dockerfile
+      dockerfile: Dockerfile
     image: scrapy-fastapi
     container_name: scrapy-fastapi
     environment:
@@ -68,26 +68,26 @@ services:
       QDRANT_ENDPOINT: http://qdrant:6333
       REDIS_HOST: redis
       REDIS_PORT: 6379
-    env_file: .env
+    env_file: apps/backend/.env
     ports:
-      - 8081:8080
+      - "8081:8080"
     networks:
       - scrapynet
     restart: unless-stopped
     develop:
       watch:
         - action: sync
-          path: src
+          path: ./apps/backend/src
           target: /app/src
         - action: rebuild
-          path: ./pyproject.toml
+          path: ./apps/backend/pyproject.toml
 
   qdrant:
     image: qdrant/qdrant:latest
     container_name: qdrant
     ports:
-      - 6333:6333
-      - 6334:6334
+      - "6333:6333"
+      - "6334:6334"
     expose:
       - 6333
       - 6334
@@ -102,10 +102,10 @@ services:
     restart: unless-stopped
 
   redis:
-    image: redis:8.2-alpine
+    image: redis:8.0-alpine
     container_name: redis
     ports:
-      - 6379:6379
+      - "6379:6379"
     expose:
       - 6379
     networks:
@@ -116,7 +116,7 @@ services:
     image: redis/redisinsight:2.70
     container_name: redis-insight
     ports:
-      - 5540:5540
+      - "5540:5540"
     expose:
       - 5540
     environment:
@@ -124,6 +124,23 @@ services:
     networks:
       - scrapynet
     restart: unless-stopped
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama:/root/.ollama
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+      - OLLAMA_PORT=11434
+    networks:
+      - scrapynet
+    restart: unless-stopped
+
+volumes:
+  ollama:
 
 configs:
   qdrant_config:
