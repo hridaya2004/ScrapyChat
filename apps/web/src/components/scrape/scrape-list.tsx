@@ -81,18 +81,15 @@ export default function ScrapeList() {
     )
   );
 
-  const getUrlsForBaseUrl = (baseUrl: string) => {
-    return (
-      data?.ingestedUrls.filter((item) => {
-        try {
-          const urlObj = new URL(item);
-          return urlObj.origin === baseUrl;
-        } catch {
-          return item === baseUrl;
-        }
-      }) ?? []
-    );
-  };
+  const getUrlsForBaseUrl = (baseUrl: string) =>
+    data?.ingestedUrls.filter((item) => {
+      try {
+        const urlObj = new URL(item);
+        return urlObj.origin === baseUrl;
+      } catch {
+        return item === baseUrl;
+      }
+    }) ?? [];
 
   const handleValueChange = (value: string) => {
     if (value === url) {
