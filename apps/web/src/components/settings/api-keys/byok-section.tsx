@@ -56,20 +56,10 @@ interface Provider {
 }
 
 const PROVIDERS: Provider[] = [
-  // {
-  //   id: "google_genai",
-  //   name: "Gemma 4",
-  //   model: "gemma-4-31b-it",
-  //   icon: GemmaIcon,
-  //   paid: true,
-  //   placeholder: "AIza............",
-  //   getKeyUrl: "https://ai.google.dev/gemini-api/docs/api-key",
-  //   defaultKey: "AIza............",
-  // },
   {
     id: "google_genai",
-    name: "Gemini 3 Flash",
-    model: "gemini-3-flash-preview",
+    name: "Gemma 4",
+    model: "gemma-4-31b-it",
     icon: GoogleIcon,
     paid: true,
     placeholder: "AIza............",
@@ -79,7 +69,7 @@ const PROVIDERS: Provider[] = [
   {
     id: "google-selfhost",
     name: "Gemma 3",
-    model: "gemma3b",
+    model: "gemma4b",
     icon: GeminiIcon,
     paid: false,
     placeholder: "AIza............",
