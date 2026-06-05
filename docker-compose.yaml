@@ -1,11 +1,11 @@
 services:
   web:
-    container_name: scrapy-web
+    container_name: scrapychat-web
     restart: unless-stopped
     build:
       context: .
       dockerfile: apps/web/Dockerfile
-    image: scrapy-web
+    image: scrapychat-web
     ports:
       - '3001:3000'
     networks:
@@ -14,27 +14,25 @@ services:
       - auth
 
   auth:
-    container_name: scrapy-auth
+    container_name: scrapychat-auth
     restart: unless-stopped
     build:
       context: .
       dockerfile: apps/auth/Dockerfile
-    image: scrapy-auth
+    image: scrapychat-auth
     ports:
       - '3002:3001'
-    env_file: apps/auth/.env
     networks:
       - scrapynet
     depends_on:
       - db
 
   migrate:
-    container_name: scrapy-migrate
+    container_name: scrapychat-migrate
     build:
       context: .
       dockerfile: apps/auth/Dockerfile.migrate
-    image: scrapy-migrate
-    env_file: apps/auth/.env
+    image: scrapychat-migrate
     networks:
       - scrapynet
     depends_on:
@@ -57,18 +55,17 @@ services:
     ports:
       - '5432:5432'
 
-  fastapi:
+  backend:
     build:
       context: ./apps/backend
       dockerfile: Dockerfile
-    image: scrapy-fastapi
-    container_name: scrapy-fastapi
+    image: scrapychat-backend
+    container_name: scrapychat-backend
     environment:
       HOT_RELOAD: false
       QDRANT_ENDPOINT: http://qdrant:6333
       REDIS_HOST: redis
       REDIS_PORT: 6379
-    env_file: apps/backend/.env
     ports:
       - '8081:8080'
     networks:
