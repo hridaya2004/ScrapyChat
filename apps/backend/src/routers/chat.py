@@ -1,5 +1,4 @@
 import logging
-from typing import Optional
 
 from fastapi import APIRouter, Depends, Header
 from fastapi.exceptions import HTTPException
@@ -20,7 +19,7 @@ logger = logging.getLogger("chat")
 
 class ChatRequest(ScrapeUrl):
     query: str = Field(..., description="The query from the user")
-    llm: Optional[LLMConfig] = Field(None, description="The LLM provider to be used")
+    llm: LLMConfig = Field(..., description="The LLM provider to be used")
     match_subpaths: bool = Field(False, description="Match all URLs under this path")
 
 
@@ -30,10 +29,7 @@ async def new_chat(
     authorization: str = Header(None),
     user_id: str = Depends(get_user),
 ):
-    if chat_request.llm is not None:
-        llm_client = await chat_request.llm.client(authorization)
-    else:
-        llm_client = None
+    llm_client = await chat_request.llm.client(authorization)
 
     try:
         retrieved_text = await sv_store.query(

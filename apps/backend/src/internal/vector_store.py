@@ -18,7 +18,6 @@ from qdrant_client.models import Distance, VectorParams
 from ..dependencies import get_user
 from ..types.provider import BaseProvider
 from .embeddings import EmbeddingProvider
-from .llm import LLMProvider
 from .redis import RedisProvider
 
 
@@ -32,11 +31,9 @@ class VectorStoreProvider(BaseProvider):
         self._init_lock = asyncio.Lock()
 
         # Initialize dependent providers
-        self._llm = LLMProvider()
         self._embed_model = EmbeddingProvider()
         self._redis = RedisProvider()
 
-        Settings.llm = self._llm.client
         Settings.embed_model = self._embed_model.client
 
         # Qdrant
