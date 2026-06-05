@@ -52,7 +52,7 @@ class VectorStoreProvider(BaseProvider):
             use_async=True,
         )
 
-        self._query_engine = self._index.as_query_engine(use_async=True)
+
 
     async def init(self) -> None:
         async with self._init_lock:
