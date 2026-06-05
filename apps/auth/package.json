@@ -15,14 +15,14 @@
     "@elysiajs/openapi": "^1.4.15",
     "drizzle-orm": "^0.45.2",
     "elysia": "1.4.28",
-    "mysql2": "^3.22.3",
-    "nodemailer": "^8.0.8",
+    "mysql2": "^3.22.4",
+    "nodemailer": "^8.0.10",
     "pg": "^8.21.0"
   },
   "devDependencies": {
     "@types/nodemailer": "^8.0.0",
     "@types/pg": "^8.20.0",
     "drizzle-kit": "^0.31.10",
-    "tsx": "^4.22.3"
+    "tsx": "^4.22.4"
   }
 }
