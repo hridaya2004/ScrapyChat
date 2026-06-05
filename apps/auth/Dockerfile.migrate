@@ -15,7 +15,6 @@ FROM base AS runner
 COPY --from=builder /app .
 
 WORKDIR /app/apps/auth
-RUN chmod +x setup-db.sh
 RUN bun install
 
-CMD ["./setup-db.sh"]
+CMD ["bun", "run", "migrate"]

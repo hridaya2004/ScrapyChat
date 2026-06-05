@@ -1,1 +1,0 @@
-alter table "jwks" add column "expiresAt" timestamptz;

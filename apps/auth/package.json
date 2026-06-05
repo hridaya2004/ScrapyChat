@@ -5,7 +5,8 @@
   "private": true,
   "scripts": {
     "dev": "bun --hot run ./src/server.ts",
-    "build": "bun build --compile --minify-whitespace --minify-syntax --outfile=server --import ./instrumentation.ts ./src/index.ts"
+    "build": "bun build --compile --minify-whitespace --minify-syntax --outfile=server --import ./instrumentation.ts ./src/index.ts",
+    "migrate": "bunx --bun auth migrate --config ./src/lib/auth.ts"
   },
   "peerDependencies": {
     "typescript": "^6.0.3"
@@ -18,16 +19,14 @@
     "@opentelemetry/sdk-metrics": "^2.7.1",
     "@opentelemetry/sdk-node": "^0.218.0",
     "@opentelemetry/sdk-trace-node": "^2.7.1",
-    "drizzle-orm": "^0.45.2",
     "elysia": "1.4.28",
+    "kysely": "0.28.17",
     "mysql2": "^3.22.4",
-    "nodemailer": "^8.0.10",
-    "pg": "^8.21.0"
+    "nodemailer": "^8.0.10"
   },
   "devDependencies": {
     "@types/nodemailer": "^8.0.0",
-    "@types/pg": "^8.20.0",
-    "drizzle-kit": "^0.31.10",
+    "auth": "^1.6.14",
     "tsx": "^4.22.4"
   }
 }

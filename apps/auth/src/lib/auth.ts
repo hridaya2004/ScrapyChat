@@ -1,12 +1,12 @@
-import { betterAuth } from "better-auth/minimal";
+import Database from "bun:sqlite";
+import { betterAuth } from "better-auth";
 import { jwt, lastLoginMethod, openAPI } from "better-auth/plugins";
 import MailSender from "../controller/mail-sender";
-import { dbAdapter } from "../db/adapter";
 
 const mailSender = MailSender.getInstance();
 
 export const auth = betterAuth({
-  database: dbAdapter,
+  database: new Database("./sqlite.db"),
 
   appName: "ScrapyChat",
   advanced: {
