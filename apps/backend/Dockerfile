@@ -43,7 +43,7 @@ ENV PYTHONUNBUFFERED=1
 
 USER nonroot
 
-EXPOSE 8000
+EXPOSE 8080
 
 # Run the FastAPI application by default
 CMD ["python", "-m", "src.main"]
