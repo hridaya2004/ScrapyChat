@@ -39,22 +39,6 @@ services:
       - db
     restart: "no"
 
-  db:
-    image: postgres:17
-    container_name: postgres_db
-    restart: unless-stopped
-    shm_size: 128mb
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: example
-      POSTGRES_DB: express_db
-    volumes:
-      - ./data:/var/lib/postgresql/data:z
-    networks:
-      - scrapynet
-    ports:
-      - "5432:5432"
-
   backend:
     build:
       context: ./apps/backend
