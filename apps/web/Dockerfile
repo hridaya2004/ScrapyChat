@@ -7,6 +7,8 @@ COPY . .
 RUN turbo prune web --docker
 
 FROM base AS builder
+ARG APP_VERSION=unknown
+ENV NEXT_PUBLIC_APP_VERSION=${APP_VERSION}
 COPY --from=prepare /app/out/json/ .
 RUN bun install
 COPY --from=prepare /app/out/full/ .

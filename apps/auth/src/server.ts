@@ -49,6 +49,9 @@ const app = new Elysia()
     })
   )
   .use(betterAuth)
+  .get("/version", () => ({
+    version: process.env.APP_VERSION || "unknown",
+  }))
   .get("/api/user", ({ user }) => user, {
     auth: true,
   })

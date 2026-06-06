@@ -46,6 +46,11 @@ async def health():
     return {"status": "ok"}
 
 
+@app.get("/version")
+async def version():
+    return {"version": os.getenv("APP_VERSION")}
+
+
 app.include_router(scraper_router, prefix="/api/scrape")
 app.include_router(chat_router, prefix="/api/chat")
 
