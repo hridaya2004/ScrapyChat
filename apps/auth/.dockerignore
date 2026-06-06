@@ -2,3 +2,5 @@
 node_modules
 Dockerfile
 server
+sqlite.db
+.env
