@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "bun --hot run ./src/server.ts",
     "build": "bun build --compile --minify-whitespace --minify-syntax --outfile=server --import ./instrumentation.ts ./src/index.ts",
-    "migrate": "bunx --bun auth migrate --config ./src/lib/auth.ts"
+    "migrate": "bunx --bun auth migrate --yes --config ./src/lib/auth.ts"
   },
   "peerDependencies": {
     "typescript": "^6.0.3"
@@ -28,5 +28,6 @@
     "@types/nodemailer": "^8.0.0",
     "auth": "^1.6.14",
     "tsx": "^4.22.4"
-  }
+  },
+  "packageManager": "bun@1.3.14"
 }
