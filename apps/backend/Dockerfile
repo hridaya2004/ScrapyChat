@@ -41,7 +41,7 @@ COPY --from=builder --chown=nonroot:nonroot /app /app
 # the application crashes without emitting any logs due to buffering.
 ENV PYTHONUNBUFFERED=1
 
-# USER nonroot
+USER nonroot
 
 EXPOSE 8000
 
