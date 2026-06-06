@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "bun --hot run ./src/server.ts",
-    "build": "bun build --compile --minify-whitespace --minify-syntax --outfile=server --import ./instrumentation.ts ./src/index.ts",
+    "build": "bun build --compile --minify-whitespace --minify-syntax --outfile=server ./src/index.ts",
     "migrate": "bunx --bun auth migrate --yes --config ./src/lib/auth.ts"
   },
   "peerDependencies": {
