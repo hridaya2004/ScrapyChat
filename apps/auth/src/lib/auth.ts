@@ -6,7 +6,8 @@ import MailSender from "../controller/mail-sender";
 const mailSender = MailSender.getInstance();
 
 export const auth = betterAuth({
-  database: new Database("./sqlite.db"),
+  // use absolute path for database
+  database: new Database(process.env.DATABASE_PATH),
 
   appName: "ScrapyChat",
   advanced: {
