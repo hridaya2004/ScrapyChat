@@ -12,9 +12,13 @@ RUN bun install
 COPY --from=prepare /app/out/full/ .
 
 FROM base AS runner
+RUN addgroup -g 1001 -S elysiajs \
+ && adduser -S -u 1001 -G elysiajs elysiajs
 COPY --from=builder /app .
 
 WORKDIR /app/apps/auth
 RUN bun install
+RUN chown -R 1001:1001 /app
+USER elysiajs
 
 CMD ["bun", "run", "migrate"]
