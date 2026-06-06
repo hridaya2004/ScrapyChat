@@ -46,7 +46,7 @@ export function ModelContextProvider({
   );
 
   const [selectedModel, setSelectedModel] = useState<string>(
-    () => getSelectedModel() ?? "google-selfhost"
+    () => getSelectedModel() ?? "google_genai"
   );
 
   const refreshSelectedModel = useCallback(() => {

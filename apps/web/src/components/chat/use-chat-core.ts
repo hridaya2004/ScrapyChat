@@ -7,10 +7,10 @@ import { useHaptics } from "@/providers/haptics-provider";
 import { toast } from "../ui/toast";
 
 interface SendMessageParams {
-  apiKey?: string;
+  apiKey: string;
   input: string;
-  modelName?: string;
-  providerId?: string;
+  modelName: string;
+  providerId: string;
   queryUrl: string;
   superUrl: boolean;
 }
@@ -55,14 +55,11 @@ export const useChatCore = () => {
         body: JSON.stringify({
           url: queryUrl,
           query: input,
-          llm:
-            providerId && modelName && apiKey
-              ? {
-                  provider: providerId,
-                  model: modelName,
-                  api_key: apiKey,
-                }
-              : undefined,
+          llm: {
+            provider: providerId,
+            model: modelName,
+            api_key: apiKey,
+          },
           match_subpaths: superUrl,
         }),
         signal: abortControllerRef.current.signal,

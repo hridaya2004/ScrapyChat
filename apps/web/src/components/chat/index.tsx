@@ -88,10 +88,7 @@ export const Chat = () => {
       return;
     }
 
-    if (
-      !models?.[selectedModel]?.apiKey?.trim() &&
-      selectedModel !== "google-selfhost"
-    ) {
+    if (!models?.[selectedModel]?.apiKey?.trim()) {
       toast({
         title: "Empty API key",
         description:
@@ -104,14 +101,12 @@ export const Chat = () => {
       return;
     }
 
-    const isSelfHost = selectedModel === "google-selfhost";
-
     send({
       input,
       queryUrl: url,
-      providerId: isSelfHost ? undefined : selectedModel,
-      apiKey: isSelfHost ? undefined : models[selectedModel].apiKey,
-      modelName: isSelfHost ? undefined : models[selectedModel].modelName,
+      providerId: selectedModel,
+      apiKey: models[selectedModel].apiKey,
+      modelName: models[selectedModel].modelName,
       superUrl,
     });
 

@@ -31,10 +31,6 @@ COPY --from=builder --chown=nonroot:nonroot /app/.venv /app/.venv
 # Place executables in the environment at the front of the path
 ENV PATH="/app/.venv/bin:$PATH"
 
-# Download the browsers
-RUN playwright install-deps chromium
-RUN playwright install chromium
-
 # Copy the application from the builder
 COPY --from=builder --chown=nonroot:nonroot /app /app
 

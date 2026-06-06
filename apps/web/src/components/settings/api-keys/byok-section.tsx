@@ -10,7 +10,6 @@ import {
   Trash2,
 } from "lucide-react";
 import { useState } from "react";
-import GeminiIcon from "@/components/icons/gemini";
 import GoogleIcon from "@/components/icons/google";
 import { H4 } from "@/components/typography";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -62,16 +61,6 @@ const PROVIDERS: Provider[] = [
     model: "gemma-4-31b-it",
     icon: GoogleIcon,
     paid: true,
-    placeholder: "AIza............",
-    getKeyUrl: "https://ai.google.dev/gemini-api/docs/api-key",
-    defaultKey: "AIza............",
-  },
-  {
-    id: "google-selfhost",
-    name: "Gemma 3",
-    model: "gemma4b",
-    icon: GeminiIcon,
-    paid: false,
     placeholder: "AIza............",
     getKeyUrl: "https://ai.google.dev/gemini-api/docs/api-key",
     defaultKey: "AIza............",

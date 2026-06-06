@@ -7,7 +7,7 @@ services:
       dockerfile: apps/web/Dockerfile
     image: scrapychat-web
     ports:
-      - '3001:3000'
+      - "3001:3000"
     networks:
       - scrapynet
     depends_on:
@@ -21,7 +21,7 @@ services:
       dockerfile: apps/auth/Dockerfile
     image: scrapychat-auth
     ports:
-      - '3002:3001'
+      - "3002:3001"
     networks:
       - scrapynet
     depends_on:
@@ -37,7 +37,7 @@ services:
       - scrapynet
     depends_on:
       - db
-    restart: 'no'
+    restart: "no"
 
   db:
     image: postgres:17
@@ -53,7 +53,7 @@ services:
     networks:
       - scrapynet
     ports:
-      - '5432:5432'
+      - "5432:5432"
 
   backend:
     build:
@@ -67,7 +67,7 @@ services:
       REDIS_HOST: redis
       REDIS_PORT: 6379
     ports:
-      - '8081:8080'
+      - "8081:8080"
     networks:
       - scrapynet
     restart: unless-stopped
@@ -83,8 +83,8 @@ services:
     image: qdrant/qdrant:latest
     container_name: qdrant
     ports:
-      - '6333:6333'
-      - '6334:6334'
+      - "6333:6333"
+      - "6334:6334"
     expose:
       - 6333
       - 6334
@@ -102,7 +102,7 @@ services:
     image: redis:8.0-alpine
     container_name: redis
     ports:
-      - '6379:6379'
+      - "6379:6379"
     expose:
       - 6379
     networks:
@@ -113,11 +113,11 @@ services:
     image: redis/redisinsight:2.70
     container_name: redis-insight
     ports:
-      - '5540:5540'
+      - "5540:5540"
     expose:
       - 5540
     environment:
-      RI_REDIS_HOST: 'redis'
+      RI_REDIS_HOST: "redis"
     networks:
       - scrapynet
     restart: unless-stopped
@@ -126,7 +126,7 @@ services:
     image: ollama/ollama:latest
     container_name: ollama
     ports:
-      - '11434:11434'
+      - "11434:11434"
     volumes:
       - ollama:/root/.ollama
     environment:
