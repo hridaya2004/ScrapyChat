@@ -2,12 +2,31 @@ import Database from "bun:sqlite";
 import { betterAuth } from "better-auth";
 import { jwt, lastLoginMethod, openAPI } from "better-auth/plugins";
 import MailSender from "../controller/mail-sender";
+import { logger } from "./logger";
 
 const mailSender = MailSender.getInstance();
 
+const dbPath = process.env.DATABASE_PATH;
+
+let db: Database;
+try {
+  db = new Database(dbPath);
+  const { pageCount, pageSize } = db
+    .query(
+      "SELECT page_count AS pageCount, page_size AS pageSize FROM pragma_page_count, pragma_page_size;"
+    )
+    .get() as { pageCount: number; pageSize: number };
+  const dbSizeKb = Number.parseFloat(
+    (((pageCount as number) * (pageSize as number)) / 1024).toFixed(1)
+  );
+  logger.info({ dbPath, dbSizeKb }, "Database connection established");
+} catch (err) {
+  logger.error({ err, dbPath }, "Database connection failed");
+  throw err;
+}
+
 export const auth = betterAuth({
-  // use absolute path for database
-  database: new Database(process.env.DATABASE_PATH),
+  database: db,
 
   appName: "ScrapyChat",
   advanced: {

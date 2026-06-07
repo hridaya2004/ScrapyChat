@@ -1,4 +1,5 @@
 import nodemailer, { type Transporter } from "nodemailer";
+import { logger } from "../lib/logger";
 
 class MailSender {
   private static instance: MailSender | null = null;
@@ -36,8 +37,12 @@ class MailSender {
         subject: props.subject,
         text: props.text,
       });
+      logger.info(
+        { to: props.to, subject: props.subject },
+        "Email sent successfully"
+      );
     } catch (error) {
-      console.error("Error sending email:", error);
+      logger.error({ err: error, to: props.to }, "Failed to send email");
       throw error;
     }
   }
