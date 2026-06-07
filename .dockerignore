@@ -1,5 +1,5 @@
-.git
 data
-node_modules
+**/node_modules
 qdrant_data
 ollama
+**/.venv

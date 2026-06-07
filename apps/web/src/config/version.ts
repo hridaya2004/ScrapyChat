@@ -1,3 +1,1 @@
-import versionData from "./version.json";
-
-export const appVersion = `${versionData.major}.${versionData.minor}`;
+export const appVersion = process.env.NEXT_PUBLIC_APP_VERSION || "unknown";
