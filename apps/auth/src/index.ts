@@ -1,4 +1,4 @@
-import "../instrumentation.ts";
+// import "../instrumentation.ts";
 import cluster from "node:cluster";
 import os from "node:os";
 import process from "node:process";
