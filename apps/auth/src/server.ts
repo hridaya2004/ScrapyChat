@@ -46,6 +46,9 @@ const app = new Elysia()
       "Incoming request"
     );
   })
+  .onResponse(({ headers }) => {
+    headers["X-Powered-By"] = "Elysia";
+  })
   .onError(({ code, error, request }) => {
     const url = new URL(request.url);
     const store = requestStore.getStore();
