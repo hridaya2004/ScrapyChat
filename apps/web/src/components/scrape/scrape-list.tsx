@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Globe, LinkIcon, RefreshCw, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { useDebounce } from "@/hooks/use-debounce";
-import { useAuthJWTProvider } from "@/providers/auth-jwt-provider";
+import { useAuthContext } from "@/providers/auth-context-provider";
 import { useDialog } from "@/providers/dialog-context-provider";
 import { useQueryPromptUrlProvider } from "@/providers/query-prompt-url-provider";
 import { Muted } from "../typography";
@@ -35,7 +35,7 @@ import ScrapeListItem from "./scrape-list-item";
 import ScrapeNew from "./scrape-new";
 
 export default function ScrapeList() {
-  const { token } = useAuthJWTProvider();
+  const { token } = useAuthContext();
   const { setUrl, url, clearUrl, setSuperUrl } = useQueryPromptUrlProvider();
   const { dialogState, setDialogState } = useDialog("scrape-list");
   const [deletingAll, setDeletingAll] = useState(false);

@@ -3,7 +3,7 @@
 import { ChevronRight, FileText, Trash2, XIcon } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { useAuthJWTProvider } from "@/providers/auth-jwt-provider";
+import { useAuthContext } from "@/providers/auth-context-provider";
 import { useDialog } from "@/providers/dialog-context-provider";
 import { Button } from "../ui/button";
 import {
@@ -35,7 +35,7 @@ export default function ScrapeUrlDetails({
   onUrlSelect,
   onUrlDeleted,
 }: ScrapeUrlDetailsProps) {
-  const { token } = useAuthJWTProvider();
+  const { token } = useAuthContext();
   const { dialogState, setDialogState } = useDialog(
     `scrape-url-details${baseUrl}`
   );

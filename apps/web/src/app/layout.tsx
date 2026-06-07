@@ -6,7 +6,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { globalMetadata, globalViewport } from "@/config/metadata";
 import { geistMono, geistSans } from "@/lib/geist";
-import { AuthJWTProvider } from "@/providers/auth-jwt-provider";
+import { AuthContextProvider } from "@/providers/auth-context-provider";
 import { DialogProvider } from "@/providers/dialog-context-provider";
 import { HapticsProvider } from "@/providers/haptics-provider";
 import { ModelContextProvider } from "@/providers/model-provider";
@@ -41,7 +41,7 @@ export default function RootLayout({
         <ThemeProvider>
           <TooltipProvider>
             <QueryClientWrapper>
-              <AuthJWTProvider>
+              <AuthContextProvider>
                 <ChatSessionProvider>
                   <QueryPromptUrlProvider>
                     <ModelContextProvider>
@@ -59,7 +59,7 @@ export default function RootLayout({
                     </ModelContextProvider>
                   </QueryPromptUrlProvider>
                 </ChatSessionProvider>
-              </AuthJWTProvider>
+              </AuthContextProvider>
             </QueryClientWrapper>
           </TooltipProvider>
         </ThemeProvider>

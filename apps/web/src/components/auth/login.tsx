@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
 import { authClient } from "@/lib/auth-client";
-import { useAuthJWTProvider } from "@/providers/auth-jwt-provider";
+import { useAuthContext } from "@/providers/auth-context-provider";
 import { Button, buttonVariants } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";
 import { Field, FieldSeparator, FieldSet } from "../ui/field";
@@ -36,7 +36,7 @@ const loginFormSchema = z.object({
 });
 
 export default function Login() {
-  const { clearAuthState } = useAuthJWTProvider();
+  const { clearAuthState } = useAuthContext();
 
   const [showPassword, setShowPassword] = useState(false);
 

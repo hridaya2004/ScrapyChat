@@ -3,10 +3,10 @@
 import { unauthorized } from "next/navigation";
 import { Chat } from "@/components/chat";
 import { Spinner } from "@/components/ui/spinner";
-import { useAuthJWTProvider } from "@/providers/auth-jwt-provider";
+import { useAuthContext } from "@/providers/auth-context-provider";
 
 export default function Page() {
-  const { errorStatusCode, loading, user } = useAuthJWTProvider();
+  const { errorStatusCode, loading, user } = useAuthContext();
 
   if (loading) {
     return (

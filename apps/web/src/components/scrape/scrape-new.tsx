@@ -7,7 +7,7 @@ import {
   type ScrapeNew as ScrapeNewType,
   scrapeNewSchema,
 } from "@/model/scrape/new";
-import { useAuthJWTProvider } from "@/providers/auth-jwt-provider";
+import { useAuthContext } from "@/providers/auth-context-provider";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -33,7 +33,7 @@ import { Spinner } from "../ui/spinner";
 import { postScrapeNewUrl } from "./scrape-core";
 
 export default function ScrapeNew() {
-  const { token } = useAuthJWTProvider();
+  const { token } = useAuthContext();
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [loading, setLoading] = useState(false);

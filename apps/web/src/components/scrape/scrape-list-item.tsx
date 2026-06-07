@@ -3,7 +3,7 @@
 import { Globe, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { useAuthJWTProvider } from "@/providers/auth-jwt-provider";
+import { useAuthContext } from "@/providers/auth-context-provider";
 import { useDialog } from "@/providers/dialog-context-provider";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
@@ -31,7 +31,7 @@ export default function ScrapeListItem({
   onUrlSelect,
   onUrlDeleted,
 }: ScrapeListItemProps) {
-  const { token } = useAuthJWTProvider();
+  const { token } = useAuthContext();
   const [deleting, setDeleting] = useState(false);
   const hasMultipleUrls = urls.length > 1;
 

@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "motion/react";
 import { useMemo } from "react";
 import { cn } from "@/lib/utils";
-import { useAuthJWTProvider } from "@/providers/auth-jwt-provider";
+import { useAuthContext } from "@/providers/auth-context-provider";
 import { useDialog } from "@/providers/dialog-context-provider";
 import { useModel } from "@/providers/model-provider";
 import { useQueryPromptUrlProvider } from "@/providers/query-prompt-url-provider";
@@ -20,7 +20,7 @@ const WWW_PREFIX_REGEX = /^www\./;
 export const Chat = () => {
   const { chatId } = useChatSession();
   const { url, superUrl } = useQueryPromptUrlProvider();
-  const { token } = useAuthJWTProvider();
+  const { token } = useAuthContext();
   const {
     input,
     messages,

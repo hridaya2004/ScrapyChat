@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { apiConfig } from "@/config/global";
 import type { Message } from "@/lib/types";
 import { rawResponseMessageSchema } from "@/model/chat/new";
-import { useAuthJWTProvider } from "@/providers/auth-jwt-provider";
+import { useAuthContext } from "@/providers/auth-context-provider";
 import { useHaptics } from "@/providers/haptics-provider";
 import { toast } from "../ui/toast";
 
@@ -16,7 +16,7 @@ interface SendMessageParams {
 }
 
 export const useChatCore = () => {
-  const { token } = useAuthJWTProvider();
+  const { token } = useAuthContext();
   const abortControllerRef = useRef<AbortController | null>(null);
 
   const [input, setInput] = useState("");

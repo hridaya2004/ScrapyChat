@@ -1,12 +1,12 @@
 import { LogOutIcon } from "lucide-react";
 import { redirect } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
-import { useAuthJWTProvider } from "@/providers/auth-jwt-provider";
+import { useAuthContext } from "@/providers/auth-context-provider";
 import { DropdownMenuItem } from "../ui/dropdown-menu";
 import { toast } from "../ui/toast";
 
 export default function LogOutButton() {
-  const { clearAuthState } = useAuthJWTProvider();
+  const { clearAuthState } = useAuthContext();
   const handleLogOut = async () => {
     const { data } = await authClient.signOut();
 

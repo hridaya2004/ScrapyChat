@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { Muted } from "@/components/typography";
 import type { ScrapeProgress as ScrapeProgressType } from "@/model/scrape/progress";
-import { useAuthJWTProvider } from "@/providers/auth-jwt-provider";
+import { useAuthContext } from "@/providers/auth-context-provider";
 import { useDialog } from "@/providers/dialog-context-provider";
 import {
   Dialog,
@@ -20,7 +20,7 @@ interface ProgressItem {
 }
 
 export const ScrapeProgress = () => {
-  const { token } = useAuthJWTProvider();
+  const { token } = useAuthContext();
   const { dialogState, setDialogState } = useDialog("scrape-progress");
 
   const [scrapeData, setScrapeData] = useState<ProgressItem[]>([]);
