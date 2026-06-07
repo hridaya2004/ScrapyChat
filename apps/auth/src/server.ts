@@ -46,8 +46,8 @@ const app = new Elysia()
       "Incoming request"
     );
   })
-  .onResponse(({ headers }) => {
-    headers["X-Powered-By"] = "Elysia";
+  .onAfterHandle(({ set }) => {
+    set.headers["X-Powered-By"] = "ElysiaJS";
   })
   .onError(({ code, error, request }) => {
     const url = new URL(request.url);
