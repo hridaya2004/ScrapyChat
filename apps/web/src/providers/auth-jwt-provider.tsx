@@ -8,7 +8,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { authClient } from "@/lib/auth-client";
+import { authClient, type User } from "@/lib/auth-client";
 
 interface AuthJWTContextProps {
   clearAuthState?: () => void;
@@ -16,10 +16,12 @@ interface AuthJWTContextProps {
   errorStatusCode?: number;
   loading: boolean;
   token: string | null;
+  user: User | null;
 }
 
 const initialAuthState: AuthJWTContextProps = {
   token: null,
+  user: null,
   loading: true,
   error: undefined,
 };
@@ -33,50 +35,71 @@ export const AuthJWTProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const [data, setData] = useState<AuthJWTContextProps>(initialAuthState);
-  const hasInitialized = useRef(false);
+  const {
+    data: sessionData,
+    isPending: sessionLoading,
+    error: sessionError,
+  } = authClient.useSession();
 
-  const clearAuthState = useCallback(() => {
-    setData(initialAuthState);
-    hasInitialized.current = false;
+  const [token, setToken] = useState<string | null>(null);
+  const [tokenLoading, setTokenLoading] = useState(true);
+  const [tokenError, setTokenError] = useState<string>();
+  const [tokenErrorStatus, setTokenErrorStatus] = useState<number>();
+  const mountedRef = useRef(true);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
+
+  const fetchToken = useCallback(async () => {
+    setTokenLoading(true);
+    const { data, error } = await authClient.token();
+    if (!mountedRef.current) {
+      return;
+    }
+    setTokenLoading(false);
+    if (error) {
+      setToken("");
+      setTokenError(error.message);
+      setTokenErrorStatus(error.status);
+    } else if (data?.token) {
+      setToken(data.token);
+      setTokenError(undefined);
+      setTokenErrorStatus(undefined);
+    }
   }, []);
 
   useEffect(() => {
-    if (hasInitialized.current) {
-      return;
+    if (sessionData?.session) {
+      fetchToken();
+    } else if (!sessionLoading) {
+      setToken(null);
+      setTokenLoading(false);
+      setTokenError(undefined);
+      setTokenErrorStatus(undefined);
     }
+  }, [sessionData, sessionLoading, fetchToken]);
 
-    const getAuthToken = async () => {
-      const { data: authData, error: authError } = await authClient.token();
-
-      if (authError) {
-        setData({
-          token: "",
-          loading: false,
-          error: authError.message,
-          errorStatusCode: authError.status,
-          clearAuthState,
-        });
-        hasInitialized.current = true;
-        return;
-      }
-
-      if (authData?.token) {
-        setData({
-          token: authData.token,
-          loading: false,
-          error: undefined,
-          clearAuthState,
-        });
-        hasInitialized.current = true;
-      }
-    };
-
-    getAuthToken();
-  }, [clearAuthState]);
+  const clearAuthState = useCallback(() => {
+    if (sessionData?.session) {
+      fetchToken();
+    }
+  }, [sessionData, fetchToken]);
 
   return (
-    <AuthJWTContext.Provider value={{ ...data, clearAuthState }}>
+    <AuthJWTContext.Provider
+      value={{
+        token,
+        user: sessionData?.user ?? null,
+        loading: sessionLoading || tokenLoading,
+        error: tokenError || sessionError?.message,
+        errorStatusCode: tokenErrorStatus,
+        clearAuthState,
+      }}
+    >
       {children}
     </AuthJWTContext.Provider>
   );

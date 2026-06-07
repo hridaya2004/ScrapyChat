@@ -6,7 +6,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { useAuthJWTProvider } from "@/providers/auth-jwt-provider";
 
 export default function Page() {
-  const { errorStatusCode, loading } = useAuthJWTProvider();
+  const { errorStatusCode, loading, user } = useAuthJWTProvider();
 
   if (loading) {
     return (
@@ -16,7 +16,7 @@ export default function Page() {
     );
   }
 
-  if (errorStatusCode === 401) {
+  if (!user || errorStatusCode === 401) {
     unauthorized();
   }
 

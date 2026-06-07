@@ -12,6 +12,7 @@ import { HapticsProvider } from "@/providers/haptics-provider";
 import { ModelContextProvider } from "@/providers/model-provider";
 import { QueryPromptUrlProvider } from "@/providers/query-prompt-url-provider";
 import { QueryClientWrapper } from "@/providers/query-provider";
+import { ChatSessionProvider } from "@/providers/session-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
 
 export const metadata: Metadata = {
@@ -39,25 +40,27 @@ export default function RootLayout({
       <body>
         <ThemeProvider>
           <TooltipProvider>
-            <AuthJWTProvider>
-              <QueryClientWrapper>
-                <QueryPromptUrlProvider>
-                  <ModelContextProvider>
-                    <DialogProvider>
-                      <HapticsProvider>
-                        <main className="container-wrapper flex h-full flex-col">
-                          <Header />
-                          <div className="flex-1 overflow-y-auto">
-                            {children}
-                          </div>
-                        </main>
-                        <Toaster />
-                      </HapticsProvider>
-                    </DialogProvider>
-                  </ModelContextProvider>
-                </QueryPromptUrlProvider>
-              </QueryClientWrapper>
-            </AuthJWTProvider>
+            <QueryClientWrapper>
+              <AuthJWTProvider>
+                <ChatSessionProvider>
+                  <QueryPromptUrlProvider>
+                    <ModelContextProvider>
+                      <DialogProvider>
+                        <HapticsProvider>
+                          <main className="container-wrapper flex h-full flex-col">
+                            <Header />
+                            <div className="flex-1 overflow-y-auto">
+                              {children}
+                            </div>
+                          </main>
+                          <Toaster />
+                        </HapticsProvider>
+                      </DialogProvider>
+                    </ModelContextProvider>
+                  </QueryPromptUrlProvider>
+                </ChatSessionProvider>
+              </AuthJWTProvider>
+            </QueryClientWrapper>
           </TooltipProvider>
         </ThemeProvider>
       </body>
