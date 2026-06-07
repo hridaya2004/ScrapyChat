@@ -149,7 +149,7 @@ export default function AboutSection() {
             )}
 
             {contributors && contributors.length > 0 && (
-              <div className="flex flex-wrap gap-1 pt-2">
+              <div className="grid grid-cols-6 gap-1 pt-2">
                 {contributors.map((contributor) => (
                   <ContributorCard
                     contributor={contributor}
