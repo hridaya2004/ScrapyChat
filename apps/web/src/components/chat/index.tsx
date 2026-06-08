@@ -11,6 +11,7 @@ import { ChatInput } from "../chat-input";
 import { getScrapeList } from "../scrape/scrape-core";
 import { ScrapeProgress } from "../scrape/scrape-progress";
 import { H2 } from "../typography";
+import { SystemMessage } from "../ui/system-message";
 import { toast } from "../ui/toast";
 import { Conversation } from "./conversation";
 import { useChatCore } from "./use-chat-core";
@@ -135,6 +136,12 @@ export const Chat = () => {
         "@container/main relative flex h-full max-h-[calc(100vh-(var(--spacing-app-header)))] flex-col items-center justify-end md:justify-center"
       )}
     >
+      {showOnboarding && (
+        <SystemMessage className="absolute top-0" variant="warning">
+          ScrapyChat is under maintenance mode. Self hosted models have been
+          sunset.
+        </SystemMessage>
+      )}
       <AnimatePresence initial={false} mode="popLayout">
         {showOnboarding ? (
           <motion.div
