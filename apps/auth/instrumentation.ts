@@ -6,7 +6,7 @@ import {
   PeriodicExportingMetricReader,
 } from "@opentelemetry/sdk-metrics";
 import { NodeSDK } from "@opentelemetry/sdk-node";
-import { ConsoleSpanExporter } from "@opentelemetry/sdk-trace-node";
+import { ConsoleSpanExporter, SimpleSpanProcessor } from "@opentelemetry/sdk-trace-node";
 
 const useOtlp = !!process.env.OTEL_EXPORTER_OTLP_ENDPOINT;
 
@@ -17,6 +17,7 @@ const sdk = new NodeSDK({
     exporter: useOtlp ? new OTLPMetricExporter() : new ConsoleMetricExporter(),
   }),
   instrumentations: [getNodeAutoInstrumentations()],
+  spanProcessors: [new SimpleSpanProcessor(new ConsoleSpanExporter())]
 });
 
 sdk.start();
