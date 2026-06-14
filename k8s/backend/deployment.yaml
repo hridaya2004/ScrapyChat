@@ -1,11 +1,9 @@
 apiVersion: apps/v1
 kind: Deployment
-
 metadata:
   name: scrapychat-backend
   labels:
     app: scrapychat-backend
-
 spec:
   selector:
     matchLabels:
@@ -17,7 +15,7 @@ spec:
     spec:
       containers:
         - name: scrapychat-backend
-          image: ghcr.io/hridaya2004/scrapychat/scrapychat-backend:1.9
+          image: ghcr.io/hridaya2004/scrapychat/scrapychat-backend:5b224d3dfec7c8906a80fe53c97f383af992ead2
           ports:
             - containerPort: 8080
           env:

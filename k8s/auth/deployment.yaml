@@ -1,11 +1,9 @@
 apiVersion: apps/v1
 kind: Deployment
-
 metadata:
   name: scrapychat-auth
   labels:
     app: scrapychat-auth
-
 spec:
   selector:
     matchLabels:
@@ -19,7 +17,7 @@ spec:
     spec:
       containers:
         - name: scrapychat-auth
-          image: ghcr.io/hridaya2004/scrapychat/scrapychat-auth:1.9
+          image: ghcr.io/hridaya2004/scrapychat/scrapychat-migrate:5b224d3dfec7c8906a80fe53c97f383af992ead2
           ports:
             - containerPort: 3001
           env:

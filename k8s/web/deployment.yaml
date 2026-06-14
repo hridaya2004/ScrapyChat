@@ -1,11 +1,9 @@
 apiVersion: apps/v1
 kind: Deployment
-
 metadata:
   name: scrapychat-web
   labels:
     app: scrapychat-web
-
 spec:
   selector:
     matchLabels:
@@ -17,7 +15,7 @@ spec:
     spec:
       containers:
         - name: scrapychat-web
-          image: ghcr.io/hridaya2004/scrapychat/scrapychat-web:1.9
+          image: ghcr.io/hridaya2004/scrapychat/scrapychat-web:5b224d3dfec7c8906a80fe53c97f383af992ead2
           ports:
             - containerPort: 3000
           env:
