@@ -99,7 +99,7 @@ jobs:
         run: |
           yq -i ".spec.template.spec.containers[0].image = \"ghcr.io/hridaya2004/scrapychat/scrapychat-web:${{ steps.image_tag.outputs.value }}\"" k8s/web/deployment.yaml
           yq -i ".spec.template.spec.containers[0].image = \"ghcr.io/hridaya2004/scrapychat/scrapychat-auth:${{ steps.image_tag.outputs.value }}\"" k8s/auth/deployment.yaml
-          yq -i ".spec.template.spec.containers[1].image = \"ghcr.io/hridaya2004/scrapychat/scrapychat-migrate:${{ steps.image_tag.outputs.value }}\"" k8s/auth/deployment.yaml
+          yq -i ".spec.template.spec.initContainer[0].image = \"ghcr.io/hridaya2004/scrapychat/scrapychat-migrate:${{ steps.image_tag.outputs.value }}\"" k8s/auth/deployment.yaml
           yq -i ".spec.template.spec.containers[0].image = \"ghcr.io/hridaya2004/scrapychat/scrapychat-backend:${{ steps.image_tag.outputs.value }}\"" k8s/backend/deployment.yaml
 
       - name: Commit to repo

@@ -43,10 +43,9 @@ spec:
             limits:
               cpu: 500m
               memory: 512Mi
-        - image: ghcr.io/hridaya2004/scrapychat/scrapychat-migrate:1.11-276d6e6
       initContainers:
         - name: scrapychat-migrate
-          image: ghcr.io/hridaya2004/scrapychat/scrapychat-migrate:1.9
+          image: ghcr.io/hridaya2004/scrapychat/scrapychat-migrate:1.11-276d6e6
           envFrom:
             - secretRef:
                 name: scrapychat-auth-secrets
