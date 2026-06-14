@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: scrapychat-auth
-          image: ghcr.io/hridaya2004/scrapychat/scrapychat-auth:1.11-276d6e6
+          image: ghcr.io/hridaya2004/scrapychat/scrapychat-auth:1.11-9160e75
           ports:
             - containerPort: 3001
           env:
@@ -63,3 +63,5 @@ spec:
         - name: scrapychat-auth-pv
           persistentVolumeClaim:
             claimName: scrapychat-auth-pvc
+      initContainer:
+        - image: ghcr.io/hridaya2004/scrapychat/scrapychat-migrate:1.11-9160e75
