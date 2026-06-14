@@ -73,3 +73,27 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  update-manifests:
+    runs-on: ubuntu-slim
+    needs: build-and-push
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Update image tags
+        run: |
+          yq -i ".spec.template.spec.containers[0].image = \"ghcr.io/hridaya2004/scrapychat/scrapychat-web:${GITHUB_SHA}\"" k8s/web/deployment.yaml
+          yq -i ".spec.template.spec.containers[0].image = \"ghcr.io/hridaya2004/scrapychat/scrapychat-auth:${GITHUB_SHA}\"" k8s/auth/deployment.yaml
+          yq -i ".spec.template.spec.containers[0].image = \"ghcr.io/hridaya2004/scrapychat/scrapychat-migrate:${GITHUB_SHA}\"" k8s/auth/deployment.yaml
+          yq -i ".spec.template.spec.containers[0].image = \"ghcr.io/hridaya2004/scrapychat/scrapychat-backend:${GITHUB_SHA}\"" k8s/backend/deployment.yaml
+
+      - name: Commit to repo
+        uses: stefanzweifel/git-auto-commit-action@v7
+        with:
+          commit_author: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
+          commit_message: 'k8s: Bump images to ${{ github.sha }} [no ci]'
+          file_pattern: 'k8s/**/deployment.yaml'
