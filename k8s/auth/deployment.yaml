@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: scrapychat-auth
-          image: ghcr.io/hridaya2004/scrapychat/scrapychat-auth:1.12-77a689e
+          image: ghcr.io/hridaya2004/scrapychat/scrapychat-auth:1.13-b2ba674
           ports:
             - containerPort: 3001
           env:
@@ -45,7 +45,7 @@ spec:
               memory: 512Mi
       initContainers:
         - name: scrapychat-migrate
-          image: ghcr.io/hridaya2004/scrapychat/scrapychat-migrate:1.12-77a689e
+          image: ghcr.io/hridaya2004/scrapychat/scrapychat-migrate:1.13-b2ba674
           envFrom:
             - secretRef:
                 name: scrapychat-auth-secrets
