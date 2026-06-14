@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: scrapychat-auth
-          image: ghcr.io/hridaya2004/scrapychat/scrapychat-migrate:5b224d3dfec7c8906a80fe53c97f383af992ead2
+          image: ghcr.io/hridaya2004/scrapychat/scrapychat-auth:1.10-e1efe2a
           ports:
             - containerPort: 3001
           env:
@@ -43,6 +43,7 @@ spec:
             limits:
               cpu: 500m
               memory: 512Mi
+        - image: ghcr.io/hridaya2004/scrapychat/scrapychat-migrate:1.10-e1efe2a
       initContainers:
         - name: scrapychat-migrate
           image: ghcr.io/hridaya2004/scrapychat/scrapychat-migrate:1.9
