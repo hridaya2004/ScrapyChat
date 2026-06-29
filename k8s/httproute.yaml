@@ -6,8 +6,8 @@ metadata:
 
 spec:
   hostnames:
-    - 'scrapychat.hridaya.tech'
-    - 'www.scrapychat.hridaya.tech'
+    - 'scrapychat.hridaya.dev'
+    - 'www.scrapychat.hridaya.dev'
   parentRefs:
     - group: gateway.networking.k8s.io
       kind: Gateway

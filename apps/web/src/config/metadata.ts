@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 
-const SITE_URL = "https://scrapy-dev.hridaya.tech";
+const SITE_URL = "https://scrapy-dev.hridaya.dev";
 const SITE_NAME = "ScrapyChat";
 const SITE_DESCRIPTION =
   "Scrape any website and chat with its content using AI. Ask questions, extract insights, and explore web data conversationally.";

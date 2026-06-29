@@ -5,9 +5,9 @@ metadata:
   name: scrapychat-backend-configmap
 
 data:
-  ALLOWED_ORIGINS: https://scrapychat.hridaya.tech
+  ALLOWED_ORIGINS: https://scrapychat.hridaya.dev
   AUTH_URL: http://scrapychat-auth-service.scrapychat.svc.cluster.local:3001
-  FRONTEND_URL: https://scrapychat.hridaya.tech
+  FRONTEND_URL: https://scrapychat.hridaya.dev
   OLLAMA_EMBEDDING_MODEL: embeddinggemma:300m
   OLLAMA_ENDPOINT: http://ollama-service.scrapychat.svc.cluster.local
   QDRANT_COLLECTION: scrapychat
