@@ -1,4 +1,4 @@
-FROM oven/bun:alpine AS base
+FROM oven/bun:canary-alpine AS base
 WORKDIR /app
 
 FROM base AS prepare
