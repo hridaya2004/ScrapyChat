@@ -6,13 +6,8 @@ import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { globalMetadata, globalViewport } from "@/config/metadata";
 import { geistMono, geistSans } from "@/lib/geist";
-import { AuthContextProvider } from "@/providers/auth-context-provider";
-import { DialogProvider } from "@/providers/dialog-context-provider";
-import { HapticsProvider } from "@/providers/haptics-provider";
-import { ModelContextProvider } from "@/providers/model-provider";
-import { QueryPromptUrlProvider } from "@/providers/query-prompt-url-provider";
+import { ClientProviders } from "@/providers/client-providers";
 import { QueryClientWrapper } from "@/providers/query-provider";
-import { ChatSessionProvider } from "@/providers/session-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
 
 export const metadata: Metadata = {
@@ -41,25 +36,15 @@ export default function RootLayout({
         <ThemeProvider>
           <TooltipProvider>
             <QueryClientWrapper>
-              <AuthContextProvider>
-                <ChatSessionProvider>
-                  <QueryPromptUrlProvider>
-                    <ModelContextProvider>
-                      <DialogProvider>
-                        <HapticsProvider>
-                          <main className="container-wrapper flex h-full flex-col">
-                            <Header />
-                            <div className="flex-1 overflow-y-auto">
-                              {children}
-                            </div>
-                          </main>
-                          <Toaster />
-                        </HapticsProvider>
-                      </DialogProvider>
-                    </ModelContextProvider>
-                  </QueryPromptUrlProvider>
-                </ChatSessionProvider>
-              </AuthContextProvider>
+              <ClientProviders>
+                <main className="container-wrapper flex h-full flex-col">
+                  <Header />
+                  <div className="flex-1 overflow-y-auto">
+                    {children}
+                  </div>
+                </main>
+                <Toaster />
+              </ClientProviders>
             </QueryClientWrapper>
           </TooltipProvider>
         </ThemeProvider>
