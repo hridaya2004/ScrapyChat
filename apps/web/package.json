@@ -2,9 +2,9 @@
   "name": "web",
   "private": true,
   "scripts": {
-    "dev": "bun --bun next dev",
-    "build": "bun --bun next build",
-    "start": "bun --bun next start"
+    "build": "bun --bun node_modules/.bin/next build",
+    "dev": "bun --bun node_modules/.bin/next dev",
+    "start": "bun --bun node_modules/.bin/next start"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.8.0",
