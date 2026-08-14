@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
 import { authClient } from "@/lib/auth-client";
@@ -41,12 +41,12 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
 
   const form = useForm<z.infer<typeof loginFormSchema>>({
-    resolver: zodResolver(loginFormSchema),
     defaultValues: {
       email: "",
       password: "",
       rememberMe: false,
     },
+    resolver: zodResolver(loginFormSchema),
   });
 
   const onSubmit = async (values: z.infer<typeof loginFormSchema>) => {
@@ -57,17 +57,17 @@ export default function Login() {
 
       if (error?.code === "EMAIL_NOT_VERIFIED") {
         toast({
-          title: "Email not verified.",
           description: "Please check your email and verify your account",
           status: "error",
+          title: "Email not verified.",
         });
         return;
       }
       if (error?.code === "INVALID_EMAIL_OR_PASSWORD") {
         toast({
-          title: "Invalid email or password",
           description: "Please check your email and password",
           status: "error",
+          title: "Invalid email or password",
         });
         return;
       }
@@ -78,12 +78,19 @@ export default function Login() {
     } catch (err) {
       console.error("An error occurred during login:", err);
       toast({
-        title: "Login failed",
         description: "An unexpected error occurred. Please try again.",
         status: "error",
+        title: "Login failed",
       });
     }
   };
+
+  const togglePassword = useCallback(() => setShowPassword((v) => !v), []);
+
+  const onCheckedChange = useCallback(
+    (checked: boolean) => form.setValue("rememberMe", checked),
+    [form]
+  );
 
   return (
     <Form {...form}>
@@ -94,6 +101,7 @@ export default function Login() {
         <FormField
           control={form.control}
           name="email"
+          // biome-ignore lint/performance/noJsxPropsBind: standard react-hook-form pattern
           render={({ field }) => (
             <FormItem>
               <FormLabel>Email</FormLabel>
@@ -112,6 +120,7 @@ export default function Login() {
         <FormField
           control={form.control}
           name="password"
+          // biome-ignore lint/performance/noJsxPropsBind: standard react-hook-form pattern
           render={({ field }) => (
             <FormItem>
               <FormLabel>Password</FormLabel>
@@ -125,7 +134,7 @@ export default function Login() {
                   <InputGroupAddon align="inline-end">
                     <button
                       className="pe-2 hover:cursor-pointer"
-                      onClick={() => setShowPassword((v) => !v)}
+                      onClick={togglePassword}
                       type="button"
                     >
                       {showPassword ? (
@@ -145,12 +154,13 @@ export default function Login() {
           <FormField
             control={form.control}
             name="rememberMe"
+            // biome-ignore lint/performance/noJsxPropsBind: standard react-hook-form pattern
             render={({ field }) => (
               <FormItem className="flex flex-row items-center space-x-1">
                 <FormControl>
                   <Checkbox
                     checked={field.value}
-                    onCheckedChange={(checked) => field.onChange(checked)}
+                    onCheckedChange={onCheckedChange}
                   />
                 </FormControl>
                 <FormLabel>Remember me</FormLabel>

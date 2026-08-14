@@ -29,6 +29,7 @@ function ScrollButton({
           : "translate-y-0 scale-100 opacity-100",
         className
       )}
+      // biome-ignore lint/performance/noJsxPropsBind: scroll handler
       onClick={() => scrollToBottom()}
       size={size}
       variant={variant}

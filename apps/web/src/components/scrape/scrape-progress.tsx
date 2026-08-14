@@ -37,7 +37,7 @@ export const ScrapeProgress = () => {
       return;
     }
 
-    if (hasShownToastRef.current || dialogState) {
+    if (dialogState) {
       return;
     }
 
@@ -49,11 +49,11 @@ export const ScrapeProgress = () => {
     hasShownToastRef.current = true;
     lastToastTimeRef.current = now;
     toast({
-      title: "Website is being scraped",
       button: {
         label: "View progress",
         onClick: () => setDialogState(true),
       },
+      title: "Website is being scraped",
     });
   }, [scrapeData, dialogState, setDialogState]);
 
@@ -75,7 +75,7 @@ export const ScrapeProgress = () => {
           }
         }
 
-        return Array.from(map, ([url, progress]) => ({ url, progress }));
+        return Array.from(map, ([url, progress]) => ({ progress, url }));
       });
     });
   }, [token]);

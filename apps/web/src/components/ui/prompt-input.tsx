@@ -26,15 +26,15 @@ interface PromptInputContextType {
 }
 
 const PromptInputContext = createContext<PromptInputContextType>({
+  disabled: false,
   isLoading: false,
-  value: "",
+  maxHeight: 240,
+  onSubmit: undefined,
   setValue: () => {
     // noop
   },
-  maxHeight: 240,
-  onSubmit: undefined,
-  disabled: false,
   textareaRef: React.createRef<HTMLTextAreaElement>(),
+  value: "",
 });
 
 function usePromptInput() {
@@ -76,11 +76,11 @@ function PromptInput({
     <PromptInputContext.Provider
       value={{
         isLoading,
-        value: value ?? internalValue,
-        setValue: onValueChange ?? handleChange,
         maxHeight,
         onSubmit,
+        setValue: onValueChange ?? handleChange,
         textareaRef,
+        value: value ?? internalValue,
       }}
     >
       {/** biome-ignore lint/a11y: If user clicks anywhere in input box, it should focus to it */}
@@ -89,6 +89,7 @@ function PromptInput({
           "cursor-text rounded-3xl border border-input bg-background p-2 shadow-xs",
           className
         )}
+        // biome-ignore lint/performance/noJsxPropsBind: focus handler
         onClick={() => textareaRef.current?.focus()}
       >
         {children}
@@ -110,7 +111,6 @@ function PromptInputTextarea({
   const { value, setValue, maxHeight, onSubmit, disabled, textareaRef } =
     usePromptInput();
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: Ignore
   useEffect(() => {
     if (disableAutosize) {
       return;
@@ -145,7 +145,9 @@ function PromptInputTextarea({
         className
       )}
       disabled={disabled}
+      // biome-ignore lint/performance/noJsxPropsBind: input change handler
       onChange={(e) => setValue(e.target.value)}
+      // biome-ignore lint/performance/noJsxPropsBind: key handler
       onKeyDown={handleKeyDown}
       ref={textareaRef}
       rows={1}
@@ -190,6 +192,7 @@ function PromptInputAction({
       <TooltipTrigger
         asChild
         disabled={disabled}
+        // biome-ignore lint/performance/noJsxPropsBind: stop propagation
         onClick={(event) => event.stopPropagation()}
       >
         {children}

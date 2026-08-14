@@ -36,5 +36,5 @@ export const useLocalStorage = (key: string) => {
     }
   };
 
-  return { setItem, getItem, removeItem };
+  return { getItem, removeItem, setItem };
 };

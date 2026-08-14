@@ -34,7 +34,7 @@ export function QueryPromptUrlProvider({ children }: { children: ReactNode }) {
 
   return (
     <QueryPromptUrlContext.Provider
-      value={{ url, setUrl, clearUrl, superUrl, setSuperUrl }}
+      value={{ clearUrl, setSuperUrl, setUrl, superUrl, url }}
     >
       {children}
     </QueryPromptUrlContext.Provider>

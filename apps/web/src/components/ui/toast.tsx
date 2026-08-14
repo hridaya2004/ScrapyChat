@@ -104,6 +104,7 @@ function Toast({ title, description, button, id, status }: ToastProps) {
       {button ? (
         <div className="shrink-0">
           <Button
+            // biome-ignore lint/performance/noJsxPropsBind: toast action handler
             onClick={() => {
               button?.onClick();
               sonnerToast.dismiss(id);
@@ -120,17 +121,17 @@ function Toast({ title, description, button, id, status }: ToastProps) {
   );
 }
 
-function toast(toast: Omit<ToastProps, "id">) {
-  triggerToastHaptic(toast.status);
+function toast(toastProps: Omit<ToastProps, "id">) {
+  triggerToastHaptic(toastProps.status);
 
   return sonnerToast.custom(
     (id) => (
       <Toast
-        button={toast?.button}
-        description={toast?.description}
+        button={toastProps.button}
+        description={toastProps.description}
         id={id}
-        status={toast?.status}
-        title={toast.title}
+        status={toastProps.status}
+        title={toastProps.title}
       />
     ),
     {

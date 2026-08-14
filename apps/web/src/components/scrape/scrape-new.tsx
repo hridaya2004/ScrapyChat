@@ -39,11 +39,11 @@ export default function ScrapeNew() {
   const [loading, setLoading] = useState(false);
 
   const scrapeNewUrlForm = useForm<ScrapeNewType>({
-    resolver: zodResolver(scrapeNewSchema),
     defaultValues: {
-      url: "",
       deep_search: false,
+      url: "",
     },
+    resolver: zodResolver(scrapeNewSchema),
   });
 
   const htmlFormId = useId();
@@ -93,6 +93,7 @@ export default function ScrapeNew() {
               <Controller
                 control={scrapeNewUrlForm.control}
                 name="url"
+                // biome-ignore lint/performance/noJsxPropsBind: standard react-hook-form pattern
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <Input
@@ -112,6 +113,7 @@ export default function ScrapeNew() {
               <Controller
                 control={scrapeNewUrlForm.control}
                 name="deep_search"
+                // biome-ignore lint/performance/noJsxPropsBind: standard react-hook-form pattern
                 render={({ field }) => (
                   <Field orientation="horizontal">
                     <Checkbox

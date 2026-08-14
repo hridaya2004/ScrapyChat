@@ -14,10 +14,10 @@ interface AuthContextProps {
 }
 
 const initialAuthState: AuthContextProps = {
+  error: undefined,
+  loading: true,
   token: null,
   user: null,
-  loading: true,
-  error: undefined,
 };
 
 const AuthContext = createContext<AuthContextProps>(initialAuthState);
@@ -44,7 +44,7 @@ export const AuthContextProvider = ({
     isPending: tokenLoading,
     error: tokenError,
   } = useQuery({
-    queryKey: ["auth-token", sessionData?.session?.id],
+    enabled: hasSession,
     queryFn: async () => {
       const { data, error } = await authClient.token();
       if (error) {
@@ -52,7 +52,7 @@ export const AuthContextProvider = ({
       }
       return data?.token ?? null;
     },
-    enabled: hasSession,
+    queryKey: ["auth-token", sessionData?.session?.id],
   });
 
   const clearAuthState = () => {
@@ -66,12 +66,12 @@ export const AuthContextProvider = ({
   return (
     <AuthContext.Provider
       value={{
+        clearAuthState,
+        error: tokenError?.message || sessionError?.message,
+        errorStatusCode: (tokenError as { status?: number }).status,
+        loading: sessionLoading || (hasSession ? tokenLoading : false),
         token: hasSession ? (token ?? null) : null,
         user: sessionData?.user ?? null,
-        loading: sessionLoading || (hasSession ? tokenLoading : false),
-        error: tokenError?.message || sessionError?.message,
-        errorStatusCode: (tokenError as { status?: number })?.status,
-        clearAuthState,
       }}
     >
       {children}

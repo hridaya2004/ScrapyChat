@@ -84,10 +84,10 @@ export default function AboutSection() {
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ["github-contributors"],
     queryFn: fetchContributors,
-    staleTime: 1000 * 60 * 10,
+    queryKey: ["github-contributors"],
     retry: 2,
+    staleTime: 1000 * 60 * 10,
   });
 
   return (
@@ -135,7 +135,6 @@ export default function AboutSection() {
             {isLoading && (
               <div className="flex flex-wrap gap-3 pt-2">
                 {Array.from({ length: 6 }).map((_, i) => (
-                  // biome-ignore lint/suspicious/noArrayIndexKey: static skeleton placeholders never reorder
                   <ContributorSkeleton key={i} />
                 ))}
               </div>

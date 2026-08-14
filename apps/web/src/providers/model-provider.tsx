@@ -18,13 +18,13 @@ interface ModelProviderContextProps {
 
 const initialModelContextState: ModelProviderContextProps = {
   models: {},
-  selectedModel: "",
   refreshModels: () => {
     //noop
   },
   refreshSelectedModel: () => {
     //noop
   },
+  selectedModel: "",
 };
 
 const ModelContext = createContext<ModelProviderContextProps>(
@@ -61,7 +61,7 @@ export function ModelContextProvider({
 
   return (
     <ModelContext.Provider
-      value={{ models, refreshModels, selectedModel, refreshSelectedModel }}
+      value={{ models, refreshModels, refreshSelectedModel, selectedModel }}
     >
       {children}
     </ModelContext.Provider>

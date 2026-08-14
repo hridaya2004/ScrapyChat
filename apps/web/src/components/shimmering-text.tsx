@@ -48,7 +48,7 @@ export function ShimmeringText({
   shimmerColor,
 }: ShimmeringTextProps) {
   const ref = useRef<HTMLSpanElement>(null);
-  const isInView = useInView(ref, { once, margin: inViewMargin });
+  const isInView = useInView(ref, { margin: inViewMargin, once });
 
   // Calculate dynamic spread based on text length
   const dynamicSpread = useMemo(() => text.length * spread, [text, spread]);
@@ -90,15 +90,15 @@ export function ShimmeringText({
       }
       transition={{
         backgroundPosition: {
-          repeat: repeat ? Number.POSITIVE_INFINITY : 0,
-          duration,
           delay,
-          repeatDelay,
+          duration,
           ease: "linear",
+          repeat: repeat ? Number.POSITIVE_INFINITY : 0,
+          repeatDelay,
         },
         opacity: {
-          duration: 0.3,
           delay,
+          duration: 0.3,
         },
       }}
     >

@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
 import {
@@ -30,7 +30,6 @@ import { toast } from "@/components/ui/toast";
 import { authClient } from "@/lib/auth-client";
 
 const resetFormSchema = z.object({
-  token: z.string(),
   newPassword: z
     .string({
       error: "Password is required",
@@ -45,20 +44,23 @@ const resetFormSchema = z.object({
       error:
         "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
     }),
+  token: z.string(),
 });
 export default function ResetPass({ token }: { token: string }) {
   // only resetForm if token is there
   const resetForm = useForm<z.infer<typeof resetFormSchema>>({
-    resolver: zodResolver(resetFormSchema),
     defaultValues: {
       newPassword: "",
       token,
     },
+    resolver: zodResolver(resetFormSchema),
   });
 
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const togglePassword = useCallback(() => setShowPassword((v) => !v), []);
 
   const onReset = async (resetData: z.infer<typeof resetFormSchema>) => {
     setLoading(true);
@@ -70,8 +72,8 @@ export default function ResetPass({ token }: { token: string }) {
 
       if (error) {
         toast({
-          title: "Failed to update the password",
           description: error.message,
+          title: "Failed to update the password",
         });
         return;
       }
@@ -82,8 +84,8 @@ export default function ResetPass({ token }: { token: string }) {
       }
     } catch {
       toast({
-        title: "Failed to update password",
         description: "Failed in sending updated password",
+        title: "Failed to update password",
       });
     } finally {
       setLoading(false);
@@ -106,6 +108,7 @@ export default function ResetPass({ token }: { token: string }) {
             <FormField
               control={resetForm.control}
               name="newPassword"
+              // biome-ignore lint/performance/noJsxPropsBind: standard react-hook-form pattern
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
@@ -118,7 +121,7 @@ export default function ResetPass({ token }: { token: string }) {
                       <InputGroupAddon align="inline-end">
                         <button
                           className="pe-2 hover:cursor-pointer"
-                          onClick={() => setShowPassword((v) => !v)}
+                          onClick={togglePassword}
                           type="button"
                         >
                           {showPassword ? (

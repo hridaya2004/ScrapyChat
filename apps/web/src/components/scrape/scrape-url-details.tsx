@@ -1,7 +1,7 @@
 "use client";
 
 import { ChevronRight, FileText, Trash2, XIcon } from "lucide-react";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { cn } from "@/lib/utils";
 import { useAuthContext } from "@/providers/auth-context-provider";
 import { useDialog } from "@/providers/dialog-context-provider";
@@ -44,10 +44,18 @@ export default function ScrapeUrlDetails({
 
   let hostname = baseUrl;
   try {
-    hostname = new URL(baseUrl).hostname;
+    ({ hostname } = new URL(baseUrl));
   } catch {
     // keep as-is
   }
+
+  const handleDialogOutside = useCallback(
+    (e: Event) => {
+      setDialogState(true);
+      e.preventDefault();
+    },
+    [setDialogState]
+  );
 
   const handleDelete = (e: React.MouseEvent, url: string) => {
     e.stopPropagation();
@@ -70,6 +78,7 @@ export default function ScrapeUrlDetails({
       <DialogTrigger asChild>
         <Button
           className="h-7 w-7 rounded-full"
+          // biome-ignore lint/performance/noJsxPropsBind: event delegation
           onClick={(e) => {
             e.stopPropagation();
           }}
@@ -81,14 +90,8 @@ export default function ScrapeUrlDetails({
       </DialogTrigger>
       <DialogContent
         className="flex max-h-[80vh] flex-col gap-0 overflow-hidden rounded-3xl p-0"
-        onInteractOutside={(e) => {
-          setDialogState(true);
-          e.preventDefault();
-        }}
-        onPointerDownOutside={(e) => {
-          setDialogState(true);
-          e.preventDefault();
-        }}
+        onInteractOutside={handleDialogOutside}
+        onPointerDownOutside={handleDialogOutside}
         showCloseButton={false}
       >
         <DialogHeader className="flex-row items-center justify-between px-6 pt-6 pb-4">
@@ -123,6 +126,7 @@ export default function ScrapeUrlDetails({
                       : "hover:bg-accent/50"
                   )}
                   key={specificUrl}
+                  // biome-ignore lint/performance/noJsxPropsBind: event delegation
                   onClick={() => {
                     onUrlSelect(specificUrl);
                     setDialogState(false);
@@ -137,6 +141,7 @@ export default function ScrapeUrlDetails({
                       <Button
                         className="h-7 w-7 shrink-0 rounded-full"
                         disabled={deletingUrl === specificUrl}
+                        // biome-ignore lint/performance/noJsxPropsBind: event delegation
                         onClick={(e) => handleDelete(e, specificUrl)}
                         size="icon"
                         variant="ghost"

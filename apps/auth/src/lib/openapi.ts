@@ -2,9 +2,13 @@
 import { auth } from "./auth";
 
 let _schema: ReturnType<typeof auth.api.generateOpenAPISchema>;
-const getSchema = async () => (_schema ??= auth.api.generateOpenAPISchema());
+const getSchema = () => {
+  _schema ??= auth.api.generateOpenAPISchema();
+  return _schema;
+};
 
 export const OpenAPI = {
+  components: getSchema().then(({ components }) => components) as Promise<any>,
   getPaths: (prefix = "/api/auth") =>
     getSchema().then(({ paths }) => {
       const reference: typeof paths = Object.create(null);
@@ -22,5 +26,4 @@ export const OpenAPI = {
 
       return reference;
     }) as Promise<any>,
-  components: getSchema().then(({ components }) => components) as Promise<any>,
 } as const;

@@ -28,10 +28,10 @@ const changeEmailSchema = z.object({
 
 export default function ChangeEmail() {
   const emailForm = useForm<z.infer<typeof changeEmailSchema>>({
-    resolver: zodResolver(changeEmailSchema),
     defaultValues: {
       newEmail: "",
     },
+    resolver: zodResolver(changeEmailSchema),
   });
 
   const onSubmit = (_values: z.infer<typeof changeEmailSchema>) => {
@@ -67,6 +67,7 @@ export default function ChangeEmail() {
             <FormField
               control={emailForm.control}
               name="newEmail"
+              // biome-ignore lint/performance/noJsxPropsBind: standard react-hook-form pattern
               render={({ field }) => (
                 <FormItem className="w-fit">
                   <FormControl>

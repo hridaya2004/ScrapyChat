@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
 import { Button } from "@/components/ui/button";
@@ -53,12 +53,17 @@ const getSchema = (oauth: boolean) =>
 export default function DeleteUser({ oauth = false }: { oauth: boolean }) {
   const [showPassword, setShowPassword] = useState(false);
 
+  const togglePassword = useCallback(
+    () => setShowPassword((prev) => !prev),
+    []
+  );
+
   const schema = getSchema(oauth);
   const deleteUserForm = useForm<z.infer<typeof schema>>({
-    resolver: zodResolver(schema),
     defaultValues: {
       password: "",
     },
+    resolver: zodResolver(schema),
   });
 
   const onDelete = async (values: z.infer<typeof schema>) => {
@@ -66,33 +71,33 @@ export default function DeleteUser({ oauth = false }: { oauth: boolean }) {
 
     try {
       toast({
-        title: "Deleting account",
         status: "loading",
+        title: "Deleting account",
       });
       const response = await authClient.deleteUser({
         callbackURL: "/auth",
         ...(!oauth && { password: values.password }),
         fetchOptions: {
-          credentials: "include",
           auth: {
-            type: "Bearer",
             token: data?.token,
+            type: "Bearer",
           },
+          credentials: "include",
         },
       });
 
       if (response.data?.success) {
         toast({
-          title: "Email for verification sent.",
           description:
             "Delete verification email has been sent to your account.",
           status: "success",
+          title: "Email for verification sent.",
         });
       }
     } catch {
       toast({
-        title: "Failed to delete account",
         status: "error",
+        title: "Failed to delete account",
       });
     }
   };
@@ -112,6 +117,7 @@ export default function DeleteUser({ oauth = false }: { oauth: boolean }) {
                 <FormField
                   control={deleteUserForm.control}
                   name="password"
+                  // biome-ignore lint/performance/noJsxPropsBind: standard react-hook-form pattern
                   render={({ field }) => (
                     <FormItem className="w-fit">
                       <FormControl>
@@ -128,9 +134,7 @@ export default function DeleteUser({ oauth = false }: { oauth: boolean }) {
                               <TooltipTrigger asChild>
                                 <InputGroupButton
                                   className="rounded-full"
-                                  onClick={() =>
-                                    setShowPassword((prev) => !prev)
-                                  }
+                                  onClick={togglePassword}
                                   size="icon-xs"
                                 >
                                   {showPassword ? <EyeOffIcon /> : <EyeIcon />}

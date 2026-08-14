@@ -13,11 +13,11 @@ const getDevelopmentUrl = () => {
 };
 
 export const apiConfig = {
-  get baseUrl() {
-    return getDevelopmentUrl();
-  },
   authUrl:
     process.env.NODE_ENV === "development"
       ? "http://localhost:3001/api"
       : "/api",
+  get baseUrl() {
+    return getDevelopmentUrl();
+  },
 };

@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
 import { authClient } from "@/lib/auth-client";
@@ -30,6 +30,9 @@ export const STRONG_PASSWORD_REGEX =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()\-_=+{}[\]|;:'",.<>/?]).{8,}$/;
 
 const signUpFormSchema = z.object({
+  email: z.email({
+    error: "Email is required",
+  }),
   name: z
     .string({
       error: "Name is required",
@@ -40,9 +43,6 @@ const signUpFormSchema = z.object({
     .max(100, {
       error: "Name must be at most 100 characters",
     }),
-  email: z.email({
-    error: "Email is required",
-  }),
   password: z
     .string({
       error: "Password is required",
@@ -61,15 +61,17 @@ const signUpFormSchema = z.object({
 
 export default function Register() {
   const form = useForm<z.infer<typeof signUpFormSchema>>({
-    resolver: zodResolver(signUpFormSchema),
     defaultValues: {
-      name: "",
       email: "",
+      name: "",
       password: "",
     },
+    resolver: zodResolver(signUpFormSchema),
   });
 
   const [showPassword, setShowPassword] = useState(false);
+
+  const togglePassword = useCallback(() => setShowPassword((v) => !v), []);
 
   const onSubmit = async (values: z.infer<typeof signUpFormSchema>) => {
     const { data, error } = await authClient.signUp.email({
@@ -77,16 +79,16 @@ export default function Register() {
     });
     if (data && !data.user.emailVerified) {
       toast({
-        title: "Email registered, check your inbox",
         description: "We've sent you a verification email.",
         status: "info",
+        title: "Email registered, check your inbox",
       });
     }
     if (error) {
       toast({
-        title: "Registration failed",
         description: error.message,
         status: "error",
+        title: "Registration failed",
       });
     }
   };
@@ -100,6 +102,7 @@ export default function Register() {
         <FormField
           control={form.control}
           name="name"
+          // biome-ignore lint/performance/noJsxPropsBind: standard react-hook-form pattern
           render={({ field }) => (
             <FormItem>
               <FormLabel>Name</FormLabel>
@@ -118,6 +121,7 @@ export default function Register() {
         <FormField
           control={form.control}
           name="email"
+          // biome-ignore lint/performance/noJsxPropsBind: standard react-hook-form pattern
           render={({ field }) => (
             <FormItem>
               <FormLabel>Email</FormLabel>
@@ -136,6 +140,7 @@ export default function Register() {
         <FormField
           control={form.control}
           name="password"
+          // biome-ignore lint/performance/noJsxPropsBind: standard react-hook-form pattern
           render={({ field }) => (
             <FormItem>
               <FormLabel>Password</FormLabel>
@@ -149,7 +154,7 @@ export default function Register() {
                   <InputGroupAddon align="inline-end">
                     <button
                       className="pe-2 hover:cursor-pointer"
-                      onClick={() => setShowPassword((v) => !v)}
+                      onClick={togglePassword}
                       type="button"
                     >
                       {showPassword ? (

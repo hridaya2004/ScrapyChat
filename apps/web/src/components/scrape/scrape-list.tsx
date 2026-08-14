@@ -41,9 +41,9 @@ export default function ScrapeList() {
   const [deletingAll, setDeletingAll] = useState(false);
 
   const { data, refetch } = useQuery({
-    queryKey: ["scrapeList"],
-    queryFn: () => getScrapeList(token?.trim() ? token : ""),
     enabled: !!token?.trim(),
+    queryFn: () => getScrapeList(token?.trim() ? token : ""),
+    queryKey: ["scrapeList"],
   });
 
   const [debouncedRefetch, isRefreshing] = useDebounce(() => refetch(), 2000);
@@ -99,13 +99,13 @@ export default function ScrapeList() {
     setUrl?.(value);
     setSuperUrl(true);
     toast({
-      title: "Updated context URL",
-      description: `${value}`,
-      status: "info",
       button: {
         label: "Clear",
         onClick: clearUrl,
       },
+      description: `${value}`,
+      status: "info",
+      title: "Updated context URL",
     });
     setDialogState(false);
   };
@@ -118,22 +118,22 @@ export default function ScrapeList() {
     setUrl?.(value);
     setSuperUrl(false);
     toast({
-      title: "Updated context URL",
-      description: `${value}`,
-      status: "info",
       button: {
         label: "Clear",
         onClick: clearUrl,
       },
+      description: `${value}`,
+      status: "info",
+      title: "Updated context URL",
     });
     setDialogState(false);
   };
 
-  const getBaseUrl = (url: string) => {
+  const getHostnameFromUrl = (targetUrl: string) => {
     try {
-      return new URL(url).hostname;
+      return new URL(targetUrl).hostname;
     } catch {
-      return url;
+      return targetUrl;
     }
   };
 
@@ -221,7 +221,7 @@ export default function ScrapeList() {
               <Button
                 className="rounded-full"
                 disabled={isRefreshing}
-                onClick={() => debouncedRefetch()}
+                onClick={debouncedRefetch}
                 size="icon"
                 variant="ghost"
               >
@@ -254,7 +254,9 @@ export default function ScrapeList() {
               {uniqueBaseUrls.map((baseUrl) => (
                 <ScrapeListItem
                   baseUrl={baseUrl}
-                  isSelected={getBaseUrl(url) === getBaseUrl(baseUrl)}
+                  isSelected={
+                    getHostnameFromUrl(url) === getHostnameFromUrl(baseUrl)
+                  }
                   key={baseUrl}
                   onSelect={handleValueChange}
                   onUrlDeleted={handleUrlDeleted}

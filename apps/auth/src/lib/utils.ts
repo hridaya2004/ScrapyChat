@@ -14,13 +14,13 @@ export async function encryptData(apiKey: string, encryptionSecret: string) {
 
   const key = await crypto.subtle.deriveKey(
     {
+      hash: "SHA-256",
+      iterations: 100_000,
       name: "PBKDF2",
       salt,
-      iterations: 100_000,
-      hash: "SHA-256",
     },
     keyMaterial,
-    { name: "AES-GCM", length: 256 },
+    { length: 256, name: "AES-GCM" },
     false,
     ["encrypt"]
   );
@@ -29,8 +29,8 @@ export async function encryptData(apiKey: string, encryptionSecret: string) {
 
   const encryptedData = await crypto.subtle.encrypt(
     {
-      name: "AES-GCM",
       iv,
+      name: "AES-GCM",
     },
     key,
     data
@@ -68,21 +68,21 @@ export async function decryptData(
 
   const key = await crypto.subtle.deriveKey(
     {
+      hash: "SHA-256",
+      iterations: 100_000,
       name: "PBKDF2",
       salt,
-      iterations: 100_000,
-      hash: "SHA-256",
     },
     keyMaterial,
-    { name: "AES-GCM", length: 256 },
+    { length: 256, name: "AES-GCM" },
     false,
     ["decrypt"]
   );
 
   const decrypted = await crypto.subtle.decrypt(
     {
-      name: "AES-GCM",
       iv,
+      name: "AES-GCM",
     },
     key,
     encryptedData

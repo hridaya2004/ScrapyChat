@@ -6,8 +6,8 @@ import { siteConfig } from "@/config/metadata";
 export const alt = "ScrapyChat — Scrape any website and chat with its content";
 
 export const size = {
-  width: 1200,
   height: 630,
+  width: 1200,
 };
 
 export const contentType = "image/png";
@@ -25,25 +25,25 @@ export default async function Image() {
     <div
       style={{
         background: "linear-gradient(145deg, #ffffff 0%, #f0f0f0 100%)",
-        width: "100%",
-        height: "100%",
         display: "flex",
         flexDirection: "column",
+        fontFamily: "Geist Sans",
+        height: "100%",
         justifyContent: "center",
         padding: "80px",
-        fontFamily: "Geist Sans",
         position: "relative",
+        width: "100%",
       }}
     >
       {/* Subtle grid */}
       <div
         style={{
-          position: "absolute",
-          inset: 0,
           backgroundImage:
             "linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px)",
           backgroundSize: "64px 64px",
           display: "flex",
+          inset: 0,
+          position: "absolute",
         }}
       />
 
@@ -56,7 +56,7 @@ export default async function Image() {
           position: "relative",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+        <div style={{ alignItems: "center", display: "flex", gap: "12px" }}>
           {/* biome-ignore lint/performance/noImgElement: ImageResponse requires native <img> */}
           <img
             alt="ScrapyChat"
@@ -67,8 +67,8 @@ export default async function Image() {
           />
           <span
             style={{
-              fontSize: "20px",
               color: "#71717a",
+              fontSize: "20px",
               fontWeight: 400,
               letterSpacing: "-0.01em",
             }}
@@ -79,11 +79,11 @@ export default async function Image() {
 
         <h1
           style={{
+            color: "#09090b",
             fontSize: "72px",
             fontWeight: 700,
-            color: "#09090b",
-            lineHeight: 1.1,
             letterSpacing: "-0.04em",
+            lineHeight: 1.1,
             margin: 0,
             maxWidth: "900px",
           }}
@@ -93,12 +93,12 @@ export default async function Image() {
 
         <p
           style={{
-            fontSize: "26px",
             color: "#52525b",
+            fontSize: "26px",
+            fontWeight: 400,
             lineHeight: 1.5,
             margin: 0,
             maxWidth: "700px",
-            fontWeight: 400,
           }}
         >
           {siteConfig.description}
@@ -109,14 +109,14 @@ export default async function Image() {
       ...size,
       fonts: [
         {
-          name: "Geist Sans",
           data: fontRegular,
+          name: "Geist Sans",
           style: "normal",
           weight: 400,
         },
         {
-          name: "Geist Sans",
           data: fontBold,
+          name: "Geist Sans",
           style: "normal",
           weight: 700,
         },

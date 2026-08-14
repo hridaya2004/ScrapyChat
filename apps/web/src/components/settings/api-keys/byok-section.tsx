@@ -56,14 +56,14 @@ interface Provider {
 
 const PROVIDERS: Provider[] = [
   {
-    id: "google_genai",
-    name: "Gemma 4",
-    model: "gemma-4-31b-it",
+    defaultKey: "AIza............",
+    getKeyUrl: "https://ai.google.dev/gemini-api/docs/api-key",
     icon: GoogleIcon,
+    id: "google_genai",
+    model: "gemma-4-31b-it",
+    name: "Gemma 4",
     paid: true,
     placeholder: "AIza............",
-    getKeyUrl: "https://ai.google.dev/gemini-api/docs/api-key",
-    defaultKey: "AIza............",
   },
 ];
 
@@ -118,16 +118,16 @@ export const BYOKSection = () => {
       modelName: string;
     }) => {
       const res = await fetch(`${apiConfig.authUrl}/api-keys/encrypt`, {
-        method: "POST",
+        body: JSON.stringify({
+          apiKey,
+          modelName,
+          provider,
+        }),
         credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          provider,
-          apiKey,
-          modelName,
-        }),
+        method: "POST",
       });
 
       if (!res.ok) {
@@ -135,6 +135,14 @@ export const BYOKSection = () => {
       }
 
       return res.json();
+    },
+    onError: (_, { provider }) => {
+      const providerConfig = PROVIDERS.find((p) => p.id === provider);
+      toast({
+        description: `Failed to save ${providerConfig?.name} API key. Please try again.`,
+        status: "error",
+        title: "Failed to save API key",
+      });
     },
     onSuccess: (response, { provider }) => {
       const providerConfig = PROVIDERS.find((p) => p.id === provider);
@@ -146,8 +154,8 @@ export const BYOKSection = () => {
       });
 
       toast({
-        title: "API key saved",
         description: `Your ${providerConfig?.name} API key has been saved.`,
+        title: "API key saved",
       });
 
       refreshModels();
@@ -155,14 +163,6 @@ export const BYOKSection = () => {
         ...prev,
         [provider]: parsed.apiKey || "",
       }));
-    },
-    onError: (_, { provider }) => {
-      const providerConfig = PROVIDERS.find((p) => p.id === provider);
-      toast({
-        title: "Failed to save API key",
-        description: `Failed to save ${providerConfig?.name} API key. Please try again.`,
-        status: "error",
-      });
     },
   });
 
@@ -175,6 +175,16 @@ export const BYOKSection = () => {
 
       return providerId;
     },
+    onError: (_, provider) => {
+      const providerConfig = PROVIDERS.find((p) => p.id === provider);
+      toast({
+        description: `Failed to delete ${providerConfig?.name} API key. Please try again.`,
+        status: "error",
+        title: "Failed to delete API key",
+      });
+      setDeleteDialogOpen(false);
+      setProviderToDelete("");
+    },
     onSuccess: (providerId: string) => {
       const providerConfig = PROVIDERS.find((p) => p.id === providerId);
 
@@ -183,22 +193,12 @@ export const BYOKSection = () => {
       setModel(updatedModels);
 
       toast({
-        title: "API key deleted",
         description: `Your ${providerConfig?.name} API key has been deleted.`,
+        title: "API key deleted",
       });
 
       refreshModels();
       setApiKeys((prev) => ({ ...prev, [providerId]: "" }));
-      setDeleteDialogOpen(false);
-      setProviderToDelete("");
-    },
-    onError: (_, provider) => {
-      const providerConfig = PROVIDERS.find((p) => p.id === provider);
-      toast({
-        title: "Failed to delete API key",
-        description: `Failed to delete ${providerConfig?.name} API key. Please try again.`,
-        status: "error",
-      });
       setDeleteDialogOpen(false);
       setProviderToDelete("");
     },
@@ -220,15 +220,15 @@ export const BYOKSection = () => {
     const model = getModelName(providerId);
     if (!value) {
       toast({
-        title: "Empty API key",
         description: "Please enter valid API key.",
+        title: "Empty API key",
       });
       return;
     }
     saveMutation.mutate({
-      provider: providerId,
       apiKey: value,
       modelName: model,
+      provider: providerId,
     });
   };
 
@@ -254,6 +254,7 @@ export const BYOKSection = () => {
                       : "border-border"
                   )}
                   key={provider.id}
+                  // biome-ignore lint/performance/noJsxPropsBind: provider selection handler
                   onClick={() => {
                     setSelectedProvider(provider.id);
                     refreshSelectedModel();
@@ -293,6 +294,7 @@ export const BYOKSection = () => {
                   className="rounded-3xl"
                   disabled={saveMutation.isPending}
                   id={`${selectedProvider}-key`}
+                  // biome-ignore lint/performance/noJsxPropsBind: API key input handler
                   onChange={(e) =>
                     setApiKeys((prev) => ({
                       ...prev,
@@ -306,6 +308,7 @@ export const BYOKSection = () => {
                 <InputGroupAddon align="inline-end">
                   <button
                     className="pe-2 hover:cursor-pointer"
+                    // biome-ignore lint/performance/noJsxPropsBind: toggle visibility
                     onClick={() => setShowApiKey((v) => !v)}
                     type="button"
                   >
@@ -345,6 +348,7 @@ export const BYOKSection = () => {
                       disabled={
                         deleteMutation.isPending || saveMutation.isPending
                       }
+                      // biome-ignore lint/performance/noJsxPropsBind: delete handler
                       onClick={() => handleDeleteClick(selectedProvider)}
                       type="button"
                       variant="outline"
@@ -358,6 +362,7 @@ export const BYOKSection = () => {
                     disabled={
                       saveMutation.isPending || deleteMutation.isPending
                     }
+                    // biome-ignore lint/performance/noJsxPropsBind: save handler
                     onClick={() => handleSave(selectedProvider)}
                     type="button"
                   >

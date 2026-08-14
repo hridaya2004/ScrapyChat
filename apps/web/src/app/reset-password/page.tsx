@@ -3,12 +3,12 @@ import { Suspense } from "react";
 import { ResetPassword } from "@/components/reset-password";
 
 export const metadata: Metadata = {
-  title: "Reset Password",
   description: "Reset your ScrapyChat account password.",
   robots: {
-    index: false,
     follow: false,
+    index: false,
   },
+  title: "Reset Password",
 };
 
 export default async function Page({

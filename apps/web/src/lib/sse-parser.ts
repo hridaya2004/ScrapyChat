@@ -39,7 +39,9 @@ const streamSSEResponse = async (
   const decoder = new TextDecoder();
   let buffer = "";
 
+  // biome-ignore lint/suspicious/noUnnecessaryConditions: streaming reader loop
   while (true) {
+    // biome-ignore lint/performance/noAwaitInLoops: streaming reader loop
     const { value, done } = await reader.read();
 
     if (done) {

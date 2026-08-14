@@ -2,6 +2,7 @@
 
 import { AlertDialog as AlertDialogPrimitive } from "radix-ui";
 import type * as React from "react";
+import { useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useHaptics } from "@/providers/haptics-provider";
@@ -154,10 +155,13 @@ function AlertDialogAction({
   Pick<React.ComponentProps<typeof Button>, "variant" | "size">) {
   const { trigger } = useHaptics();
 
-  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    trigger("warning");
-    onClick?.(e);
-  };
+  const handleClick = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      trigger("warning");
+      onClick?.(e);
+    },
+    [trigger, onClick]
+  );
 
   return (
     <Button asChild size={size} variant={variant}>

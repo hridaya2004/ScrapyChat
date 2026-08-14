@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
 import { Button } from "@/components/ui/button";
@@ -51,16 +51,26 @@ const changePasswordSchema = z.object({
 
 export default function ChangePassword() {
   const passwordForm = useForm<z.infer<typeof changePasswordSchema>>({
-    resolver: zodResolver(changePasswordSchema),
     defaultValues: {
       currentPassword: "",
       newPassword: "",
       revokeOtherSessions: false,
     },
+    resolver: zodResolver(changePasswordSchema),
   });
 
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
+
+  const toggleCurrentPassword = useCallback(
+    () => setShowCurrentPassword((prev) => !prev),
+    []
+  );
+
+  const toggleNewPassword = useCallback(
+    () => setShowNewPassword((prev) => !prev),
+    []
+  );
 
   const onSubmit = async (values: z.infer<typeof changePasswordSchema>) => {
     try {
@@ -71,31 +81,31 @@ export default function ChangePassword() {
       if (error) {
         if (error.code === "INVALID_PASSWORD") {
           toast({
-            title: "Invalid current password",
             description: "Please enter your current password correctly.",
             status: "error",
+            title: "Invalid current password",
           });
         } else {
           toast({
-            title: "Failed to change password",
             description: "Please try again later.",
             status: "error",
+            title: "Failed to change password",
           });
         }
       }
 
       if (data) {
         toast({
-          title: "Password changed successfully",
           description: "Your password has been updated.",
           status: "success",
+          title: "Password changed successfully",
         });
       }
     } catch {
       toast({
-        title: "Failed to change password",
         description: "Please try again later.",
         status: "error",
+        title: "Failed to change password",
       });
     }
   };
@@ -114,6 +124,7 @@ export default function ChangePassword() {
             <FormField
               control={passwordForm.control}
               name="currentPassword"
+              // biome-ignore lint/performance/noJsxPropsBind: standard react-hook-form pattern
               render={({ field }) => (
                 <FormItem className="w-fit">
                   <FormControl>
@@ -130,9 +141,7 @@ export default function ChangePassword() {
                           <TooltipTrigger asChild>
                             <InputGroupButton
                               className="rounded-full"
-                              onClick={() =>
-                                setShowCurrentPassword((prev) => !prev)
-                              }
+                              onClick={toggleCurrentPassword}
                               size="icon-xs"
                             >
                               {showCurrentPassword ? (
@@ -158,6 +167,7 @@ export default function ChangePassword() {
             <FormField
               control={passwordForm.control}
               name="newPassword"
+              // biome-ignore lint/performance/noJsxPropsBind: standard react-hook-form pattern
               render={({ field }) => (
                 <FormItem className="w-fit">
                   <FormControl>
@@ -174,9 +184,7 @@ export default function ChangePassword() {
                           <TooltipTrigger asChild>
                             <InputGroupButton
                               className="rounded-full"
-                              onClick={() =>
-                                setShowNewPassword((prev) => !prev)
-                              }
+                              onClick={toggleNewPassword}
                               size="icon-xs"
                             >
                               {showNewPassword ? <EyeOffIcon /> : <EyeIcon />}
@@ -203,6 +211,7 @@ export default function ChangePassword() {
             <FormField
               control={passwordForm.control}
               name="revokeOtherSessions"
+              // biome-ignore lint/performance/noJsxPropsBind: standard react-hook-form pattern
               render={({ field }) => (
                 <FormItem className="flex w-fit flex-row-reverse items-center gap-2">
                   <FormLabel>Revoke other sessions</FormLabel>

@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useCallback } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -32,10 +33,10 @@ export default function ChangeUserDetails() {
   const { data } = authClient.useSession();
 
   const userDetailsForm = useForm<z.infer<typeof userDetailsSchema>>({
-    resolver: zodResolver(userDetailsSchema),
     defaultValues: {
       name: data?.user.name,
     },
+    resolver: zodResolver(userDetailsSchema),
   });
 
   // changing user's image is yet not supported
@@ -45,6 +46,12 @@ export default function ChangeUserDetails() {
       name: values.name,
     });
   };
+
+  const handleReset = useCallback(() => {
+    userDetailsForm.reset({
+      name: data?.user.name,
+    });
+  }, [userDetailsForm, data?.user.name]);
 
   return (
     <Form {...userDetailsForm}>
@@ -68,6 +75,7 @@ export default function ChangeUserDetails() {
               <FormField
                 control={userDetailsForm.control}
                 name="name"
+                // biome-ignore lint/performance/noJsxPropsBind: standard react-hook-form pattern
                 render={({ field }) => (
                   <FormItem className="w-fit">
                     <FormLabel>Full name</FormLabel>
@@ -84,11 +92,7 @@ export default function ChangeUserDetails() {
             <Button className="rounded-3xl">Save changes</Button>
             <Button
               className="rounded-3xl"
-              onClick={() => {
-                userDetailsForm.reset({
-                  name: data?.user.name,
-                });
-              }}
+              onClick={handleReset}
               type="button"
               variant="ghost"
             >

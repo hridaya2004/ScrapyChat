@@ -21,72 +21,67 @@ try {
   );
   logger.info({ dbPath, dbSizeKb }, "Database connection established");
 } catch (err) {
-  logger.error({ err, dbPath }, "Database connection failed");
+  logger.error({ dbPath, err }, "Database connection failed");
   throw err;
 }
 
 export const auth = betterAuth({
-  database: db,
-
-  appName: "ScrapyChat",
   advanced: {
     useSecureCookies: process.env.NODE_ENV === "production",
   },
 
-  session: {
-    cookieCache: {
-      enabled: process.env.NODE_ENV === "production",
-    },
-  },
+  appName: "ScrapyChat",
 
   baseURL: process.env.BETTER_AUTH_BASE_URL,
+  database: db,
 
   emailAndPassword: {
     enabled: true,
-    revokeSessionsOnPasswordReset: true,
     requireEmailVerification: true,
+    revokeSessionsOnPasswordReset: true,
 
     sendResetPassword: async ({ user, url }) => {
       await mailSender.sendEmail({
-        to: user.email,
         subject: "Reset your password",
         text: `Click the link to reset your password: ${url}`,
+        to: user.email,
       });
     },
   },
 
   emailVerification: {
-    sendOnSignUp: true,
     autoSignInAfterVerification: true,
+    sendOnSignUp: true,
     sendVerificationEmail: async ({ user, url }) => {
       await mailSender.sendEmail({
-        to: user.email,
         subject: "Verify your email address",
         text: `Click the link to verify your email: ${url}`,
+        to: user.email,
       });
     },
   },
 
-  user: {
-    deleteUser: {
-      enabled: true,
-      sendDeleteAccountVerification: async ({ user, url }) => {
-        await mailSender.sendEmail({
-          to: user.email,
-          subject: "Delete account",
-          text: `Click the link to delete your account: ${url}`,
-        });
+  plugins: [
+    lastLoginMethod(),
+    jwt({
+      jwks: {
+        jwksPath: "/.well-known/jwks.json",
+        keyPairConfig: {
+          alg: "EdDSA",
+        },
+        rotationInterval: 86_400,
       },
-    },
-    changeEmail: {
-      enabled: true,
-      sendChangeEmailConfirmation: async ({ user, url }) => {
-        await mailSender.sendEmail({
-          to: user.email,
-          subject: "Approve email change",
-          text: `Click the link to approve the change: ${url}`,
-        });
-      },
+    }),
+    openAPI(),
+  ],
+
+  rateLimit: {
+    enabled: process.env.NODE_ENV === "production",
+  },
+
+  session: {
+    cookieCache: {
+      enabled: process.env.NODE_ENV === "production",
     },
   },
 
@@ -98,31 +93,36 @@ export const auth = betterAuth({
     },
 
     google: {
+      accessType: "offline",
       clientId: process.env.GOOGLE_CLIENT_ID as string,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-      redirectURI: process.env.GOOGLE_REDIRECT_URI as string,
-      accessType: "offline",
       prompt: "select_account consent",
+      redirectURI: process.env.GOOGLE_REDIRECT_URI as string,
     },
   },
 
-  rateLimit: {
-    enabled: process.env.NODE_ENV === "production",
-  },
-
-  plugins: [
-    lastLoginMethod(),
-    jwt({
-      jwks: {
-        keyPairConfig: {
-          alg: "EdDSA",
-        },
-        jwksPath: "/.well-known/jwks.json",
-        rotationInterval: 86_400,
-      },
-    }),
-    openAPI(),
-  ],
-
   trustedOrigins: process.env.TRUSTED_ORIGIN?.split("|"),
+
+  user: {
+    changeEmail: {
+      enabled: true,
+      sendChangeEmailConfirmation: async ({ user, url }) => {
+        await mailSender.sendEmail({
+          subject: "Approve email change",
+          text: `Click the link to approve the change: ${url}`,
+          to: user.email,
+        });
+      },
+    },
+    deleteUser: {
+      enabled: true,
+      sendDeleteAccountVerification: async ({ user, url }) => {
+        await mailSender.sendEmail({
+          subject: "Delete account",
+          text: `Click the link to delete your account: ${url}`,
+          to: user.email,
+        });
+      },
+    },
+  },
 });

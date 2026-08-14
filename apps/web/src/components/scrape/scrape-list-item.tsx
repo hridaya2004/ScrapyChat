@@ -1,7 +1,7 @@
 "use client";
 
 import { Globe, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { cn } from "@/lib/utils";
 import { useAuthContext } from "@/providers/auth-context-provider";
 import { useDialog } from "@/providers/dialog-context-provider";
@@ -37,7 +37,7 @@ export default function ScrapeListItem({
 
   let hostname = baseUrl;
   try {
-    hostname = new URL(baseUrl).hostname;
+    ({ hostname } = new URL(baseUrl));
   } catch {
     // keep as-is
   }
@@ -74,6 +74,12 @@ export default function ScrapeListItem({
     `scrape-url-details${baseUrl}`
   );
 
+  const handleItemClick = useCallback(() => {
+    if (!scrapeUrlDetailsDialogOpen) {
+      onSelect(baseUrl);
+    }
+  }, [scrapeUrlDetailsDialogOpen, onSelect, baseUrl]);
+
   return (
     // biome-ignore lint/a11y: "Hydration issue prevents it from being a button"
     <div
@@ -83,11 +89,7 @@ export default function ScrapeListItem({
           ? "border-primary bg-primary/5 dark:bg-primary/10"
           : "border-border hover:bg-accent/50"
       )}
-      onClick={() => {
-        if (!scrapeUrlDetailsDialogOpen) {
-          onSelect(baseUrl);
-        }
-      }}
+      onClick={handleItemClick}
     >
       <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted">
         <Globe className="h-4 w-4 text-muted-foreground" />

@@ -59,26 +59,27 @@ export function HapticsProvider({
   const haptic = useWebHaptics({ debug: isSoundEnabled });
 
   const setHapticsEnabled = useCallback(
-    (value: boolean) => {
-      setHapticsEnabledState(value);
-      setHapticsEnabledValue(value);
+    (enabled: boolean) => {
+      setHapticsEnabledState(enabled);
+      setHapticsEnabledValue(enabled);
     },
     [setHapticsEnabledValue]
   );
 
   const setSoundEnabled = useCallback(
-    (value: boolean) => {
-      setSoundEnabledState(value);
-      setSoundEnabledValue(value);
+    (enabled: boolean) => {
+      setSoundEnabledState(enabled);
+      setSoundEnabledValue(enabled);
     },
     [setSoundEnabledValue]
   );
 
   const trigger = useCallback(
     (type?: HapticType) => {
-      const { isHapticsEnabled, isSoundEnabled } = stateRef.current;
+      const { isHapticsEnabled: hapticsOn, isSoundEnabled: soundOn } =
+        stateRef.current;
 
-      if ((isHapticsEnabled && WebHaptics.isSupported) || isSoundEnabled) {
+      if ((hapticsOn && WebHaptics.isSupported) || soundOn) {
         haptic.trigger(type);
       }
     },
@@ -88,8 +89,8 @@ export function HapticsProvider({
   const value = useMemo(
     () => ({
       isHapticsEnabled,
-      setHapticsEnabled,
       isSoundEnabled,
+      setHapticsEnabled,
       setSoundEnabled,
       trigger,
     }),

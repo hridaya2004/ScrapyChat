@@ -34,10 +34,10 @@ export function ResetPassword({
 }) {
   const params = data;
   const form = useForm<z.infer<typeof resetPasswordFormSchema>>({
-    resolver: zodResolver(resetPasswordFormSchema),
     defaultValues: {
       email: "",
     },
+    resolver: zodResolver(resetPasswordFormSchema),
   });
 
   const router = useRouter();
@@ -48,36 +48,36 @@ export function ResetPassword({
   ) => {
     setLoading(true);
     try {
-      const { data, error } = await authClient.requestPasswordReset({
-        email: formData.email,
-        redirectTo: `${window.location.origin}/reset-password`,
-        fetchOptions: {
-          credentials: "include",
-        },
-      });
+      const { data: resultData, error } = await authClient.requestPasswordReset(
+        {
+          email: formData.email,
+          fetchOptions: {
+            credentials: "include",
+          },
+          redirectTo: `${window.location.origin}/reset-password`,
+        }
+      );
       if (error) {
         toast({
-          title: "Error while resetting the password.",
           description: error.message,
           status: "error",
+          title: "Error while resetting the password.",
         });
 
         return;
       }
-      if (data) {
+      if (resultData) {
         toast({
-          title: "Reset password link successfully sent",
-          description: data.message,
+          description: resultData.message,
           status: "success",
+          title: "Reset password link successfully sent",
         });
         router.push("/");
-
-        return;
       }
     } catch {
       toast({
-        title: "Error while sending reset link",
         status: "error",
+        title: "Error while sending reset link",
       });
     } finally {
       setLoading(false);
@@ -87,8 +87,8 @@ export function ResetPassword({
   if (params.error && !params.token) {
     if (params.error === "INVALID_TOKEN") {
       toast({
-        title: "Invalid token",
         description: "Please try resetting your password again",
+        title: "Invalid token",
       });
     }
     router.push("/reset-password");
@@ -118,6 +118,7 @@ export function ResetPassword({
             <FormField
               control={form.control}
               name="email"
+              // biome-ignore lint/performance/noJsxPropsBind: standard react-hook-form pattern
               render={({ field }) => (
                 <FormItem>
                   <FormControl>

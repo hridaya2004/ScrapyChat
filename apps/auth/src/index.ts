@@ -8,7 +8,7 @@ if (cluster.isPrimary) {
   const workerCount = os.availableParallelism();
   logger.info({ workerCount }, "Forking worker processes");
 
-  for (let i = 0; i < workerCount; i++) {
+  for (let i = 0; i < workerCount; i += 1) {
     const worker = cluster.fork();
     worker.on("online", () => {
       logger.info(
@@ -20,7 +20,7 @@ if (cluster.isPrimary) {
 
   cluster.on("exit", (worker, code, signal) => {
     logger.warn(
-      { pid: worker.process.pid, workerId: worker.id, code, signal },
+      { code, pid: worker.process.pid, signal, workerId: worker.id },
       "Worker process exited"
     );
   });

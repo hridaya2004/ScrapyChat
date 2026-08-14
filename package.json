@@ -1,14 +1,14 @@
 {
   "name": "scrapy-chat",
-  "type": "module",
   "private": true,
+  "type": "module",
   "workspaces": [
     "apps/*"
   ],
   "scripts": {
     "build": "turbo run build",
-    "dev": "turbo run dev",
     "check": "ultracite check",
+    "dev": "turbo run dev",
     "fix": "ultracite fix",
     "prepare": "husky"
   },
