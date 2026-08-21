@@ -1,8 +1,8 @@
 import z from "zod";
 
 const rawResponseMessageSchema = z.object({
-  response: z.string(),
   references: z.string().array(),
+  response: z.string(),
 });
 
 type ResponseMessage = z.infer<typeof rawResponseMessageSchema>;

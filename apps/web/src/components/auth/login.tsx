@@ -1,8 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useCallback, useState } from "react";
+import { type ControllerRenderProps, useForm } from "react-hook-form";
 import z from "zod";
 import { authClient } from "@/lib/auth-client";
 import { useAuthContext } from "@/providers/auth-context-provider";
@@ -35,21 +35,94 @@ const loginFormSchema = z.object({
   rememberMe: z.boolean(),
 });
 
+type LoginValues = z.infer<typeof loginFormSchema>;
+
 export default function Login() {
   const { clearAuthState } = useAuthContext();
 
   const [showPassword, setShowPassword] = useState(false);
 
-  const form = useForm<z.infer<typeof loginFormSchema>>({
-    resolver: zodResolver(loginFormSchema),
+  const form = useForm<LoginValues>({
     defaultValues: {
       email: "",
       password: "",
       rememberMe: false,
     },
+    resolver: zodResolver(loginFormSchema),
   });
 
-  const onSubmit = async (values: z.infer<typeof loginFormSchema>) => {
+  const toggleShowPassword = useCallback(() => {
+    setShowPassword((v) => !v);
+  }, []);
+
+  const renderEmailField = useCallback(
+    ({ field }: { field: ControllerRenderProps<LoginValues, "email"> }) => (
+      <FormItem>
+        <FormLabel>Email</FormLabel>
+        <FormControl>
+          <Input
+            className="rounded-3xl"
+            placeholder="user@example.com"
+            type="email"
+            {...field}
+          />
+        </FormControl>
+        <FormMessage />
+      </FormItem>
+    ),
+    []
+  );
+
+  const renderPasswordField = useCallback(
+    ({ field }: { field: ControllerRenderProps<LoginValues, "password"> }) => (
+      <FormItem>
+        <FormLabel>Password</FormLabel>
+        <FormControl>
+          <InputGroup className="rounded-3xl">
+            <InputGroupInput
+              placeholder="******"
+              type={showPassword ? "text" : "password"}
+              {...field}
+            />
+            <InputGroupAddon align="inline-end">
+              <button
+                className="pe-2 hover:cursor-pointer"
+                onClick={toggleShowPassword}
+                type="button"
+              >
+                {showPassword ? (
+                  <EyeOffIcon className="size-4" />
+                ) : (
+                  <EyeIcon className="size-4" />
+                )}
+              </button>
+            </InputGroupAddon>
+          </InputGroup>
+        </FormControl>
+        <FormMessage />
+      </FormItem>
+    ),
+    [showPassword, toggleShowPassword]
+  );
+
+  const renderRememberMeField = useCallback(
+    ({
+      field,
+    }: {
+      field: ControllerRenderProps<LoginValues, "rememberMe">;
+    }) => (
+      <FormItem className="flex flex-row items-center space-x-1">
+        <FormControl>
+          <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+        </FormControl>
+        <FormLabel>Remember me</FormLabel>
+        <FormMessage />
+      </FormItem>
+    ),
+    []
+  );
+
+  const onSubmit = async (values: LoginValues) => {
     try {
       const { error, data } = await authClient.signIn.email({
         ...values,
@@ -57,17 +130,17 @@ export default function Login() {
 
       if (error?.code === "EMAIL_NOT_VERIFIED") {
         toast({
-          title: "Email not verified.",
           description: "Please check your email and verify your account",
           status: "error",
+          title: "Email not verified.",
         });
         return;
       }
       if (error?.code === "INVALID_EMAIL_OR_PASSWORD") {
         toast({
-          title: "Invalid email or password",
           description: "Please check your email and password",
           status: "error",
+          title: "Invalid email or password",
         });
         return;
       }
@@ -78,9 +151,9 @@ export default function Login() {
     } catch (err) {
       console.error("An error occurred during login:", err);
       toast({
-        title: "Login failed",
         description: "An unexpected error occurred. Please try again.",
         status: "error",
+        title: "Login failed",
       });
     }
   };
@@ -94,69 +167,18 @@ export default function Login() {
         <FormField
           control={form.control}
           name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input
-                  className="rounded-3xl"
-                  placeholder="user@example.com"
-                  type="email"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+          render={renderEmailField}
         />
         <FormField
           control={form.control}
           name="password"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Password</FormLabel>
-              <FormControl>
-                <InputGroup className="rounded-3xl">
-                  <InputGroupInput
-                    placeholder="******"
-                    type={showPassword ? "text" : "password"}
-                    {...field}
-                  />
-                  <InputGroupAddon align="inline-end">
-                    <button
-                      className="pe-2 hover:cursor-pointer"
-                      onClick={() => setShowPassword((v) => !v)}
-                      type="button"
-                    >
-                      {showPassword ? (
-                        <EyeOffIcon className="size-4" />
-                      ) : (
-                        <EyeIcon className="size-4" />
-                      )}
-                    </button>
-                  </InputGroupAddon>
-                </InputGroup>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+          render={renderPasswordField}
         />
         <Field className="flex justify-between" orientation="horizontal">
           <FormField
             control={form.control}
             name="rememberMe"
-            render={({ field }) => (
-              <FormItem className="flex flex-row items-center space-x-1">
-                <FormControl>
-                  <Checkbox
-                    checked={field.value}
-                    onCheckedChange={(checked) => field.onChange(checked)}
-                  />
-                </FormControl>
-                <FormLabel>Remember me</FormLabel>
-                <FormMessage />
-              </FormItem>
-            )}
+            render={renderRememberMeField}
           />
           <Link
             className={buttonVariants({

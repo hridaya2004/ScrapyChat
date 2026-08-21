@@ -2,6 +2,7 @@
 
 import type { VariantProps } from "class-variance-authority";
 import { ChevronDown } from "lucide-react";
+import { useCallback } from "react";
 import { useStickToBottomContext } from "use-stick-to-bottom";
 import { Button, type buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -20,6 +21,10 @@ function ScrollButton({
 }: ScrollButtonProps) {
   const { isAtBottom, scrollToBottom } = useStickToBottomContext();
 
+  const handleClick = useCallback(() => {
+    scrollToBottom();
+  }, [scrollToBottom]);
+
   return (
     <Button
       className={cn(
@@ -29,7 +34,7 @@ function ScrollButton({
           : "translate-y-0 scale-100 opacity-100",
         className
       )}
-      onClick={() => scrollToBottom()}
+      onClick={handleClick}
       size={size}
       variant={variant}
       {...props}

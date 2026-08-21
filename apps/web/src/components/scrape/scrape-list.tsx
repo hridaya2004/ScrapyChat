@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { Globe, LinkIcon, RefreshCw, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { useDebounce } from "@/hooks/use-debounce";
 import { useAuthContext } from "@/providers/auth-context-provider";
 import { useDialog } from "@/providers/dialog-context-provider";
@@ -41,12 +41,16 @@ export default function ScrapeList() {
   const [deletingAll, setDeletingAll] = useState(false);
 
   const { data, refetch } = useQuery({
-    queryKey: ["scrapeList"],
-    queryFn: () => getScrapeList(token?.trim() ? token : ""),
     enabled: !!token?.trim(),
+    queryFn: () => getScrapeList(token?.trim() ? token : ""),
+    queryKey: ["scrapeList"],
   });
 
   const [debouncedRefetch, isRefreshing] = useDebounce(() => refetch(), 2000);
+
+  const handleRefresh = useCallback(() => {
+    debouncedRefetch();
+  }, [debouncedRefetch]);
 
   const handleUrlDeleted = () => {
     refetch();
@@ -99,13 +103,13 @@ export default function ScrapeList() {
     setUrl?.(value);
     setSuperUrl(true);
     toast({
-      title: "Updated context URL",
-      description: `${value}`,
-      status: "info",
       button: {
         label: "Clear",
         onClick: clearUrl,
       },
+      description: `${value}`,
+      status: "info",
+      title: "Updated context URL",
     });
     setDialogState(false);
   };
@@ -118,22 +122,22 @@ export default function ScrapeList() {
     setUrl?.(value);
     setSuperUrl(false);
     toast({
-      title: "Updated context URL",
-      description: `${value}`,
-      status: "info",
       button: {
         label: "Clear",
         onClick: clearUrl,
       },
+      description: `${value}`,
+      status: "info",
+      title: "Updated context URL",
     });
     setDialogState(false);
   };
 
-  const getBaseUrl = (url: string) => {
+  const getBaseUrl = (value: string) => {
     try {
-      return new URL(url).hostname;
+      return new URL(value).hostname;
     } catch {
-      return url;
+      return value;
     }
   };
 
@@ -221,7 +225,7 @@ export default function ScrapeList() {
               <Button
                 className="rounded-full"
                 disabled={isRefreshing}
-                onClick={() => debouncedRefetch()}
+                onClick={handleRefresh}
                 size="icon"
                 variant="ghost"
               >

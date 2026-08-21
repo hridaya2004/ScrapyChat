@@ -11,12 +11,12 @@ import { authClient } from "@/lib/auth-client";
 
 const tabs = [
   {
-    label: "Login",
     component: <Login />,
+    label: "Login",
   },
   {
-    label: "Register",
     component: <Register />,
+    label: "Register",
   },
 ];
 

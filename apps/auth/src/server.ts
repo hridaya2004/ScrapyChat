@@ -28,8 +28,8 @@ const betterAuth = new Elysia({ name: "better-auth" })
         }
 
         return {
-          user: session.user,
           session: session.session,
+          user: session.user,
         };
       },
     },
@@ -42,7 +42,7 @@ const app = new Elysia()
     requestStore.enterWith({ requestId });
 
     logger.info(
-      { requestId, method: request.method, path: url.pathname },
+      { method: request.method, path: url.pathname, requestId },
       "Incoming request"
     );
   })
@@ -51,29 +51,29 @@ const app = new Elysia()
     const store = requestStore.getStore();
     logger.error(
       {
-        requestId: store?.requestId,
-        method: request.method,
-        path: url.pathname,
         code,
         err: error,
+        method: request.method,
+        path: url.pathname,
+        requestId: store?.requestId,
       },
       "Request failed"
     );
   })
   .use(
     cors({
-      origin: ALLOWED_ORIGIN,
-      credentials: true,
       allowedHeaders: ["Content-Type", "Authorization"],
+      credentials: true,
+      origin: ALLOWED_ORIGIN,
     })
   )
   .use(
     openapi({
-      path: "/openapi.json",
       documentation: {
         components: await OpenAPI.components,
         paths: await OpenAPI.getPaths(),
       },
+      path: "/openapi.json",
     })
   )
   .use(betterAuth)
@@ -96,22 +96,22 @@ const app = new Elysia()
       const encrypted = await encryptData(apiKey, uniqueSalt);
 
       logger.info(
-        { requestId, userId: ctx.user.id, provider },
+        { provider, requestId, userId: ctx.user.id },
         "API key encrypted successfully"
       );
       return {
-        provider_id: provider,
         api_key: encrypted,
         model: modelName,
+        provider_id: provider,
       };
     },
     {
+      auth: true,
       body: z.object({
-        provider: z.string(),
         apiKey: z.string(),
         modelName: z.string(),
+        provider: z.string(),
       }),
-      auth: true,
     }
   )
   .post(

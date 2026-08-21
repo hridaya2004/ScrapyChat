@@ -1,5 +1,6 @@
 "use client";
 
+import { useCallback } from "react";
 import { authClient } from "@/lib/auth-client";
 import { useDialog } from "@/providers/dialog-context-provider";
 import SettingsTrigger from "../settings/settings-trigger";
@@ -30,6 +31,21 @@ export default function UserToggle() {
     }
   };
 
+  const handleCloseAutoFocus = useCallback((e: Event) => {
+    e.preventDefault();
+  }, []);
+
+  const handleInteractOutside = useCallback(
+    (e: Event) => {
+      if (settingsDialogState) {
+        e.preventDefault();
+        return;
+      }
+      setUserMenuState(false);
+    },
+    [settingsDialogState, setUserMenuState]
+  );
+
   if (data?.session) {
     return (
       <DropdownMenu
@@ -48,14 +64,8 @@ export default function UserToggle() {
         </DropdownMenuTrigger>
         <DropdownMenuContent
           forceMount
-          onCloseAutoFocus={(e) => e.preventDefault()}
-          onInteractOutside={(e) => {
-            if (settingsDialogState) {
-              e.preventDefault();
-              return;
-            }
-            setUserMenuState(false);
-          }}
+          onCloseAutoFocus={handleCloseAutoFocus}
+          onInteractOutside={handleInteractOutside}
           sideOffset={4}
         >
           <UserInfo data={data.user} />

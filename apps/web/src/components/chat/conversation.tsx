@@ -21,7 +21,7 @@ export function Conversation({
 }: ConversationProps) {
   const initialMessageCount = useRef(messages.length);
 
-  if (!messages || messages.length === 0) {
+  if (messages.length === 0) {
     return <div className="h-full w-full" />;
   }
 
@@ -39,7 +39,7 @@ export function Conversation({
             scrollbarWidth: "none",
           }}
         >
-          {messages?.map((message, index) => {
+          {messages.map((message, index) => {
             const isLast =
               index === messages.length - 1 && status !== "submitted";
             const hasScrollAnchor =

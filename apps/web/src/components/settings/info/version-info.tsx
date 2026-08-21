@@ -1,4 +1,4 @@
-import { useId, useRef, useState } from "react";
+import { useCallback, useId, useRef, useState } from "react";
 import { Muted } from "@/components/typography";
 import {
   AlertDialog,
@@ -31,8 +31,8 @@ export default function VersionInfo() {
   const handleEnableDevelopment = () => {
     if (developmentModeEnabled) {
       toast({
-        title: "You're already a developer.",
         description: "Stop clicking a lot.",
+        title: "You're already a developer.",
       });
       return;
     }
@@ -51,8 +51,8 @@ export default function VersionInfo() {
     setDevelopmentUrl(url);
     setDevUrl(url);
     toast({
-      title: "Development URL set.",
       description: `Development URL set to ${url}`,
+      title: "Development URL set.",
     });
   };
 
@@ -61,6 +61,17 @@ export default function VersionInfo() {
     setShowDialog(false);
     window.location.href = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
   };
+
+  const handleDevUrlChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setDevUrl(e.target.value);
+    },
+    []
+  );
+
+  const handleCancelClick = useCallback(() => {
+    setShowDialog(false);
+  }, []);
 
   return (
     <div className="flex flex-col gap-3">
@@ -82,7 +93,7 @@ export default function VersionInfo() {
               disabled={!developmentModeEnabled}
               id={developmentUrlId}
               name={developmentUrlId}
-              onChange={(e) => setDevUrl(e.target.value)}
+              onChange={handleDevUrlChange}
               placeholder="http://localhost:8080"
               value={devUrl}
             />
@@ -106,7 +117,7 @@ export default function VersionInfo() {
           <AlertDialogFooter>
             <Button
               className="rounded-3xl"
-              onClick={() => setShowDialog(false)}
+              onClick={handleCancelClick}
               variant="outline"
             >
               Cancel

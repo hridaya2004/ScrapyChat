@@ -1,8 +1,13 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useId, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useCallback, useId, useState } from "react";
+import {
+  Controller,
+  type ControllerFieldState,
+  type ControllerRenderProps,
+  useForm,
+} from "react-hook-form";
 import {
   type ScrapeNew as ScrapeNewType,
   scrapeNewSchema,
@@ -39,16 +44,62 @@ export default function ScrapeNew() {
   const [loading, setLoading] = useState(false);
 
   const scrapeNewUrlForm = useForm<ScrapeNewType>({
-    resolver: zodResolver(scrapeNewSchema),
     defaultValues: {
-      url: "",
       deep_search: false,
+      url: "",
     },
+    resolver: zodResolver(scrapeNewSchema),
   });
 
   const htmlFormId = useId();
   const formUrlInputId = useId();
   const formDeepSearchId = useId();
+
+  const renderUrlField = useCallback(
+    ({
+      field,
+      fieldState,
+    }: {
+      field: ControllerRenderProps<ScrapeNewType, "url">;
+      fieldState: ControllerFieldState;
+    }) => (
+      <Field data-invalid={fieldState.invalid}>
+        <Input
+          {...field}
+          aria-invalid={fieldState.invalid}
+          autoComplete="off"
+          className="rounded-3xl"
+          id={formUrlInputId}
+          placeholder="https://example.com"
+        />
+        {!!fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+      </Field>
+    ),
+    [formUrlInputId]
+  );
+
+  const renderDeepSearchField = useCallback(
+    ({
+      field,
+    }: {
+      field: ControllerRenderProps<ScrapeNewType, "deep_search">;
+    }) => (
+      <Field orientation="horizontal">
+        <Checkbox
+          checked={field.value}
+          id={formDeepSearchId}
+          onCheckedChange={field.onChange}
+        />
+        <FieldContent>
+          <FieldLabel htmlFor={formDeepSearchId}>Deep Search</FieldLabel>
+          <FieldDescription>
+            If selected, all the links within the page will be ingested as well.
+          </FieldDescription>
+        </FieldContent>
+      </Field>
+    ),
+    [formDeepSearchId]
+  );
 
   if (!token?.trim()) {
     return null;
@@ -93,43 +144,12 @@ export default function ScrapeNew() {
               <Controller
                 control={scrapeNewUrlForm.control}
                 name="url"
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <Input
-                      {...field}
-                      aria-invalid={fieldState.invalid}
-                      autoComplete="off"
-                      className="rounded-3xl"
-                      id={formUrlInputId}
-                      placeholder="https://example.com"
-                    />
-                    {!!fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
-                  </Field>
-                )}
+                render={renderUrlField}
               />
               <Controller
                 control={scrapeNewUrlForm.control}
                 name="deep_search"
-                render={({ field }) => (
-                  <Field orientation="horizontal">
-                    <Checkbox
-                      checked={field.value}
-                      id={formDeepSearchId}
-                      onCheckedChange={field.onChange}
-                    />
-                    <FieldContent>
-                      <FieldLabel htmlFor={formDeepSearchId}>
-                        Deep Search
-                      </FieldLabel>
-                      <FieldDescription>
-                        If selected, all the links within the page will be
-                        ingested as well.
-                      </FieldDescription>
-                    </FieldContent>
-                  </Field>
-                )}
+                render={renderDeepSearchField}
               />
             </FieldGroup>
           </form>

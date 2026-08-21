@@ -7,14 +7,14 @@ class MailSender {
 
   private constructor() {
     this.mailer = nodemailer.createTransport({
-      service: "Gmail",
+      auth: {
+        pass: process.env.SMTP_PASS,
+        user: process.env.SMTP_USER,
+      },
       host: "smtp.gmail.com",
       port: 465,
       secure: true,
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
+      service: "Gmail",
     });
   }
 
@@ -33,12 +33,12 @@ class MailSender {
     try {
       await this.mailer.sendMail({
         from: process.env.SMTP_USER,
-        to: props.to,
         subject: props.subject,
         text: props.text,
+        to: props.to,
       });
       logger.info(
-        { to: props.to, subject: props.subject },
+        { subject: props.subject, to: props.to },
         "Email sent successfully"
       );
     } catch (error) {

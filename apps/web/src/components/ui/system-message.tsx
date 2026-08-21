@@ -9,52 +9,52 @@ import { cn } from "@/lib/utils";
 const systemMessageVariants = cva(
   "flex flex-row items-center gap-3 rounded-[12px] border py-2 pr-2 pl-3",
   {
+    compoundVariants: [
+      {
+        class: "border-transparent bg-zinc-100 dark:bg-zinc-900",
+        fill: true,
+        variant: "action",
+      },
+      {
+        class: "border-transparent bg-red-100 dark:bg-red-900/20",
+        fill: true,
+        variant: "error",
+      },
+      {
+        class: "border-transparent bg-amber-100 dark:bg-amber-900/20",
+        fill: true,
+        variant: "warning",
+      },
+      {
+        class: "border-zinc-200 dark:border-zinc-800",
+        fill: false,
+        variant: "action",
+      },
+      {
+        class: "border-red-600 dark:border-red-900",
+        fill: false,
+        variant: "error",
+      },
+      {
+        class: "border-amber-600 dark:border-amber-900",
+        fill: false,
+        variant: "warning",
+      },
+    ],
+    defaultVariants: {
+      fill: false,
+      variant: "action",
+    },
     variants: {
+      fill: {
+        false: "",
+        true: "bg-background",
+      },
       variant: {
         action: "text-zinc-700 dark:text-zinc-300",
         error: "text-red-700 dark:text-red-800",
         warning: "text-amber-700 dark:text-amber-700",
       },
-      fill: {
-        true: "bg-background",
-        false: "",
-      },
-    },
-    compoundVariants: [
-      {
-        variant: "action",
-        fill: true,
-        class: "border-transparent bg-zinc-100 dark:bg-zinc-900",
-      },
-      {
-        variant: "error",
-        fill: true,
-        class: "border-transparent bg-red-100 dark:bg-red-900/20",
-      },
-      {
-        variant: "warning",
-        fill: true,
-        class: "border-transparent bg-amber-100 dark:bg-amber-900/20",
-      },
-      {
-        variant: "action",
-        fill: false,
-        class: "border-zinc-200 dark:border-zinc-800",
-      },
-      {
-        variant: "error",
-        fill: false,
-        class: "border-red-600 dark:border-red-900",
-      },
-      {
-        variant: "warning",
-        fill: false,
-        class: "border-amber-600 dark:border-amber-900",
-      },
-    ],
-    defaultVariants: {
-      variant: "action",
-      fill: false,
     },
   }
 );
@@ -109,7 +109,7 @@ export function SystemMessage({
 
   return (
     <div
-      className={cn(systemMessageVariants({ variant, fill }), className)}
+      className={cn(systemMessageVariants({ fill, variant }), className)}
       {...props}
     >
       <div className="flex flex-1 flex-row items-center gap-3 leading-normal">

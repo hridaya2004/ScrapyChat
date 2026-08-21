@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import type { Message as MessageType } from "@/lib/types";
 import { MessageAgent } from "./message-agent";
 import { MessageUser } from "./message-user";
@@ -22,11 +22,11 @@ export function Message({
 }: MessageProps) {
   const [copied, setCopied] = useState(false);
 
-  const copyToClipboard = () => {
+  const copyToClipboard = useCallback(() => {
     navigator.clipboard.writeText(children);
     setCopied(true);
     setTimeout(() => setCopied(false), 500);
-  };
+  }, [children]);
 
   if (variant === "user") {
     return (

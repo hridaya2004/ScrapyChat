@@ -5,6 +5,7 @@ import {
   InfoIcon,
   MessageCircleWarningIcon,
 } from "lucide-react";
+import { useCallback } from "react";
 import { toast as sonnerToast } from "sonner";
 import { WebHaptics } from "web-haptics";
 import type { HapticType } from "@/providers/haptics-provider";
@@ -77,6 +78,11 @@ function triggerToastHaptic(status?: ToastProps["status"]) {
 }
 
 function Toast({ title, description, button, id, status }: ToastProps) {
+  const handleButtonClick = useCallback(() => {
+    button?.onClick();
+    sonnerToast.dismiss(id);
+  }, [button, id]);
+
   return (
     <div className="flex items-center overflow-hidden rounded-xl border border-input bg-popover p-4 font-sans shadow-xs backdrop-blur-xl">
       <div className="flex flex-1 items-center">
@@ -104,10 +110,7 @@ function Toast({ title, description, button, id, status }: ToastProps) {
       {button ? (
         <div className="shrink-0">
           <Button
-            onClick={() => {
-              button?.onClick();
-              sonnerToast.dismiss(id);
-            }}
+            onClick={handleButtonClick}
             size="sm"
             type="button"
             variant="secondary"
@@ -120,17 +123,17 @@ function Toast({ title, description, button, id, status }: ToastProps) {
   );
 }
 
-function toast(toast: Omit<ToastProps, "id">) {
-  triggerToastHaptic(toast.status);
+function toast(options: Omit<ToastProps, "id">) {
+  triggerToastHaptic(options.status);
 
   return sonnerToast.custom(
     (id) => (
       <Toast
-        button={toast?.button}
-        description={toast?.description}
+        button={options.button}
+        description={options.description}
         id={id}
-        status={toast?.status}
-        title={toast.title}
+        status={options.status}
+        title={options.title}
       />
     ),
     {

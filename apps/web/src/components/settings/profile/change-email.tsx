@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CheckIcon } from "lucide-react";
-import { useForm } from "react-hook-form";
+import { useCallback } from "react";
+import { type ControllerRenderProps, useForm } from "react-hook-form";
 import z from "zod";
 import { Muted } from "@/components/typography";
 import { Button } from "@/components/ui/button";
@@ -28,10 +29,10 @@ const changeEmailSchema = z.object({
 
 export default function ChangeEmail() {
   const emailForm = useForm<z.infer<typeof changeEmailSchema>>({
-    resolver: zodResolver(changeEmailSchema),
     defaultValues: {
       newEmail: "",
     },
+    resolver: zodResolver(changeEmailSchema),
   });
 
   const onSubmit = (_values: z.infer<typeof changeEmailSchema>) => {
@@ -40,6 +41,30 @@ export default function ChangeEmail() {
   };
 
   const { data } = authClient.useSession();
+
+  const renderNewEmailField = useCallback(
+    ({
+      field,
+    }: {
+      field: ControllerRenderProps<
+        z.infer<typeof changeEmailSchema>,
+        "newEmail"
+      >;
+    }) => (
+      <FormItem className="w-fit">
+        <FormControl>
+          <Input
+            className="rounded-3xl"
+            placeholder="New email address"
+            type="email"
+            {...field}
+          />
+        </FormControl>
+        <FormMessage />
+      </FormItem>
+    ),
+    []
+  );
 
   return (
     <Form {...emailForm}>
@@ -67,19 +92,7 @@ export default function ChangeEmail() {
             <FormField
               control={emailForm.control}
               name="newEmail"
-              render={({ field }) => (
-                <FormItem className="w-fit">
-                  <FormControl>
-                    <Input
-                      className="rounded-3xl"
-                      placeholder="New email address"
-                      type="email"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+              render={renderNewEmailField}
             />
             <Field className="w-fit">
               <Button className="rounded-3xl">Change email</Button>

@@ -2,8 +2,8 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useCallback, useState } from "react";
+import { type ControllerRenderProps, useForm } from "react-hook-form";
 import z from "zod";
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
@@ -34,50 +34,72 @@ export function ResetPassword({
 }) {
   const params = data;
   const form = useForm<z.infer<typeof resetPasswordFormSchema>>({
-    resolver: zodResolver(resetPasswordFormSchema),
     defaultValues: {
       email: "",
     },
+    resolver: zodResolver(resetPasswordFormSchema),
   });
 
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+
+  const renderEmailField = useCallback(
+    ({
+      field,
+    }: {
+      field: ControllerRenderProps<
+        z.infer<typeof resetPasswordFormSchema>,
+        "email"
+      >;
+    }) => (
+      <FormItem>
+        <FormControl>
+          <Input
+            className="rounded-3xl"
+            placeholder="user@example.com"
+            type="email"
+            {...field}
+          />
+        </FormControl>
+        <FormMessage />
+      </FormItem>
+    ),
+    []
+  );
 
   const onSubmit = async (
     formData: z.infer<typeof resetPasswordFormSchema>
   ) => {
     setLoading(true);
     try {
-      const { data, error } = await authClient.requestPasswordReset({
+      const { data: resetData, error } = await authClient.requestPasswordReset({
         email: formData.email,
-        redirectTo: `${window.location.origin}/reset-password`,
         fetchOptions: {
           credentials: "include",
         },
+        redirectTo: `${window.location.origin}/reset-password`,
       });
       if (error) {
         toast({
-          title: "Error while resetting the password.",
           description: error.message,
           status: "error",
+          title: "Error while resetting the password.",
         });
 
         return;
       }
-      if (data) {
+      if (resetData) {
         toast({
-          title: "Reset password link successfully sent",
-          description: data.message,
+          description: resetData.message,
           status: "success",
+          title: "Reset password link successfully sent",
         });
         router.push("/");
-
-        return;
       }
     } catch {
       toast({
-        title: "Error while sending reset link",
         status: "error",
+        title: "Error while sending reset link",
       });
     } finally {
       setLoading(false);
@@ -87,8 +109,8 @@ export function ResetPassword({
   if (params.error && !params.token) {
     if (params.error === "INVALID_TOKEN") {
       toast({
-        title: "Invalid token",
         description: "Please try resetting your password again",
+        title: "Invalid token",
       });
     }
     router.push("/reset-password");
@@ -118,19 +140,7 @@ export function ResetPassword({
             <FormField
               control={form.control}
               name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Input
-                      className="rounded-3xl"
-                      placeholder="user@example.com"
-                      type="email"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+              render={renderEmailField}
             />
 
             <Button

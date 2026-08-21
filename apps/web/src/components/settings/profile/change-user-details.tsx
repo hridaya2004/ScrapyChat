@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useCallback } from "react";
+import { type ControllerRenderProps, useForm } from "react-hook-form";
 import z from "zod";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -32,10 +33,10 @@ export default function ChangeUserDetails() {
   const { data } = authClient.useSession();
 
   const userDetailsForm = useForm<z.infer<typeof userDetailsSchema>>({
-    resolver: zodResolver(userDetailsSchema),
     defaultValues: {
       name: data?.user.name,
     },
+    resolver: zodResolver(userDetailsSchema),
   });
 
   // changing user's image is yet not supported
@@ -45,6 +46,29 @@ export default function ChangeUserDetails() {
       name: values.name,
     });
   };
+
+  const renderNameField = useCallback(
+    ({
+      field,
+    }: {
+      field: ControllerRenderProps<z.infer<typeof userDetailsSchema>, "name">;
+    }) => (
+      <FormItem className="w-fit">
+        <FormLabel>Full name</FormLabel>
+        <FormControl>
+          <Input className="rounded-3xl" type="text" {...field} />
+        </FormControl>
+        <FormMessage />
+      </FormItem>
+    ),
+    []
+  );
+
+  const handleResetChanges = useCallback(() => {
+    userDetailsForm.reset({
+      name: data?.user.name,
+    });
+  }, [data?.user.name, userDetailsForm]);
 
   return (
     <Form {...userDetailsForm}>
@@ -68,15 +92,7 @@ export default function ChangeUserDetails() {
               <FormField
                 control={userDetailsForm.control}
                 name="name"
-                render={({ field }) => (
-                  <FormItem className="w-fit">
-                    <FormLabel>Full name</FormLabel>
-                    <FormControl>
-                      <Input className="rounded-3xl" type="text" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                render={renderNameField}
               />
             </FieldGroup>
           </FieldContent>
@@ -84,11 +100,7 @@ export default function ChangeUserDetails() {
             <Button className="rounded-3xl">Save changes</Button>
             <Button
               className="rounded-3xl"
-              onClick={() => {
-                userDetailsForm.reset({
-                  name: data?.user.name,
-                });
-              }}
+              onClick={handleResetChanges}
               type="button"
               variant="ghost"
             >

@@ -34,9 +34,9 @@ export const Chat = () => {
   const { selectedModel, models } = useModel();
 
   const { data: scrapeData } = useQuery({
-    queryKey: ["scrapeList"],
-    queryFn: () => getScrapeList(token?.trim() ? token : ""),
     enabled: !!token?.trim(),
+    queryFn: () => getScrapeList(token?.trim() ? token : ""),
+    queryKey: ["scrapeList"],
   });
 
   const headline = useMemo(() => {
@@ -73,9 +73,9 @@ export const Chat = () => {
   const sendMessage = () => {
     if (!input.trim()) {
       toast({
-        title: "Invalid prompt",
         description: "Please provide a valid prompt.",
         status: "warning",
+        title: "Invalid prompt",
       });
 
       return;
@@ -91,10 +91,10 @@ export const Chat = () => {
 
     if (!models?.[selectedModel]?.apiKey?.trim()) {
       toast({
-        title: "Empty API key",
         description:
           "Please go to the API Keys section to add API key for the selected model.",
         status: "error",
+        title: "Empty API key",
       });
       setUserMenuState(true);
       setSettingsDialogState(true);
@@ -103,11 +103,11 @@ export const Chat = () => {
     }
 
     send({
-      input,
-      queryUrl: url,
-      providerId: selectedModel,
       apiKey: models[selectedModel].apiKey,
+      input,
       modelName: models[selectedModel].modelName,
+      providerId: selectedModel,
+      queryUrl: url,
       superUrl,
     });
 
@@ -121,13 +121,13 @@ export const Chat = () => {
   };
 
   const chatInputProps = {
-    onSend: sendMessage,
-    stop,
-    status,
     hasMessages: messages.length > 0,
-    value: input,
     isSubmitting: status === "submitted",
+    onSend: sendMessage,
     onValueChange: setInput,
+    status,
+    stop,
+    value: input,
   };
 
   return (
@@ -145,9 +145,9 @@ export const Chat = () => {
       <AnimatePresence initial={false} mode="popLayout">
         {showOnboarding ? (
           <motion.div
-            animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+            animate={{ filter: "blur(0px)", opacity: 1, scale: 1 }}
             className="absolute bottom-[60%] mx-auto max-w-200 md:relative md:bottom-auto"
-            exit={{ opacity: 0, scale: 0.98, filter: "blur(4px)" }}
+            exit={{ filter: "blur(4px)", opacity: 0, scale: 0.98 }}
             initial={{ opacity: 0 }}
             key="onboarding"
             layout="position"

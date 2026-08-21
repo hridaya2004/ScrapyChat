@@ -28,7 +28,7 @@ export function MessageAgent({
   className,
 }: MessageAgentProps) {
   // const reasoningParts = parts?.find((part) => part.type === "reasoning");
-  const contentNullOrEmpty = children === null || children === "";
+  const contentNullOrEmpty = children === "";
   const isLastStreaming = status !== "ready" && isLast;
 
   const messageRef = useRef<HTMLDivElement>(null);

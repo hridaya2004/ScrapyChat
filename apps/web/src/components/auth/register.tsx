@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useCallback, useState } from "react";
+import { type ControllerRenderProps, useForm } from "react-hook-form";
 import z from "zod";
 import { authClient } from "@/lib/auth-client";
 import { Button } from "../ui/button";
@@ -30,6 +30,9 @@ export const STRONG_PASSWORD_REGEX =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()\-_=+{}[\]|;:'",.<>/?]).{8,}$/;
 
 const signUpFormSchema = z.object({
+  email: z.email({
+    error: "Email is required",
+  }),
   name: z
     .string({
       error: "Name is required",
@@ -40,9 +43,6 @@ const signUpFormSchema = z.object({
     .max(100, {
       error: "Name must be at most 100 characters",
     }),
-  email: z.email({
-    error: "Email is required",
-  }),
   password: z
     .string({
       error: "Password is required",
@@ -61,15 +61,89 @@ const signUpFormSchema = z.object({
 
 export default function Register() {
   const form = useForm<z.infer<typeof signUpFormSchema>>({
-    resolver: zodResolver(signUpFormSchema),
     defaultValues: {
-      name: "",
       email: "",
+      name: "",
       password: "",
     },
+    resolver: zodResolver(signUpFormSchema),
   });
 
   const [showPassword, setShowPassword] = useState(false);
+
+  type SignUpValues = z.infer<typeof signUpFormSchema>;
+
+  const toggleShowPassword = useCallback(() => {
+    setShowPassword((v) => !v);
+  }, []);
+
+  const renderNameField = useCallback(
+    ({ field }: { field: ControllerRenderProps<SignUpValues, "name"> }) => (
+      <FormItem>
+        <FormLabel>Name</FormLabel>
+        <FormControl>
+          <Input
+            className="rounded-3xl"
+            placeholder="John Doe"
+            type="text"
+            {...field}
+          />
+        </FormControl>
+        <FormMessage />
+      </FormItem>
+    ),
+    []
+  );
+
+  const renderEmailField = useCallback(
+    ({ field }: { field: ControllerRenderProps<SignUpValues, "email"> }) => (
+      <FormItem>
+        <FormLabel>Email</FormLabel>
+        <FormControl>
+          <Input
+            className="rounded-3xl"
+            placeholder="user@example.com"
+            type="email"
+            {...field}
+          />
+        </FormControl>
+        <FormMessage />
+      </FormItem>
+    ),
+    []
+  );
+
+  const renderPasswordField = useCallback(
+    ({ field }: { field: ControllerRenderProps<SignUpValues, "password"> }) => (
+      <FormItem>
+        <FormLabel>Password</FormLabel>
+        <FormControl>
+          <InputGroup className="rounded-3xl">
+            <InputGroupInput
+              placeholder="******"
+              type={showPassword ? "text" : "password"}
+              {...field}
+            />
+            <InputGroupAddon align="inline-end">
+              <button
+                className="pe-2 hover:cursor-pointer"
+                onClick={toggleShowPassword}
+                type="button"
+              >
+                {showPassword ? (
+                  <EyeOffIcon className="size-4" />
+                ) : (
+                  <EyeIcon className="size-4" />
+                )}
+              </button>
+            </InputGroupAddon>
+          </InputGroup>
+        </FormControl>
+        <FormMessage />
+      </FormItem>
+    ),
+    [showPassword, toggleShowPassword]
+  );
 
   const onSubmit = async (values: z.infer<typeof signUpFormSchema>) => {
     const { data, error } = await authClient.signUp.email({
@@ -77,16 +151,16 @@ export default function Register() {
     });
     if (data && !data.user.emailVerified) {
       toast({
-        title: "Email registered, check your inbox",
         description: "We've sent you a verification email.",
         status: "info",
+        title: "Email registered, check your inbox",
       });
     }
     if (error) {
       toast({
-        title: "Registration failed",
         description: error.message,
         status: "error",
+        title: "Registration failed",
       });
     }
   };
@@ -100,70 +174,17 @@ export default function Register() {
         <FormField
           control={form.control}
           name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Name</FormLabel>
-              <FormControl>
-                <Input
-                  className="rounded-3xl"
-                  placeholder="John Doe"
-                  type="text"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+          render={renderNameField}
         />
         <FormField
           control={form.control}
           name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input
-                  className="rounded-3xl"
-                  placeholder="user@example.com"
-                  type="email"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+          render={renderEmailField}
         />
         <FormField
           control={form.control}
           name="password"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Password</FormLabel>
-              <FormControl>
-                <InputGroup className="rounded-3xl">
-                  <InputGroupInput
-                    placeholder="******"
-                    type={showPassword ? "text" : "password"}
-                    {...field}
-                  />
-                  <InputGroupAddon align="inline-end">
-                    <button
-                      className="pe-2 hover:cursor-pointer"
-                      onClick={() => setShowPassword((v) => !v)}
-                      type="button"
-                    >
-                      {showPassword ? (
-                        <EyeOffIcon className="size-4" />
-                      ) : (
-                        <EyeIcon className="size-4" />
-                      )}
-                    </button>
-                  </InputGroupAddon>
-                </InputGroup>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+          render={renderPasswordField}
         />
         <Button className="w-full rounded-full" type="submit">
           Register

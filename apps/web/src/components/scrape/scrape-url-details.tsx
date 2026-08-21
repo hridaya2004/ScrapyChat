@@ -1,7 +1,7 @@
 "use client";
 
 import { ChevronRight, FileText, Trash2, XIcon } from "lucide-react";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { cn } from "@/lib/utils";
 import { useAuthContext } from "@/providers/auth-context-provider";
 import { useDialog } from "@/providers/dialog-context-provider";
@@ -44,35 +44,71 @@ export default function ScrapeUrlDetails({
 
   let hostname = baseUrl;
   try {
-    hostname = new URL(baseUrl).hostname;
+    ({ hostname } = new URL(baseUrl));
   } catch {
     // keep as-is
   }
 
-  const handleDelete = (e: React.MouseEvent, url: string) => {
+  const handleDelete = useCallback(
+    (e: React.MouseEvent, url: string) => {
+      e.stopPropagation();
+      if (!token?.trim()) {
+        return;
+      }
+      setDeletingUrl(url);
+      deleteScrapeUrl(url, token, (success, loading) => {
+        if (!loading) {
+          setDeletingUrl(null);
+        }
+        if (success) {
+          onUrlDeleted();
+        }
+      });
+    },
+    [onUrlDeleted, token]
+  );
+
+  const handleTriggerClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!token?.trim()) {
-      return;
-    }
-    setDeletingUrl(url);
-    deleteScrapeUrl(url, token, (success, loading) => {
-      if (!loading) {
-        setDeletingUrl(null);
-      }
-      if (success) {
-        onUrlDeleted();
-      }
-    });
-  };
+  }, []);
+
+  const handleInteractOutside = useCallback(
+    (e: Event) => {
+      setDialogState(true);
+      e.preventDefault();
+    },
+    [setDialogState]
+  );
+
+  const handlePointerDownOutside = useCallback(
+    (e: Event) => {
+      setDialogState(true);
+      e.preventDefault();
+    },
+    [setDialogState]
+  );
+
+  const createUrlSelectHandler = useCallback(
+    (specificUrl: string) => () => {
+      onUrlSelect(specificUrl);
+      setDialogState(false);
+    },
+    [onUrlSelect, setDialogState]
+  );
+
+  const createDeleteHandler = useCallback(
+    (url: string) => (e: React.MouseEvent) => {
+      handleDelete(e, url);
+    },
+    [handleDelete]
+  );
 
   return (
     <Dialog onOpenChange={setDialogState} open={dialogState}>
       <DialogTrigger asChild>
         <Button
           className="h-7 w-7 rounded-full"
-          onClick={(e) => {
-            e.stopPropagation();
-          }}
+          onClick={handleTriggerClick}
           size="icon"
           variant="ghost"
         >
@@ -81,14 +117,8 @@ export default function ScrapeUrlDetails({
       </DialogTrigger>
       <DialogContent
         className="flex max-h-[80vh] flex-col gap-0 overflow-hidden rounded-3xl p-0"
-        onInteractOutside={(e) => {
-          setDialogState(true);
-          e.preventDefault();
-        }}
-        onPointerDownOutside={(e) => {
-          setDialogState(true);
-          e.preventDefault();
-        }}
+        onInteractOutside={handleInteractOutside}
+        onPointerDownOutside={handlePointerDownOutside}
         showCloseButton={false}
       >
         <DialogHeader className="flex-row items-center justify-between px-6 pt-6 pb-4">
@@ -123,10 +153,7 @@ export default function ScrapeUrlDetails({
                       : "hover:bg-accent/50"
                   )}
                   key={specificUrl}
-                  onClick={() => {
-                    onUrlSelect(specificUrl);
-                    setDialogState(false);
-                  }}
+                  onClick={createUrlSelectHandler(specificUrl)}
                 >
                   <FileText className="h-4 w-4 shrink-0 text-muted-foreground" />
                   <span className="scrollbar-none min-w-0 flex-1 overflow-x-auto whitespace-nowrap font-mono text-sm">
@@ -137,7 +164,7 @@ export default function ScrapeUrlDetails({
                       <Button
                         className="h-7 w-7 shrink-0 rounded-full"
                         disabled={deletingUrl === specificUrl}
-                        onClick={(e) => handleDelete(e, specificUrl)}
+                        onClick={createDeleteHandler(specificUrl)}
                         size="icon"
                         variant="ghost"
                       >

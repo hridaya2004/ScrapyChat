@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useCallback, useState } from "react";
+import { type ControllerRenderProps, useForm } from "react-hook-form";
 import z from "zod";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -51,16 +51,127 @@ const changePasswordSchema = z.object({
 
 export default function ChangePassword() {
   const passwordForm = useForm<z.infer<typeof changePasswordSchema>>({
-    resolver: zodResolver(changePasswordSchema),
     defaultValues: {
       currentPassword: "",
       newPassword: "",
       revokeOtherSessions: false,
     },
+    resolver: zodResolver(changePasswordSchema),
   });
 
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
+
+  type ChangePasswordValues = z.infer<typeof changePasswordSchema>;
+
+  const toggleCurrentPassword = useCallback(() => {
+    setShowCurrentPassword((prev) => !prev);
+  }, []);
+
+  const toggleNewPassword = useCallback(() => {
+    setShowNewPassword((prev) => !prev);
+  }, []);
+
+  const renderCurrentPasswordField = useCallback(
+    ({
+      field,
+    }: {
+      field: ControllerRenderProps<ChangePasswordValues, "currentPassword">;
+    }) => (
+      <FormItem className="w-fit">
+        <FormControl>
+          <InputGroup className="rounded-3xl">
+            <InputGroupInput
+              className="rounded-3xl"
+              placeholder="Old password"
+              type={showCurrentPassword ? "text" : "password"}
+              {...field}
+            />
+
+            <InputGroupAddon align="inline-end">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <InputGroupButton
+                    className="rounded-full"
+                    onClick={toggleCurrentPassword}
+                    size="icon-xs"
+                  >
+                    {showCurrentPassword ? <EyeOffIcon /> : <EyeIcon />}
+                  </InputGroupButton>
+                </TooltipTrigger>
+                <TooltipContent>
+                  {showCurrentPassword ? "Hide password" : "Show password"}
+                </TooltipContent>
+              </Tooltip>
+            </InputGroupAddon>
+          </InputGroup>
+        </FormControl>
+        <FormMessage />
+      </FormItem>
+    ),
+    [showCurrentPassword, toggleCurrentPassword]
+  );
+
+  const renderNewPasswordField = useCallback(
+    ({
+      field,
+    }: {
+      field: ControllerRenderProps<ChangePasswordValues, "newPassword">;
+    }) => (
+      <FormItem className="w-fit">
+        <FormControl>
+          <InputGroup className="w-fit rounded-3xl">
+            <InputGroupInput
+              className="rounded-3xl"
+              placeholder="New password"
+              type={showNewPassword ? "text" : "password"}
+              {...field}
+            />
+
+            <InputGroupAddon align="inline-end">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <InputGroupButton
+                    className="rounded-full"
+                    onClick={toggleNewPassword}
+                    size="icon-xs"
+                  >
+                    {showNewPassword ? <EyeOffIcon /> : <EyeIcon />}
+                  </InputGroupButton>
+                </TooltipTrigger>
+                <TooltipContent>
+                  {showNewPassword ? "Hide password" : "Show password"}
+                </TooltipContent>
+              </Tooltip>
+            </InputGroupAddon>
+          </InputGroup>
+        </FormControl>
+        <FormDescription className="text-balance">
+          Should contain at least 8 characters, including at least one uppercase
+          letter, lowercase letter, number, and special character.
+        </FormDescription>
+        <FormMessage />
+      </FormItem>
+    ),
+    [showNewPassword, toggleNewPassword]
+  );
+
+  const renderRevokeSessionsField = useCallback(
+    ({
+      field,
+    }: {
+      field: ControllerRenderProps<ChangePasswordValues, "revokeOtherSessions">;
+    }) => (
+      <FormItem className="flex w-fit flex-row-reverse items-center gap-2">
+        <FormLabel>Revoke other sessions</FormLabel>
+        <FormControl>
+          <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+        </FormControl>
+        <FormMessage />
+      </FormItem>
+    ),
+    []
+  );
 
   const onSubmit = async (values: z.infer<typeof changePasswordSchema>) => {
     try {
@@ -71,31 +182,31 @@ export default function ChangePassword() {
       if (error) {
         if (error.code === "INVALID_PASSWORD") {
           toast({
-            title: "Invalid current password",
             description: "Please enter your current password correctly.",
             status: "error",
+            title: "Invalid current password",
           });
         } else {
           toast({
-            title: "Failed to change password",
             description: "Please try again later.",
             status: "error",
+            title: "Failed to change password",
           });
         }
       }
 
       if (data) {
         toast({
-          title: "Password changed successfully",
           description: "Your password has been updated.",
           status: "success",
+          title: "Password changed successfully",
         });
       }
     } catch {
       toast({
-        title: "Failed to change password",
         description: "Please try again later.",
         status: "error",
+        title: "Failed to change password",
       });
     }
   };
@@ -114,107 +225,17 @@ export default function ChangePassword() {
             <FormField
               control={passwordForm.control}
               name="currentPassword"
-              render={({ field }) => (
-                <FormItem className="w-fit">
-                  <FormControl>
-                    <InputGroup className="rounded-3xl">
-                      <InputGroupInput
-                        className="rounded-3xl"
-                        placeholder="Old password"
-                        type={showCurrentPassword ? "text" : "password"}
-                        {...field}
-                      />
-
-                      <InputGroupAddon align="inline-end">
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <InputGroupButton
-                              className="rounded-full"
-                              onClick={() =>
-                                setShowCurrentPassword((prev) => !prev)
-                              }
-                              size="icon-xs"
-                            >
-                              {showCurrentPassword ? (
-                                <EyeOffIcon />
-                              ) : (
-                                <EyeIcon />
-                              )}
-                            </InputGroupButton>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            {showCurrentPassword
-                              ? "Hide password"
-                              : "Show password"}
-                          </TooltipContent>
-                        </Tooltip>
-                      </InputGroupAddon>
-                    </InputGroup>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+              render={renderCurrentPasswordField}
             />
             <FormField
               control={passwordForm.control}
               name="newPassword"
-              render={({ field }) => (
-                <FormItem className="w-fit">
-                  <FormControl>
-                    <InputGroup className="w-fit rounded-3xl">
-                      <InputGroupInput
-                        className="rounded-3xl"
-                        placeholder="New password"
-                        type={showNewPassword ? "text" : "password"}
-                        {...field}
-                      />
-
-                      <InputGroupAddon align="inline-end">
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <InputGroupButton
-                              className="rounded-full"
-                              onClick={() =>
-                                setShowNewPassword((prev) => !prev)
-                              }
-                              size="icon-xs"
-                            >
-                              {showNewPassword ? <EyeOffIcon /> : <EyeIcon />}
-                            </InputGroupButton>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            {showNewPassword
-                              ? "Hide password"
-                              : "Show password"}
-                          </TooltipContent>
-                        </Tooltip>
-                      </InputGroupAddon>
-                    </InputGroup>
-                  </FormControl>
-                  <FormDescription className="text-balance">
-                    Should contain at least 8 characters, including at least one
-                    uppercase letter, lowercase letter, number, and special
-                    character.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
+              render={renderNewPasswordField}
             />
             <FormField
               control={passwordForm.control}
               name="revokeOtherSessions"
-              render={({ field }) => (
-                <FormItem className="flex w-fit flex-row-reverse items-center gap-2">
-                  <FormLabel>Revoke other sessions</FormLabel>
-                  <FormControl>
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+              render={renderRevokeSessionsField}
             />
             <Field className="w-fit">
               <Button className="rounded-3xl" size="sm">

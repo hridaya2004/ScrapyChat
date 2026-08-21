@@ -1,4 +1,5 @@
 import { SettingsIcon, XIcon } from "lucide-react";
+import { useCallback } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useDialog } from "@/providers/dialog-context-provider";
 import { H4 } from "../typography";
@@ -38,11 +39,16 @@ export default function SettingsTrigger({
     onOpenChange(isOpen);
   };
 
+  const handleTriggerSelect = useCallback((e: Event) => {
+    e.preventDefault();
+  }, []);
+
+  const handleContentOpenAutoFocus = useCallback((e: Event) => {
+    e.preventDefault();
+  }, []);
+
   const trigger = (
-    <DropdownMenuItem
-      className="cursor-pointer"
-      onSelect={(e) => e.preventDefault()}
-    >
+    <DropdownMenuItem className="cursor-pointer" onSelect={handleTriggerSelect}>
       <SettingsIcon />
       <span>Settings</span>
     </DropdownMenuItem>
@@ -74,7 +80,7 @@ export default function SettingsTrigger({
       <DialogTrigger asChild>{trigger}</DialogTrigger>
       <DialogContent
         className="flex max-h-[85vh] flex-col gap-0 overflow-hidden p-0 max-md:min-h-[60vh] md:h-150 md:max-w-170 lg:max-w-200"
-        onOpenAutoFocus={(e) => e.preventDefault()}
+        onOpenAutoFocus={handleContentOpenAutoFocus}
         showCloseButton={isMobile}
       >
         <DialogHeader>

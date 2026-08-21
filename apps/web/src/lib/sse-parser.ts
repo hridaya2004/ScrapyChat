@@ -39,7 +39,9 @@ const streamSSEResponse = async (
   const decoder = new TextDecoder();
   let buffer = "";
 
+  // biome-ignore lint/suspicious/noUnnecessaryConditions: stream is read until the producer closes it
   while (true) {
+    // biome-ignore lint/performance/noAwaitInLoops: SSE chunks must be consumed sequentially
     const { value, done } = await reader.read();
 
     if (done) {

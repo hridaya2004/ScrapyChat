@@ -12,16 +12,16 @@ export default function LogOutButton() {
 
     if (data?.success) {
       toast({
-        title: "Signed out successfully.",
         status: "success",
+        title: "Signed out successfully.",
       });
       authClient.clearLastUsedLoginMethod();
       clearAuthState?.();
       redirect("/auth");
     } else {
       toast({
-        title: "Failed to sign out.",
         status: "error",
+        title: "Failed to sign out.",
       });
     }
   };

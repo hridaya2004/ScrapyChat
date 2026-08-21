@@ -8,24 +8,24 @@ import ProfileSettings from "./profile";
 
 const tabs = [
   {
-    label: "Profile",
     component: <ProfileSettings />,
+    label: "Profile",
   },
   {
-    label: "Preferences",
     component: <PreferencesSettings />,
+    label: "Preferences",
   },
   {
-    label: "Model Providers",
     component: <BYOKSection />,
+    label: "Model Providers",
   },
   {
-    label: "About",
     component: <AboutSection />,
+    label: "About",
   },
   {
-    label: "Info",
     component: <InfoSection />,
+    label: "Info",
   },
 ];
 

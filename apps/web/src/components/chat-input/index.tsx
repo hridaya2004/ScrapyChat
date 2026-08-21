@@ -49,9 +49,13 @@ export function ChatInput({
     return "Select a website first...";
   }, [url]);
 
-  const clearContextUrl = () => {
+  const clearContextUrl = useCallback(() => {
     clearUrl();
-  };
+  }, [clearUrl]);
+
+  const handleContainerClick = useCallback(() => {
+    textareaRef.current?.focus();
+  }, []);
 
   const handleSend = useCallback(() => {
     if (status === "submitted") {
@@ -62,7 +66,6 @@ export function ChatInput({
     onSend();
   }, [onSend, status, stop]);
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: ignore
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
       if (e.key === "Enter" && status === "submitted") {
@@ -87,7 +90,7 @@ export function ChatInput({
       {/** biome-ignore lint/a11y: ignore */}
       <div
         className="relative order-2 px-2 pb-3 sm:pb-4 md:order-1"
-        onClick={() => textareaRef.current?.focus()}
+        onClick={handleContainerClick}
       >
         <PromptInput
           className="relative z-10 overflow-hidden bg-popover p-0 shadow-xs backdrop-blur-xl"

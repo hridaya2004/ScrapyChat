@@ -26,7 +26,7 @@ export const useChatCore = () => {
   const { trigger } = useHaptics();
 
   const sendMessage = async ({
-    input,
+    input: userInput,
     queryUrl,
     providerId,
     modelName,
@@ -37,8 +37,8 @@ export const useChatCore = () => {
       setMessages([
         ...messages,
         {
-          text: input,
           role: "user",
+          text: userInput,
         },
       ]);
       setStatus("submitted");
@@ -46,22 +46,22 @@ export const useChatCore = () => {
       abortControllerRef.current = new AbortController();
 
       const response = await fetch(`${apiConfig.baseUrl}/chat/new`, {
+        body: JSON.stringify({
+          llm: {
+            api_key: apiKey,
+            model: modelName,
+            provider: providerId,
+          },
+          match_subpaths: superUrl,
+          query: input,
+          url: queryUrl,
+        }),
         credentials: "include",
-        method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          url: queryUrl,
-          query: input,
-          llm: {
-            provider: providerId,
-            model: modelName,
-            api_key: apiKey,
-          },
-          match_subpaths: superUrl,
-        }),
+        method: "POST",
         signal: abortControllerRef.current.signal,
       });
 
@@ -72,8 +72,8 @@ export const useChatCore = () => {
 
         if (parsed.error) {
           toast({
-            title: "Failed to parse response message.",
             status: "error",
+            title: "Failed to parse response message.",
           });
         }
 
@@ -82,26 +82,26 @@ export const useChatCore = () => {
           setMessages((prev) => [
             ...prev,
             {
-              text: parsed.data.response,
-              role: "assistant",
               references: parsed.data.references,
+              role: "assistant",
+              text: parsed.data.response,
             },
           ]);
           setStatus("ready");
         }
       } else {
         toast({
-          title: "Failed to send message",
           description: "Unable to process your request. Please try again.",
           status: "error",
+          title: "Failed to send message",
         });
       }
     } catch (err) {
       console.error(err);
       toast({
-        title: "Error",
         description: "An error occurred while sending your message.",
         status: "error",
+        title: "Error",
       });
     } finally {
       setStatus("ready");
@@ -110,8 +110,9 @@ export const useChatCore = () => {
   };
 
   const stop = () => {
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
+    const controller = abortControllerRef.current;
+    if (controller !== null) {
+      controller.abort();
       abortControllerRef.current = null;
       setStatus("ready");
     }
@@ -119,12 +120,12 @@ export const useChatCore = () => {
 
   return {
     input,
-    setInput,
     messages,
-    setMessages,
-    status,
-    setStatus,
     sendMessage,
+    setInput,
+    setMessages,
+    setStatus,
+    status,
     stop,
   };
 };

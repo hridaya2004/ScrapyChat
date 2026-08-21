@@ -4,16 +4,16 @@ import { siteConfig } from "@/config/metadata";
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
     {
-      url: siteConfig.url,
-      lastModified: new Date(),
       changeFrequency: "weekly",
+      lastModified: new Date(),
       priority: 1,
+      url: siteConfig.url,
     },
     {
-      url: `${siteConfig.url}/auth`,
-      lastModified: new Date(),
       changeFrequency: "monthly",
+      lastModified: new Date(),
       priority: 0.5,
+      url: `${siteConfig.url}/auth`,
     },
   ];
 }

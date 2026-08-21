@@ -1,8 +1,8 @@
 import z from "zod";
 
 const scrapeNewSchema = z.object({
-  url: z.url(),
   deep_search: z.boolean(),
+  url: z.url(),
 });
 
 type ScrapeNew = z.infer<typeof scrapeNewSchema>;

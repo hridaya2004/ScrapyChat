@@ -14,11 +14,11 @@ const getScrapeList = async (token: string): Promise<ScrapeList> => {
 
   try {
     const response = await fetch(`${apiConfig.baseUrl}/scrape/list`, {
-      method: "GET",
       credentials: "include",
       headers: {
         Authorization: `Bearer ${token}`,
       },
+      method: "GET",
     });
 
     if (response.ok) {
@@ -28,9 +28,9 @@ const getScrapeList = async (token: string): Promise<ScrapeList> => {
 
       if (parsed.error) {
         toast({
-          title: "Error",
           description: "Failed to parse scraped websites.",
           status: "error",
+          title: "Error",
         });
 
         console.error(parsed.error);
@@ -44,9 +44,9 @@ const getScrapeList = async (token: string): Promise<ScrapeList> => {
       }
     } else {
       toast({
-        title: "API failed",
-        status: "error",
         description: "Failed to get scraped list data from API.",
+        status: "error",
+        title: "API failed",
       });
     }
   } catch {
@@ -74,17 +74,16 @@ const postScrapeNewUrl = async (
   try {
     callback?.(false, true);
     const response = await fetch(`${apiConfig.baseUrl}/scrape/new`, {
-      method: "POST",
+      body: JSON.stringify({
+        deep_search: isDeepSearchEnabled,
+        url: scrapeUrl,
+      }),
       credentials: "include",
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
-
-      body: JSON.stringify({
-        url: scrapeUrl,
-        deep_search: isDeepSearchEnabled,
-      }),
+      method: "POST",
     });
 
     if (!response.ok) {
@@ -93,22 +92,22 @@ const postScrapeNewUrl = async (
         try {
           const errorData = JSON.parse(await response.text());
           toast({
-            title: "Failed to scrape given URL",
             description: errorData.detail || "URL already exists",
             status: "error",
+            title: "Failed to scrape given URL",
           });
         } catch {
           toast({
-            title: "Failed to scrape given URL",
             description: "URL already exists",
             status: "error",
+            title: "Failed to scrape given URL",
           });
         }
       } else {
         toast({
-          title: "Error",
           description: "Failed to start scraping.",
           status: "error",
+          title: "Error",
         });
       }
 
@@ -118,19 +117,18 @@ const postScrapeNewUrl = async (
 
     if (response.ok) {
       toast({
-        title: "Success",
         description: "Scraping started.",
         status: "success",
+        title: "Success",
       });
       callback?.(true, false);
-      return;
     }
   } catch (err) {
     console.error(err);
     toast({
-      title: "Error",
       description: "An error occurred while starting the scrape.",
       status: "error",
+      title: "Error",
     });
     callback?.(false, false);
   }
@@ -146,11 +144,11 @@ const getScrapeProgress = async (
 
   try {
     const response = await fetch(`${apiConfig.baseUrl}/scrape/progress`, {
-      method: "GET",
       credentials: "include",
       headers: {
         Authorization: `Bearer ${token}`,
       },
+      method: "GET",
     });
 
     if (!response.ok) {
@@ -184,9 +182,9 @@ const deleteScrapeUrl = async (
 
   if (parsed.error) {
     toast({
-      title: "Invalid URL",
       description: "The URL provided is not valid.",
       status: "error",
+      title: "Invalid URL",
     });
     callback?.(false, false);
     return;
@@ -195,37 +193,37 @@ const deleteScrapeUrl = async (
   try {
     callback?.(false, true);
     const response = await fetch(`${apiConfig.baseUrl}/scrape/remove`, {
-      method: "DELETE",
+      body: JSON.stringify({ url: parsed.data.url }),
       credentials: "include",
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ url: parsed.data.url }),
+      method: "DELETE",
     });
 
     if (response.ok) {
       toast({
-        title: "Deleted",
         description: "Scraped URL has been removed.",
         status: "success",
+        title: "Deleted",
       });
       callback?.(true, false);
       return;
     }
 
     toast({
-      title: "Error",
       description: "Failed to delete the scraped URL.",
       status: "error",
+      title: "Error",
     });
     callback?.(false, false);
   } catch (err) {
     console.error(err);
     toast({
-      title: "Error",
       description: "An error occurred while deleting the scraped URL.",
       status: "error",
+      title: "Error",
     });
     callback?.(false, false);
   }
@@ -243,35 +241,35 @@ const deleteAllScrapeUrls = async (
   try {
     callback?.(false, true);
     const response = await fetch(`${apiConfig.baseUrl}/scrape/remove-all`, {
-      method: "DELETE",
       credentials: "include",
       headers: {
         Authorization: `Bearer ${token}`,
       },
+      method: "DELETE",
     });
 
     if (response.ok) {
       toast({
-        title: "Deleted",
         description: "All scraped URLs have been removed.",
         status: "success",
+        title: "Deleted",
       });
       callback?.(true, false);
       return;
     }
 
     toast({
-      title: "Error",
       description: "Failed to delete all scraped URLs.",
       status: "error",
+      title: "Error",
     });
     callback?.(false, false);
   } catch (err) {
     console.error(err);
     toast({
-      title: "Error",
       description: "An error occurred while deleting all scraped URLs.",
       status: "error",
+      title: "Error",
     });
     callback?.(false, false);
   }

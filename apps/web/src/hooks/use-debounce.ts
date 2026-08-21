@@ -13,7 +13,8 @@ export function useDebounce<T extends (...args: unknown[]) => unknown>(
 
   const debouncedFn = useCallback(
     (...args: Parameters<T>) => {
-      if (timeoutRef.current) {
+      const existingTimeout = timeoutRef.current;
+      if (existingTimeout !== null) {
         return;
       }
 

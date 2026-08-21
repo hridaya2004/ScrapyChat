@@ -6,18 +6,21 @@ import {
   PeriodicExportingMetricReader,
 } from "@opentelemetry/sdk-metrics";
 import { NodeSDK } from "@opentelemetry/sdk-node";
-import { ConsoleSpanExporter, SimpleSpanProcessor } from "@opentelemetry/sdk-trace-node";
+import {
+  ConsoleSpanExporter,
+  SimpleSpanProcessor,
+} from "@opentelemetry/sdk-trace-node";
 
 const useOtlp = !!process.env.OTEL_EXPORTER_OTLP_ENDPOINT;
 
 const sdk = new NodeSDK({
-  serviceName: process.env.OTEL_SERVICE_NAME || "scrapychat-auth",
-  traceExporter: useOtlp ? new OTLPTraceExporter() : new ConsoleSpanExporter(),
+  instrumentations: [getNodeAutoInstrumentations()],
   metricReader: new PeriodicExportingMetricReader({
     exporter: useOtlp ? new OTLPMetricExporter() : new ConsoleMetricExporter(),
   }),
-  instrumentations: [getNodeAutoInstrumentations()],
-  spanProcessors: [new SimpleSpanProcessor(new ConsoleSpanExporter())]
+  serviceName: process.env.OTEL_SERVICE_NAME || "scrapychat-auth",
+  spanProcessors: [new SimpleSpanProcessor(new ConsoleSpanExporter())],
+  traceExporter: useOtlp ? new OTLPTraceExporter() : new ConsoleSpanExporter(),
 });
 
 sdk.start();
