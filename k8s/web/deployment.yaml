@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: scrapychat-web
-          image: ghcr.io/hridaya2004/scrapychat/scrapychat-web:1.20-feaa57f
+          image: ghcr.io/hridaya2004/scrapychat/scrapychat-web:1.21-ffd96fa
           ports:
             - containerPort: 3000
           env:
