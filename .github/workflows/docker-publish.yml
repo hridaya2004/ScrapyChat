@@ -2,7 +2,7 @@ name: Publish Docker Images
 
 on:
   push:
-    tags: ['v*']
+    tags: ["v*"]
   workflow_dispatch:
 
 env:
@@ -13,70 +13,64 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        service:
+        include:
           - name: web
             context: .
-            dockerfile: apps/web/Dockerfile
+            file: apps/web/Dockerfile
           - name: auth
             context: .
-            dockerfile: apps/auth/Dockerfile
+            file: apps/auth/Dockerfile
           - name: migrate
             context: .
-            dockerfile: apps/auth/Dockerfile.migrate
+            file: apps/auth/Dockerfile.migrate
           - name: backend
             context: .
-            dockerfile: apps/backend/Dockerfile
+            file: apps/backend/Dockerfile
 
-    runs-on: ubuntu-latest
     permissions:
       contents: read
+      id-token: write
       packages: write
 
     steps:
-      - uses: actions/checkout@v6
-
-      - name: Log in to the Container registry
-        uses: docker/login-action@v4
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
       - name: Extract version from tag
         id: version
-        run: echo "value=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
+        run: echo "value=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
       - name: Compute image tag
         id: image_tag
-        run: echo "value=${{ steps.version.outputs.value }}-${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@v6
+        run: echo "value=${{ steps.version.outputs.value }}-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+
+      - name: Build and push Docker image
+        uses: docker/github-builder/.github/workflows/build.yml@v1
         with:
-          images: ${{ env.REGISTRY }}/${{ github.repository }}/scrapychat-${{ matrix.service.name }}
-          tags: |
+          context: ${{ matrix.context }}
+          file: ${{ matrix.file }}
+          job-name-prefix: ${{ matrix.name }}
+          output: image
+          push: true
+          platforms: linux/amd64,linux/arm64
+          build-args: APP_VERSION=${{ steps.version.outputs.value }}
+          cache: true
+          cache-scope: ${{ matrix.name }}
+          sbom: true
+          set-meta-labels: true
+          set-meta-annotations: true
+          meta-images: ${{ env.REGISTRY }}/${{ github.repository }}/scrapychat-${{ matrix.name }}
+          meta-tags: |
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=match,pattern=^v?(.*)$,group=1
             type=sha,format=short
             type=raw,value=${{ steps.image_tag.outputs.value }}
             type=raw,value=latest,enable={{is_default_branch}}
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v4
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v7
-        with:
-          context: ${{ matrix.service.context }}
-          file: ${{ matrix.service.dockerfile }}
-          push: true
-          build-args: |
-            APP_VERSION=${{ steps.version.outputs.value }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha,scope=${{ matrix.service.name }}
-          cache-to: type=gha,mode=max,scope=${{ matrix.service.name }}
+        secrets:
+          registry-auths: |
+            - registry: ghcr.io
+              username: ${{ github.actor }}
+              password: ${{ secrets.GITHUB_TOKEN }}
 
   update-manifests:
+    if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     needs: build-and-push
     permissions:
@@ -89,11 +83,11 @@ jobs:
 
       - name: Extract version from tag
         id: version
-        run: echo "value=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
+        run: echo "value=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
 
       - name: Compute image tag
         id: image_tag
-        run: echo "value=${{ steps.version.outputs.value }}-${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+        run: echo "value=${{ steps.version.outputs.value }}-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
 
       - name: Update image tags
         run: |
@@ -106,5 +100,5 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v7
         with:
           commit_author: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
-          commit_message: 'k8s: Bump images to ${{ steps.image_tag.outputs.value }} [no ci]'
-          file_pattern: 'k8s/**/deployment.yaml'
+          commit_message: "k8s: Bump images to ${{ steps.image_tag.outputs.value }} [no ci]"
+          file_pattern: "k8s/**/deployment.yaml"
