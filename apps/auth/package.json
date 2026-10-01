@@ -6,7 +6,7 @@
   "scripts": {
     "build": "bun build --compile --minify-whitespace --minify-syntax --outfile=server ./src/index.ts",
     "dev": "bun --hot run ./src/server.ts",
-    "migrate": "bunx --bun auth migrate --yes --config ./src/lib/auth.ts"
+    "migrate": "bun run ./src/db/repair-schema.ts && bunx --bun auth migrate --yes --config ./src/lib/auth.ts"
   },
   "dependencies": {
     "@elysiajs/cors": "^1.4.2",
