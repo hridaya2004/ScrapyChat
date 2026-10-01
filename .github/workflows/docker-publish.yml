@@ -36,6 +36,7 @@ jobs:
             dockerfile: apps/auth/Dockerfile.migrate
           - name: backend
             dockerfile: apps/backend/Dockerfile
+            build-args: BUILDKIT_CONTEXT_KEEP_GIT_DIR=1
     uses: docker/github-builder/.github/workflows/build.yml@v1
     permissions:
       contents: read
@@ -46,6 +47,7 @@ jobs:
       file: ${{ matrix.service.dockerfile }}
       build-args: |
         APP_VERSION=${{ needs.prepare.outputs.version }}
+        ${{ matrix.service.build-args }}
       output: image
       push: true
       platforms: linux/amd64
