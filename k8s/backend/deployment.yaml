@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: scrapychat-backend
-          image: ghcr.io/hridaya2004/scrapychat/scrapychat-backend:1.25-161721f
+          image: ghcr.io/hridaya2004/scrapychat/scrapychat-backend:1.26-81d5158
           ports:
             - containerPort: 8080
           env:
